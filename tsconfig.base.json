@@ -1,0 +1,40 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "rootDir": ".",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "ES2022",
+    "module": "ESNext",
+    "lib": ["ES2022", "dom"],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "@myapp/shared/types": ["libs/shared/types/src/index.ts"],
+      "@myapp/shared/utils": ["libs/shared/utils/src/index.ts"],
+      "@myapp/backend/logger": ["libs/backend/logger/src/index.ts"],
+      "@myapp/backend/metrics": ["libs/backend/metrics/src/index.ts"],
+      "@myapp/backend/security": ["libs/backend/security/src/index.ts"],
+      "@myapp/backend/database": ["libs/backend/database/src/index.ts"],
+      "@myapp/frontend/ui-components": [
+        "libs/frontend/ui-components/src/index.ts"
+      ],
+      "@myapp/frontend/api-client": ["libs/frontend/api-client/src/index.ts"],
+      "@myapp/frontend/stores": ["libs/frontend/stores/src/index.ts"],
+      "@myapp/frontend/utils": ["libs/frontend/utils/src/index.ts"]
+    }
+  },
+  "exclude": ["node_modules", "tmp"]
+}

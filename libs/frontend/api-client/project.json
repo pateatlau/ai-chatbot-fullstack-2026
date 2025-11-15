@@ -1,0 +1,19 @@
+{
+  "name": "api-client",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/frontend/api-client/src",
+  "projectType": "library",
+  "tags": ["type:frontend"],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/frontend/api-client",
+        "main": "libs/frontend/api-client/src/index.ts",
+        "tsConfig": "libs/frontend/api-client/tsconfig.lib.json",
+        "assets": ["libs/frontend/api-client/*.md"]
+      }
+    }
+  }
+}

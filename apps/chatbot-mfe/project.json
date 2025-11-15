@@ -1,0 +1,9 @@
+{
+  "name": "chatbot-mfe",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/chatbot-mfe/src",
+  "projectType": "application",
+  "tags": ["type:frontend", "scope:chatbot"],
+  "// targets": "to see all targets run: nx show project chatbot-mfe --web",
+  "targets": {}
+}

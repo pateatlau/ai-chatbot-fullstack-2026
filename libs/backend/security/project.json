@@ -1,0 +1,20 @@
+{
+  "name": "security",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/backend/security/src",
+  "projectType": "library",
+  "tags": ["type:backend"],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/backend/security",
+        "tsConfig": "libs/backend/security/tsconfig.lib.json",
+        "packageJson": "libs/backend/security/package.json",
+        "main": "libs/backend/security/src/index.ts",
+        "assets": ["libs/backend/security/*.md"]
+      }
+    }
+  }
+}
