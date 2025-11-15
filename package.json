@@ -10,6 +10,7 @@
     "dev:admin": "nx serve admin-service --inspect=false",
     "dev:frontend": "nx run-many --target=serve --projects=tag:type:frontend --parallel=5",
     "dev:shell": "nx serve shell",
+    "dev:shell:mock": "VITE_USE_MOCKS=true nx serve shell",
     "dev:auth-mfe": "nx serve auth-mfe",
     "dev:chatbot-mfe": "nx serve chatbot-mfe",
     "dev:admin-mfe": "nx serve admin-mfe",
@@ -129,5 +130,10 @@
     "uuid": "^13.0.0",
     "zod": "^4.1.12",
     "zustand": "^5.0.8"
+  },
+  "msw": {
+    "workerDirectory": [
+      "apps/shell/public"
+    ]
   }
 }

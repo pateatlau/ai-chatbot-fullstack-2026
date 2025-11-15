@@ -1,16 +1,16 @@
 import { Outlet, Link, useNavigate } from 'react-router-dom';
-import { useAuthStore, useToastStore } from '@myapp/frontend/stores';
+import { useAuth, useToast } from '@ai-chatbot/hooks';
 import { Button } from '@myapp/frontend/ui-components';
 
 export function DashboardLayout() {
-  const { user, clearAuth } = useAuthStore();
-  const { addToast } = useToastStore();
+  const { user, logout, hasRole } = useAuth();
+  const toast = useToast();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    clearAuth();
-    addToast('Logged out successfully', 'success');
-    navigate('/auth/login');
+  const handleLogout = async () => {
+    await logout();
+    toast.success('Logged out successfully');
+    navigate('/login');
   };
 
   return (
@@ -45,7 +45,7 @@ export function DashboardLayout() {
                 >
                   Profile
                 </Link>
-                {user?.role === 'ADMIN' && (
+                {hasRole('ADMIN') && (
                   <Link
                     to="/admin"
                     className="text-gray-600 hover:text-gray-900 transition-colors"

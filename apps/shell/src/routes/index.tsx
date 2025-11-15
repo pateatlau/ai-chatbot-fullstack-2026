@@ -1,18 +1,33 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { createBrowserRouter } from 'react-router-dom';
 import { ProtectedRoute } from '../components/ProtectedRoute';
 import { PublicRoute } from '../components/PublicRoute';
 import { DashboardLayout } from '../layouts/DashboardLayout';
+
+// Auth pages
 import { LoginPage } from '../pages/LoginPage';
 import { RegisterPage } from '../pages/RegisterPage';
 
-// Placeholder pages
-const DashboardPage = () => (
-  <div>
-    <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
-    <p className="text-gray-600">Welcome to your dashboard!</p>
-  </div>
-);
+// Core pages
+import { HomePage } from '../pages/HomePage';
+import { DashboardPage } from '../pages/DashboardPage';
+import { NotFoundPage } from '../pages/NotFoundPage';
 
+// Profile pages
+import {
+  ProfilePage,
+  EditProfilePage,
+  SettingsPage,
+  SecurityPage,
+} from '../pages/profile';
+
+// Admin pages
+import {
+  AdminDashboardPage,
+  UserListPage,
+  UserDetailPage,
+} from '../pages/admin';
+
+// Placeholder for Chatbot MFE (to be replaced with actual MFE)
 const ChatbotPage = () => (
   <div>
     <h1 className="text-2xl font-bold mb-4">Chatbot</h1>
@@ -20,21 +35,14 @@ const ChatbotPage = () => (
   </div>
 );
 
-const ProfilePage = () => (
-  <div>
-    <h1 className="text-2xl font-bold mb-4">Profile</h1>
-    <p className="text-gray-600">Profile MFE will be loaded here.</p>
-  </div>
-);
-
-const AdminPage = () => (
-  <div>
-    <h1 className="text-2xl font-bold mb-4">Admin</h1>
-    <p className="text-gray-600">Admin MFE will be loaded here.</p>
-  </div>
-);
-
 export const router = createBrowserRouter([
+  // Public home page
+  {
+    path: '/',
+    index: true,
+    element: <HomePage />,
+  },
+  // Auth routes
   {
     path: '/login',
     element: (
@@ -51,6 +59,7 @@ export const router = createBrowserRouter([
       </PublicRoute>
     ),
   },
+  // Protected routes with DashboardLayout
   {
     path: '/',
     element: (
@@ -59,26 +68,51 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
     children: [
-      {
-        index: true,
-        element: <Navigate to="/dashboard" replace />,
-      },
+      // Dashboard
       {
         path: 'dashboard',
         element: <DashboardPage />,
       },
+      // Chatbot (placeholder for MFE)
       {
         path: 'chatbot',
         element: <ChatbotPage />,
       },
+      // Profile routes
       {
         path: 'profile',
         element: <ProfilePage />,
       },
       {
+        path: 'profile/edit',
+        element: <EditProfilePage />,
+      },
+      {
+        path: 'profile/settings',
+        element: <SettingsPage />,
+      },
+      {
+        path: 'profile/security',
+        element: <SecurityPage />,
+      },
+      // Admin routes
+      {
         path: 'admin',
-        element: <AdminPage />,
+        element: <AdminDashboardPage />,
+      },
+      {
+        path: 'admin/users',
+        element: <UserListPage />,
+      },
+      {
+        path: 'admin/users/:userId',
+        element: <UserDetailPage />,
       },
     ],
+  },
+  // 404 catch-all route
+  {
+    path: '*',
+    element: <NotFoundPage />,
   },
 ]);

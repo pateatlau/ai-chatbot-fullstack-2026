@@ -1,0 +1,19 @@
+{
+  "name": "mocks",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/frontend/mocks/src",
+  "projectType": "library",
+  "tags": ["type:frontend"],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/frontend/mocks",
+        "main": "libs/frontend/mocks/src/index.ts",
+        "tsConfig": "libs/frontend/mocks/tsconfig.lib.json",
+        "assets": ["libs/frontend/mocks/*.md"]
+      }
+    }
+  }
+}
