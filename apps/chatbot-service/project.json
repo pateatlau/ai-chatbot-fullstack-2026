@@ -26,7 +26,14 @@
         }
       },
       "configurations": {
-        "development": {},
+        "development": {
+          "esbuildOptions": {
+            "sourcemap": true,
+            "outExtension": {
+              ".js": ".js"
+            }
+          }
+        },
         "production": {
           "esbuildOptions": {
             "sourcemap": false,
@@ -65,13 +72,12 @@
       "executor": "nx:noop"
     },
     "serve": {
-      "continuous": true,
       "executor": "@nx/js:node",
       "defaultConfiguration": "development",
       "dependsOn": ["build"],
       "options": {
         "buildTarget": "chatbot-service:build",
-        "runBuildTargetDependencies": false
+        "watch": true
       },
       "configurations": {
         "development": {
