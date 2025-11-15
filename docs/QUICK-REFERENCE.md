@@ -1,4 +1,4 @@
-# 🚀 Quick Reference Card
+# Quick Reference Card
 
 ## Essential Commands
 
@@ -167,4 +167,4 @@ npx prisma migrate reset
 
 ---
 
-**Keep this card handy for quick reference!** 📌
+**Keep this card handy for quick reference!**

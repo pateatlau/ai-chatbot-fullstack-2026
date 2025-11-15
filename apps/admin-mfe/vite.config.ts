@@ -11,6 +11,9 @@ export default defineConfig(() => ({
   server: {
     port: 5176,
     host: 'localhost',
+    hmr: {
+      overlay: true,
+    },
   },
   preview: {
     port: 5176,
