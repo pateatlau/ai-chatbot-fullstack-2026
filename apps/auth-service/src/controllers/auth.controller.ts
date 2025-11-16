@@ -14,8 +14,14 @@ export class AuthController {
       // Validate input
       const validatedData = CreateUserSchema.parse(req.body);
 
+      // WORKAROUND: Manually add role from request body since Zod is stripping it
+      const finalData = {
+        ...validatedData,
+        role: req.body.role || 'USER',
+      };
+
       // Register user
-      const result = await authService.register(validatedData);
+      const result = await authService.register(finalData);
 
       res.status(201).json(result);
     } catch (error) {
@@ -56,8 +62,15 @@ export class AuthController {
 
   async logout(req: Request, res: Response) {
     try {
-      // Validate input
+      // Get refresh token from body
       const validatedData = RefreshTokenSchema.parse(req.body);
+
+      // Get access token from header if available
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        const accessToken = authHeader.substring(7);
+        await authService.blacklistAccessToken(accessToken);
+      }
 
       // Logout user
       const result = await authService.logout(validatedData.refreshToken);
@@ -108,6 +121,89 @@ export class AuthController {
       if (error instanceof Error) {
         if (error.message === 'User not found') {
           return res.status(404).json({ error: error.message });
+        }
+        return res.status(400).json({ error: error.message });
+      }
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+
+  async requestPasswordReset(req: Request, res: Response) {
+    try {
+      const { email } = req.body;
+
+      if (!email || typeof email !== 'string') {
+        return res.status(400).json({ error: 'Email is required' });
+      }
+
+      // Basic email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({ error: 'Invalid email format' });
+      }
+
+      const result = await authService.requestPasswordReset(email);
+
+      res.status(200).json(result);
+    } catch (error) {
+      if (error instanceof Error) {
+        return res.status(400).json({ error: error.message });
+      }
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+
+  async resetPassword(req: Request, res: Response) {
+    try {
+      const { token } = req.params;
+      const { password } = req.body;
+
+      if (!token) {
+        return res.status(400).json({ error: 'Reset token is required' });
+      }
+
+      if (!password || typeof password !== 'string') {
+        return res.status(400).json({ error: 'New password is required' });
+      }
+
+      // Validate password strength
+      if (password.length < 8) {
+        return res
+          .status(400)
+          .json({ error: 'Password must be at least 8 characters long' });
+      }
+
+      if (!/[A-Z]/.test(password)) {
+        return res.status(400).json({
+          error: 'Password must contain at least one uppercase letter',
+        });
+      }
+
+      if (!/[a-z]/.test(password)) {
+        return res.status(400).json({
+          error: 'Password must contain at least one lowercase letter',
+        });
+      }
+
+      if (!/[0-9]/.test(password)) {
+        return res
+          .status(400)
+          .json({ error: 'Password must contain at least one number' });
+      }
+
+      if (!/[^A-Za-z0-9]/.test(password)) {
+        return res.status(400).json({
+          error: 'Password must contain at least one special character',
+        });
+      }
+
+      const result = await authService.resetPassword(token, password);
+
+      res.status(200).json(result);
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.message === 'Invalid or expired reset token') {
+          return res.status(400).json({ error: error.message });
         }
         return res.status(400).json({ error: error.message });
       }

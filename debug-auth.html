@@ -1,0 +1,286 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Auth Debug - Chatbot MFE</title>
+    <style>
+      body {
+        font-family: monospace;
+        padding: 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      .section {
+        margin: 20px 0;
+        padding: 15px;
+        background: #f5f5f5;
+        border-radius: 5px;
+      }
+      .error {
+        color: red;
+      }
+      .success {
+        color: green;
+      }
+      .warning {
+        color: orange;
+      }
+      pre {
+        background: #fff;
+        padding: 10px;
+        border: 1px solid #ddd;
+        overflow-x: auto;
+      }
+      button {
+        margin: 5px;
+        padding: 10px 20px;
+        cursor: pointer;
+      }
+      .token-display {
+        word-break: break-all;
+        background: #fff;
+        padding: 10px;
+        border: 1px solid #ddd;
+        margin: 10px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🔍 Authentication Debug Tool</h1>
+
+    <div class="section">
+      <h2>📦 LocalStorage State</h2>
+      <div id="localStorage-state"></div>
+    </div>
+
+    <div class="section">
+      <h2>🔐 Token Details</h2>
+      <div id="token-details"></div>
+    </div>
+
+    <div class="section">
+      <h2>🧪 API Test</h2>
+      <button onclick="testConversationsAPI()">
+        Test GET /chat/conversations
+      </button>
+      <button onclick="testAuthAPI()">Test Auth Status</button>
+      <button onclick="clearTokens()">Clear All Tokens</button>
+      <div id="api-results"></div>
+    </div>
+
+    <div class="section">
+      <h2>📝 Instructions</h2>
+      <ol>
+        <li>Open this file while logged into your app</li>
+        <li>Check the localStorage state above</li>
+        <li>Verify token format and expiration</li>
+        <li>Test API calls to see actual server response</li>
+      </ol>
+    </div>
+
+    <script>
+      // Display localStorage state
+      function displayLocalStorage() {
+        const container = document.getElementById('localStorage-state');
+        const keys = ['access_token', 'refresh_token', 'auth-storage'];
+
+        let html =
+          '<table border="1" style="width:100%; border-collapse: collapse;">';
+        html += '<tr><th>Key</th><th>Value</th></tr>';
+
+        keys.forEach((key) => {
+          const value = localStorage.getItem(key);
+          if (value) {
+            const displayValue =
+              value.length > 100 ? value.substring(0, 100) + '...' : value;
+            html += `<tr><td><strong>${key}</strong></td><td class="token-display">${displayValue}</td></tr>`;
+          } else {
+            html += `<tr><td><strong>${key}</strong></td><td class="warning">NOT FOUND</td></tr>`;
+          }
+        });
+
+        html += '</table>';
+        container.innerHTML = html;
+      }
+
+      // Decode JWT token
+      function decodeJWT(token) {
+        try {
+          const base64Url = token.split('.')[1];
+          const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+          const jsonPayload = decodeURIComponent(
+            atob(base64)
+              .split('')
+              .map((c) => {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+              })
+              .join('')
+          );
+          return JSON.parse(jsonPayload);
+        } catch (e) {
+          return null;
+        }
+      }
+
+      // Display token details
+      function displayTokenDetails() {
+        const container = document.getElementById('token-details');
+        const accessToken = localStorage.getItem('access_token');
+        const authStorage = localStorage.getItem('auth-storage');
+
+        let html = '';
+
+        // Check access_token key
+        if (accessToken) {
+          html += '<h3>✅ access_token (standalone key)</h3>';
+          const decoded = decodeJWT(accessToken);
+          if (decoded) {
+            const exp = new Date(decoded.exp * 1000);
+            const now = new Date();
+            const isExpired = exp < now;
+
+            html += '<pre>' + JSON.stringify(decoded, null, 2) + '</pre>';
+            html += `<div class="${isExpired ? 'error' : 'success'}">`;
+            html += `Expires: ${exp.toLocaleString()} (${isExpired ? 'EXPIRED' : 'Valid'})</div>`;
+          } else {
+            html += '<div class="error">Failed to decode token</div>';
+          }
+        } else {
+          html += '<div class="warning">⚠️ No access_token key found</div>';
+        }
+
+        // Check auth-storage (Zustand store)
+        if (authStorage) {
+          html += '<h3>📦 auth-storage (Zustand persist)</h3>';
+          try {
+            const parsed = JSON.parse(authStorage);
+            html += '<pre>' + JSON.stringify(parsed, null, 2) + '</pre>';
+
+            if (parsed.state && parsed.state.accessToken) {
+              html +=
+                '<div class="success">✅ accessToken found in Zustand store</div>';
+              const decoded = decodeJWT(parsed.state.accessToken);
+              if (decoded) {
+                const exp = new Date(decoded.exp * 1000);
+                const now = new Date();
+                const isExpired = exp < now;
+                html += `<div class="${isExpired ? 'error' : 'success'}">`;
+                html += `Zustand token expires: ${exp.toLocaleString()} (${isExpired ? 'EXPIRED' : 'Valid'})</div>`;
+              }
+            } else {
+              html +=
+                '<div class="warning">⚠️ No accessToken in Zustand store</div>';
+            }
+          } catch (e) {
+            html +=
+              '<div class="error">Failed to parse auth-storage: ' +
+              e.message +
+              '</div>';
+          }
+        } else {
+          html += '<div class="warning">⚠️ No auth-storage found</div>';
+        }
+
+        container.innerHTML = html;
+      }
+
+      // Test conversations API
+      async function testConversationsAPI() {
+        const container = document.getElementById('api-results');
+        container.innerHTML = '<div class="warning">Testing...</div>';
+
+        const accessToken = localStorage.getItem('access_token');
+
+        if (!accessToken) {
+          container.innerHTML =
+            '<div class="error">❌ No access_token found in localStorage</div>';
+          return;
+        }
+
+        try {
+          const response = await fetch(
+            'http://localhost:3001/api/chat/conversations',
+            {
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+              },
+            }
+          );
+
+          const status = response.status;
+          let html = `<h3>Response Status: <span class="${status === 200 ? 'success' : 'error'}">${status}</span></h3>`;
+
+          try {
+            const data = await response.json();
+            html += '<h4>Response Body:</h4>';
+            html += '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+          } catch (e) {
+            const text = await response.text();
+            html += '<h4>Response Body (text):</h4>';
+            html += '<pre>' + text + '</pre>';
+          }
+
+          container.innerHTML = html;
+        } catch (e) {
+          container.innerHTML =
+            '<div class="error">❌ Request failed: ' + e.message + '</div>';
+        }
+      }
+
+      // Test auth status
+      async function testAuthAPI() {
+        const container = document.getElementById('api-results');
+        container.innerHTML =
+          '<div class="warning">Testing auth endpoint...</div>';
+
+        const accessToken = localStorage.getItem('access_token');
+
+        if (!accessToken) {
+          container.innerHTML =
+            '<div class="error">❌ No access_token found</div>';
+          return;
+        }
+
+        try {
+          const response = await fetch('http://localhost:3000/api/auth/me', {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              'Content-Type': 'application/json',
+            },
+          });
+
+          const status = response.status;
+          let html = `<h3>Auth Status: <span class="${status === 200 ? 'success' : 'error'}">${status}</span></h3>`;
+
+          const data = await response.json();
+          html += '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+
+          container.innerHTML = html;
+        } catch (e) {
+          container.innerHTML =
+            '<div class="error">❌ Auth test failed: ' + e.message + '</div>';
+        }
+      }
+
+      // Clear tokens
+      function clearTokens() {
+        if (confirm('Clear all authentication tokens?')) {
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('refresh_token');
+          localStorage.removeItem('auth-storage');
+          location.reload();
+        }
+      }
+
+      // Auto-refresh every 2 seconds
+      function refresh() {
+        displayLocalStorage();
+        displayTokenDetails();
+      }
+
+      // Initial load
+      refresh();
+      setInterval(refresh, 2000);
+    </script>
+  </body>
+</html>

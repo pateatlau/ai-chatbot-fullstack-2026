@@ -1,39 +1,17 @@
 import { createBrowserRouter } from 'react-router-dom';
 import { ProtectedRoute } from '../components/ProtectedRoute';
 import { PublicRoute } from '../components/PublicRoute';
+import { AdminRoute } from '../components/AdminRoute';
 import { DashboardLayout } from '../layouts/DashboardLayout';
-
-// Auth pages
-import { LoginPage } from '../pages/LoginPage';
-import { RegisterPage } from '../pages/RegisterPage';
+import { ChatbotMfe } from '../components/ChatbotMfe';
+import { AuthMfe } from '../components/AuthMfe';
+import { AdminMfe } from '../components/AdminMfe';
+import { ProfileMfe } from '../components/ProfileMfe';
 
 // Core pages
 import { HomePage } from '../pages/HomePage';
 import { DashboardPage } from '../pages/DashboardPage';
 import { NotFoundPage } from '../pages/NotFoundPage';
-
-// Profile pages
-import {
-  ProfilePage,
-  EditProfilePage,
-  SettingsPage,
-  SecurityPage,
-} from '../pages/profile';
-
-// Admin pages
-import {
-  AdminDashboardPage,
-  UserListPage,
-  UserDetailPage,
-} from '../pages/admin';
-
-// Placeholder for Chatbot MFE (to be replaced with actual MFE)
-const ChatbotPage = () => (
-  <div>
-    <h1 className="text-2xl font-bold mb-4">Chatbot</h1>
-    <p className="text-gray-600">Chatbot MFE will be loaded here.</p>
-  </div>
-);
 
 export const router = createBrowserRouter([
   // Public home page
@@ -42,12 +20,12 @@ export const router = createBrowserRouter([
     index: true,
     element: <HomePage />,
   },
-  // Auth routes
+  // Auth routes - delegated to Auth MFE
   {
     path: '/login',
     element: (
       <PublicRoute>
-        <LoginPage />
+        <AuthMfe />
       </PublicRoute>
     ),
   },
@@ -55,7 +33,7 @@ export const router = createBrowserRouter([
     path: '/register',
     element: (
       <PublicRoute>
-        <RegisterPage />
+        <AuthMfe />
       </PublicRoute>
     ),
   },
@@ -73,40 +51,52 @@ export const router = createBrowserRouter([
         path: 'dashboard',
         element: <DashboardPage />,
       },
-      // Chatbot (placeholder for MFE)
+      // Chatbot MFE
       {
         path: 'chatbot',
-        element: <ChatbotPage />,
+        element: <ChatbotMfe />,
       },
-      // Profile routes
+      // Profile routes - delegated to Profile MFE
       {
         path: 'profile',
-        element: <ProfilePage />,
+        element: <ProfileMfe />,
       },
       {
         path: 'profile/edit',
-        element: <EditProfilePage />,
+        element: <ProfileMfe />,
       },
       {
         path: 'profile/settings',
-        element: <SettingsPage />,
+        element: <ProfileMfe />,
       },
       {
         path: 'profile/security',
-        element: <SecurityPage />,
+        element: <ProfileMfe />,
       },
-      // Admin routes
+      // Admin routes - delegated to Admin MFE with admin role check
       {
         path: 'admin',
-        element: <AdminDashboardPage />,
+        element: (
+          <AdminRoute>
+            <AdminMfe />
+          </AdminRoute>
+        ),
       },
       {
         path: 'admin/users',
-        element: <UserListPage />,
+        element: (
+          <AdminRoute>
+            <AdminMfe />
+          </AdminRoute>
+        ),
       },
       {
         path: 'admin/users/:userId',
-        element: <UserDetailPage />,
+        element: (
+          <AdminRoute>
+            <AdminMfe />
+          </AdminRoute>
+        ),
       },
     ],
   },

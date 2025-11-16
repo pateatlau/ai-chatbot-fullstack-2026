@@ -3,7 +3,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import { nxCopyAssetsPlugin } from '@nx/vite/plugins/nx-copy-assets.plugin';
-import federation from '@originjs/vite-plugin-federation';
+import { federation } from '@module-federation/vite';
 
 export default defineConfig(() => ({
   root: __dirname,
@@ -26,19 +26,43 @@ export default defineConfig(() => ({
     federation({
       name: 'shell',
       remotes: {
-        authMfe: 'http://localhost:5174/assets/remoteEntry.js',
-        chatbotMfe: 'http://localhost:5175/assets/remoteEntry.js',
-        adminMfe: 'http://localhost:5176/assets/remoteEntry.js',
-        profileMfe: 'http://localhost:5177/assets/remoteEntry.js',
+        authMfe: {
+          type: 'module',
+          name: 'authMfe',
+          entry: 'http://localhost:5174/remoteEntry.js',
+          entryGlobalName: 'authMfe',
+          shareScope: 'default',
+        },
+        chatbotMfe: {
+          type: 'module',
+          name: 'chatbotMfe',
+          entry: 'http://localhost:5175/remoteEntry.js',
+          entryGlobalName: 'chatbotMfe',
+          shareScope: 'default',
+        },
+        adminMfe: {
+          type: 'module',
+          name: 'adminMfe',
+          entry: 'http://localhost:5176/remoteEntry.js',
+          entryGlobalName: 'adminMfe',
+          shareScope: 'default',
+        },
+        profileMfe: {
+          type: 'module',
+          name: 'profileMfe',
+          entry: 'http://localhost:5177/remoteEntry.js',
+          entryGlobalName: 'profileMfe',
+          shareScope: 'default',
+        },
       },
-      shared: [
-        'react',
-        'react-dom',
-        'react-router-dom',
-        'zustand',
-        '@tanstack/react-query',
-        'zod',
-      ],
+      shared: {
+        react: { singleton: true, requiredVersion: '^19.0.0' },
+        'react-dom': { singleton: true, requiredVersion: '^19.0.0' },
+        'react-router-dom': { singleton: true },
+        zustand: {},
+        '@tanstack/react-query': {},
+        zod: {},
+      },
     }),
   ],
   // Uncomment this if you are using workers.

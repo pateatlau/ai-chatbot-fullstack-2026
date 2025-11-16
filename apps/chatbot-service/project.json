@@ -5,8 +5,15 @@
   "projectType": "application",
   "tags": ["type:backend", "scope:chatbot"],
   "targets": {
+    "prisma-generate": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx prisma generate --schema=./apps/chatbot-service/prisma/schema.prisma"
+      }
+    },
     "build": {
       "executor": "@nx/esbuild:esbuild",
+      "dependsOn": ["prisma-generate"],
       "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
       "options": {

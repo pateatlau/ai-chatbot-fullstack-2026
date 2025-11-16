@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import redis from '../lib/redis';
 
 // JWT Secret with guaranteed default - TypeScript needs explicit type
 const jwtSecretValue =
@@ -14,7 +15,7 @@ export interface AuthRequest extends Request {
   };
 }
 
-export const authMiddleware = (
+export const authMiddleware = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -35,6 +36,17 @@ export const authMiddleware = (
     }
 
     const token = parts[1];
+
+    // Check if token is blacklisted
+    try {
+      const isBlacklisted = await redis.get(`blacklist:access:${token}`);
+      if (isBlacklisted) {
+        return res.status(401).json({ error: 'Token has been revoked' });
+      }
+    } catch (redisError) {
+      console.error('Redis error in auth middleware:', redisError);
+      // Continue without blacklist check if Redis is down
+    }
 
     // Verify token with explicit secret handling
     const secret: string =

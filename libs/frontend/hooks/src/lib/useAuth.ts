@@ -130,10 +130,10 @@ export function useAuth(): UseAuthReturn {
   const logout = useCallback(async (): Promise<void> => {
     try {
       // Optional: Call backend logout endpoint
-      if (accessToken) {
+      if (accessToken && refreshToken) {
         await axios.post(
           `${API_URL}/auth/logout`,
-          {},
+          { refreshToken },
           {
             headers: { Authorization: `Bearer ${accessToken}` },
           }
@@ -145,7 +145,7 @@ export function useAuth(): UseAuthReturn {
     } finally {
       clearAuth();
     }
-  }, [accessToken, clearAuth]);
+  }, [accessToken, refreshToken, clearAuth]);
 
   /**
    * Refresh access and refresh tokens

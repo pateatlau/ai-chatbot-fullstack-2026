@@ -42,12 +42,30 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       lg: 'px-6 py-3 text-lg rounded-lg',
     };
 
+    // Check if custom background classes are provided in className
+    const hasCustomBg = className?.includes('bg-');
+
     return (
       <button
         ref={ref}
         className={clsx(
           baseStyles,
-          variants[variant],
+          !hasCustomBg && variants[variant],
+          hasCustomBg &&
+            variant === 'primary' &&
+            'text-white focus:ring-primary-500',
+          hasCustomBg &&
+            variant === 'secondary' &&
+            'text-white focus:ring-secondary-500',
+          hasCustomBg &&
+            variant === 'danger' &&
+            'text-white focus:ring-error-500',
+          hasCustomBg &&
+            variant === 'outline' &&
+            'border-2 border-primary-600 text-primary-600 focus:ring-primary-500',
+          hasCustomBg &&
+            variant === 'ghost' &&
+            'text-primary-600 focus:ring-primary-500',
           sizes[size],
           fullWidth && 'w-full',
           className
@@ -57,7 +75,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       >
         {loading && (
           <svg
-            className="animate-spin -ml-1 mr-2 h-4 w-4"
+            className="w-4 h-4 mr-2 -ml-1 animate-spin"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
