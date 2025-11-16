@@ -3,7 +3,8 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import { nxCopyAssetsPlugin } from '@nx/vite/plugins/nx-copy-assets.plugin';
-import federation from '@originjs/vite-plugin-federation';
+import { federation } from '@module-federation/vite';
+import tailwindcss from '@tailwindcss/postcss';
 
 export default defineConfig(() => ({
   root: __dirname,
@@ -19,6 +20,11 @@ export default defineConfig(() => ({
     port: 5174,
     host: 'localhost',
   },
+  css: {
+    postcss: {
+      plugins: [tailwindcss()],
+    },
+  },
   plugins: [
     react(),
     nxViteTsPaths(),
@@ -26,17 +32,18 @@ export default defineConfig(() => ({
     federation({
       name: 'authMfe',
       filename: 'remoteEntry.js',
+      manifest: true,
       exposes: {
-        './Module': './src/app/app',
+        './Module': './src/app/app.tsx',
       },
-      shared: [
-        'react',
-        'react-dom',
-        'react-router-dom',
-        'zustand',
-        '@tanstack/react-query',
-        'zod',
-      ],
+      shared: {
+        react: { singleton: true, requiredVersion: '^19.0.0' },
+        'react-dom': { singleton: true, requiredVersion: '^19.0.0' },
+        'react-router-dom': { singleton: true },
+        zustand: {},
+        '@tanstack/react-query': {},
+        zod: {},
+      },
     }),
   ],
   // Uncomment this if you are using workers.

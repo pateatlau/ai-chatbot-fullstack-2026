@@ -8,6 +8,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="stylesheet" href="/src/styles.css" />
+
+    <!-- Global error handler to catch module loading errors -->
+    <script>
+      window.addEventListener('error', (event) => {
+        document.body.innerHTML = `
+          <div style="padding: 20px; background: #fee; border: 3px solid red; font-family: monospace;">
+            <h1 style="color: red;">⚠️ Fatal Error</h1>
+            <p><strong>Message:</strong> ${event.message || 'Unknown error'}</p>
+            <p><strong>File:</strong> ${event.filename || 'Unknown'}</p>
+            <p><strong>Line:</strong> ${event.lineno || 'Unknown'}:${event.colno || 'Unknown'}</p>
+            ${event.error ? `<pre style="background: white; padding: 10px; border: 1px solid #ccc; overflow: auto;">${event.error.stack || event.error}</pre>` : ''}
+            <button onclick="location.reload()" style="padding: 10px 20px; background: #4f46e5; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px;">
+              Reload Page
+            </button>
+          </div>
+        `;
+      });
+
+      window.addEventListener('unhandledrejection', (event) => {
+        document.body.innerHTML = `
+          <div style="padding: 20px; background: #ffc; border: 3px solid orange; font-family: monospace;">
+            <h1 style="color: orange;">⚠️ Unhandled Promise Rejection</h1>
+            <pre style="background: white; padding: 10px; border: 1px solid #ccc; overflow: auto;">${event.reason?.stack || event.reason}</pre>
+            <button onclick="location.reload()" style="padding: 10px 20px; background: #4f46e5; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px;">
+              Reload Page
+            </button>
+          </div>
+        `;
+      });
+    </script>
   </head>
   <body>
     <div id="root"></div>

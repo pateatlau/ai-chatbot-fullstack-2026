@@ -1,11 +1,10 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "ignoreDeprecations": "6.0",
     "rootDir": ".",
     "sourceMap": true,
     "declaration": false,
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "importHelpers": true,
@@ -33,7 +32,9 @@
       ],
       "@myapp/frontend/api-client": ["libs/frontend/api-client/src/index.ts"],
       "@myapp/frontend/stores": ["libs/frontend/stores/src/index.ts"],
-      "@myapp/frontend/utils": ["libs/frontend/utils/src/index.ts"]
+      "@myapp/frontend/utils": ["libs/frontend/utils/src/index.ts"],
+      "@myapp/frontend/mocks": ["libs/frontend/mocks/src/index.ts"],
+      "@ai-chatbot/hooks": ["libs/frontend/hooks/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
