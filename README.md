@@ -252,6 +252,7 @@ Module boundary enforcement
 ## Documentation
 
 - [Implementation Roadmap](./docs/CONSOLIDATED_IMPLEMENTATION_ROADMAP-NX.md)
+- [Micro-Frontend Architecture](./docs/MICROFRONTEND_ARCHITECTURE.md)
 - [Phase 1 Setup Summary](./docs/PHASE-1-SETUP-SUMMARY.md)
 - [Quick Reference Guide](./docs/QUICK-REFERENCE.md)
 - [Nx Documentation](https://nx.dev)
