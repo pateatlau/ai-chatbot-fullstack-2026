@@ -1,8 +1,10 @@
 import 'dotenv/config';
 import express from 'express';
+import swaggerUi from 'swagger-ui-express';
 import authRoutes from './routes/auth.routes';
 import { PrismaClient } from '@prisma/client';
 import Redis from 'ioredis';
+import { swaggerSpec } from './swagger';
 
 const host = process.env.HOST ?? 'localhost';
 const port = process.env.PORT ? Number(process.env.PORT) : 3000;
@@ -28,6 +30,37 @@ app.use((req, res, next) => {
   next();
 });
 
+// Swagger API Documentation
+app.use(
+  '/api-docs',
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec, {
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: 'Auth Service API Documentation',
+  })
+);
+
+/**
+ * @swagger
+ * /health:
+ *   get:
+ *     summary: Health check endpoint
+ *     description: Returns the health status of the auth service and its dependencies
+ *     tags: [Health]
+ *     responses:
+ *       200:
+ *         description: Service is healthy
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/HealthCheck'
+ *       503:
+ *         description: Service is degraded
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/HealthCheck'
+ */
 // Enhanced health check with dependency status
 app.get('/health', async (_req, res) => {
   const startTime = Date.now();

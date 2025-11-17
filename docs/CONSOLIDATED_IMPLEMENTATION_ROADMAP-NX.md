@@ -26,8 +26,8 @@
 | **Phase 2: Chatbot MFE**           | ✅ Complete     | 100%       | ~3h        | Chat UI, streaming, 50+ tests               |
 | **Phase 3: E2E Testing**           | ✅ Complete     | 100%       | ~3h        | 54 E2E tests, CI/CD workflow                |
 | **Phase 4: Production Ready**      | ✅ Complete     | 100%       | ~3h        | Docker, CI/CD, load testing, docs           |
-| **Phase 5: Optional Enhancements** | 🔄 In Progress  | 50%        | ~35m       | Enhanced health + Profile MSW (2/4 done)    |
-| **Total Project**                  | **✅ Complete** | **99%**    | **~12.5h** | **Production-ready application**            |
+| **Phase 5: Optional Enhancements** | 🔄 In Progress  | 75%        | ~95m       | Health checks, Profile MSW, Swagger (3/4)   |
+| **Total Project**                  | **✅ Complete** | **99%**    | **~13.5h** | **Production-ready application**            |
 
 ### 🏗️ Architecture Components Status
 
@@ -279,7 +279,7 @@
 
 - ✅ Enhanced health checks with dependency status (~20 min) - COMPLETE
 - ✅ Profile MFE MSW handlers (~15 min) - COMPLETE
-- ⏳ Swagger/OpenAPI documentation (~60 min)
+- ✅ Swagger/OpenAPI documentation (~60 min) - COMPLETE
 - ⏳ Prometheus metrics integration (~2 hours)
 
 **Priority 3 (Long Term):**

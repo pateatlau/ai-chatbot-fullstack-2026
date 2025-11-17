@@ -2,10 +2,12 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
+import swaggerUi from 'swagger-ui-express';
 import chatRoutes from './routes/chat.routes';
 import { PrismaClient } from '@prisma/client';
 import Redis from 'ioredis';
 import OpenAI from 'openai';
+import { swaggerSpec } from './swagger';
 
 // Load environment variables with smart path resolution
 const envPath =
@@ -55,6 +57,37 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Swagger API Documentation
+app.use(
+  '/api-docs',
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec, {
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: 'Chatbot Service API Documentation',
+  })
+);
+
+/**
+ * @swagger
+ * /health:
+ *   get:
+ *     summary: Health check endpoint
+ *     description: Returns the health status of the chatbot service and its dependencies (Database, Redis, OpenAI)
+ *     tags: [Health]
+ *     responses:
+ *       200:
+ *         description: Service is healthy
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/HealthCheck'
+ *       503:
+ *         description: Service is degraded
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/HealthCheck'
+ */
 // Enhanced health check with dependency status
 app.get('/health', async (_req, res) => {
   const startTime = Date.now();

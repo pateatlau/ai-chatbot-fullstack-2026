@@ -33,7 +33,147 @@
 - OpenAI API account (for chatbot functionality)
 - Domain name and DNS management
 - SSL certificate (Let's Encrypt recommended)
-- Container registry (Docker Hub, AWS ECR, GCP GCR, etc.)
+- **Container registry** (Docker Hub, AWS ECR, GCP GCR, etc.)
+
+---
+
+## API Documentation
+
+All backend services expose interactive API documentation via Swagger UI.
+
+### Accessing API Documentation
+
+#### Local Development
+
+- **Auth Service**: http://localhost:3000/api-docs
+- **Chatbot Service**: http://localhost:3001/api-docs
+- **Admin Service**: http://localhost:3002/api-docs
+
+#### Production
+
+- **Auth Service**: https://api.yourdomain.com/auth/api-docs
+- **Chatbot Service**: https://api.yourdomain.com/chat/api-docs
+- **Admin Service**: https://api.yourdomain.com/admin/api-docs
+
+### Using Swagger UI
+
+1. **Navigate** to the API documentation URL
+2. **Click** "Authorize" button (top right)
+3. **Enter** your JWT token in the format: `Bearer YOUR_TOKEN_HERE`
+4. **Click** "Authorize" then "Close"
+5. **Try** endpoints by clicking "Try it out" and "Execute"
+
+### Getting an Access Token
+
+```bash
+# Login to get access token
+curl -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@example.com",
+    "password": "SecurePass123!"
+  }'
+
+# Response includes accessToken
+{
+  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "refreshToken": "...",
+  "user": { ... }
+}
+```
+
+### API Endpoints Overview
+
+#### Auth Service (Port 3000)
+
+**Authentication:**
+
+- `POST /api/auth/register` - Create new user account
+- `POST /api/auth/login` - Login with email/password
+- `POST /api/auth/logout` - Logout current session
+- `POST /api/auth/refresh` - Refresh access token
+- `POST /api/auth/forgot-password` - Request password reset
+- `POST /api/auth/reset-password/:token` - Reset password
+
+**User Management:**
+
+- `GET /api/auth/me` - Get current user profile
+- `PATCH /api/auth/profile` - Update user profile
+- `POST /api/auth/change-password` - Change password
+
+**Health:**
+
+- `GET /health` - Service health check
+
+#### Chatbot Service (Port 3001)
+
+**Conversations:**
+
+- `POST /api/chat/conversations` - Create new conversation
+- `GET /api/chat/conversations` - List user's conversations
+- `GET /api/chat/conversations/:id` - Get conversation details
+- `PATCH /api/chat/conversations/:id` - Update conversation
+- `DELETE /api/chat/conversations/:id` - Delete conversation
+
+**Chat Messages:**
+
+- `POST /api/chat/conversations/:id/messages` - Send message (streaming response)
+- `GET /api/chat/conversations/:id/messages` - Get conversation messages
+- `DELETE /api/chat/messages/:id` - Delete message
+
+**Stats:**
+
+- `GET /api/chat/stats` - Get user chat statistics
+
+**Health:**
+
+- `GET /health` - Service health check (includes OpenAI status)
+
+#### Admin Service (Port 3002)
+
+**User Management (Admin Only):**
+
+- `GET /api/admin/users` - List all users (paginated, searchable)
+- `GET /api/admin/users/:id` - Get user details
+- `PATCH /api/admin/users/:id` - Update user
+- `DELETE /api/admin/users/:id` - Delete user
+- `POST /api/admin/users/:id/reset-password` - Reset user password
+
+**Analytics (Admin Only):**
+
+- `GET /api/admin/stats` - System statistics (users, chats, system metrics)
+
+**Audit (Admin Only):**
+
+- `GET /api/admin/audit-logs` - Audit logs (paginated, filterable)
+
+**Health:**
+
+- `GET /health` - Service health check
+
+### Features
+
+✅ **Interactive Testing** - Execute API calls directly from browser
+✅ **Authentication** - Built-in Bearer token authentication
+✅ **Request/Response Examples** - See sample payloads for all endpoints
+✅ **Schema Validation** - View detailed request/response schemas
+✅ **Error Responses** - See all possible error codes and messages
+✅ **Rate Limiting** - Documented rate limits for protected endpoints
+
+### OpenAPI Specification
+
+Each service exposes its OpenAPI 3.0 specification:
+
+- **Auth Service**: http://localhost:3000/api-docs/swagger.json
+- **Chatbot Service**: http://localhost:3001/api-docs/swagger.json
+- **Admin Service**: http://localhost:3002/api-docs/swagger.json
+
+Use these specs with:
+
+- Postman (import collection)
+- Insomnia (import specification)
+- Code generators (openapi-generator)
+- API testing tools
 
 ---
 
