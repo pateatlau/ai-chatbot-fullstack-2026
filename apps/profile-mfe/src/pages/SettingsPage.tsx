@@ -1,10 +1,61 @@
-import { useState } from 'react';
-import { Card } from '@myapp/frontend/ui-components';
+import { useState, useEffect } from 'react';
+import { useSettingsStore } from '@myapp/frontend/stores';
+import { useToast } from '@myapp/frontend/hooks';
+import { Card, Button } from '@myapp/frontend/ui-components';
 
 export function SettingsPage() {
-  const [emailNotifications, setEmailNotifications] = useState(true);
-  const [pushNotifications, setPushNotifications] = useState(false);
-  const [weeklyDigest, setWeeklyDigest] = useState(true);
+  const { settings, updateSettings, resetSettings } = useSettingsStore();
+  const toast = useToast();
+
+  const [emailNotifications, setEmailNotifications] = useState(
+    settings.emailNotifications
+  );
+  const [pushNotifications, setPushNotifications] = useState(
+    settings.pushNotifications
+  );
+  const [weeklyDigest, setWeeklyDigest] = useState(settings.weeklyDigest);
+  const [theme, setTheme] = useState(settings.theme);
+  const [hasChanges, setHasChanges] = useState(false);
+
+  useEffect(() => {
+    // Check if there are unsaved changes
+    const changed =
+      emailNotifications !== settings.emailNotifications ||
+      pushNotifications !== settings.pushNotifications ||
+      weeklyDigest !== settings.weeklyDigest ||
+      theme !== settings.theme;
+    setHasChanges(changed);
+  }, [emailNotifications, pushNotifications, weeklyDigest, theme, settings]);
+
+  const handleSave = () => {
+    updateSettings({
+      emailNotifications,
+      pushNotifications,
+      weeklyDigest,
+      theme,
+    });
+    toast.success('Settings saved successfully');
+    setHasChanges(false);
+  };
+
+  const handleReset = () => {
+    resetSettings();
+    setEmailNotifications(true);
+    setPushNotifications(false);
+    setWeeklyDigest(true);
+    setTheme('light');
+    toast.info('Settings reset to defaults');
+    setHasChanges(false);
+  };
+
+  const handleCancel = () => {
+    // Revert to saved settings
+    setEmailNotifications(settings.emailNotifications);
+    setPushNotifications(settings.pushNotifications);
+    setWeeklyDigest(settings.weeklyDigest);
+    setTheme(settings.theme);
+    setHasChanges(false);
+  };
 
   return (
     <div className="max-w-3xl mx-auto p-6">
@@ -35,6 +86,8 @@ export function SettingsPage() {
                 className={`${
                   emailNotifications ? 'bg-primary-600' : 'bg-gray-200'
                 } relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2`}
+                role="switch"
+                aria-checked={emailNotifications}
               >
                 <span
                   className={`${
@@ -59,6 +112,8 @@ export function SettingsPage() {
                 className={`${
                   pushNotifications ? 'bg-primary-600' : 'bg-gray-200'
                 } relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2`}
+                role="switch"
+                aria-checked={pushNotifications}
               >
                 <span
                   className={`${
@@ -83,6 +138,8 @@ export function SettingsPage() {
                 className={`${
                   weeklyDigest ? 'bg-primary-600' : 'bg-gray-200'
                 } relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2`}
+                role="switch"
+                aria-checked={weeklyDigest}
               >
                 <span
                   className={`${
@@ -99,17 +156,61 @@ export function SettingsPage() {
           <h3 className="text-lg font-medium text-gray-900 mb-4">Appearance</h3>
           <div className="space-y-4">
             <div>
-              <label className="text-sm font-medium text-gray-900 block mb-2">
+              <label
+                htmlFor="theme-select"
+                className="text-sm font-medium text-gray-900 block mb-2"
+              >
                 Theme
               </label>
-              <select className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md">
-                <option>Light</option>
-                <option>Dark</option>
-                <option>System</option>
+              <select
+                id="theme-select"
+                value={theme}
+                onChange={(e) =>
+                  setTheme(e.target.value as 'light' | 'dark' | 'system')
+                }
+                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md"
+              >
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+                <option value="system">System</option>
               </select>
+              <p className="mt-2 text-sm text-gray-500">
+                Choose how the interface appears
+              </p>
             </div>
           </div>
         </Card>
+
+        {/* Save/Reset Actions */}
+        {hasChanges && (
+          <Card>
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-gray-600">You have unsaved changes</p>
+              <div className="flex space-x-3">
+                <Button variant="outline" size="sm" onClick={handleCancel}>
+                  Cancel
+                </Button>
+                <Button variant="outline" size="sm" onClick={handleReset}>
+                  Reset to Defaults
+                </Button>
+                <Button size="sm" onClick={handleSave}>
+                  Save Changes
+                </Button>
+              </div>
+            </div>
+          </Card>
+        )}
+
+        {!hasChanges && (
+          <Card>
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-gray-600">All changes saved</p>
+              <Button variant="outline" size="sm" onClick={handleReset}>
+                Reset to Defaults
+              </Button>
+            </div>
+          </Card>
+        )}
       </div>
     </div>
   );

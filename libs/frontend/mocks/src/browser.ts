@@ -1,8 +1,9 @@
 import { setupWorker } from 'msw/browser';
 import { authHandlers, seedMockUsers } from './handlers/auth.handlers';
+import { profileHandlers } from './handlers/profile.handlers';
 
 // Combine all handlers
-const handlers = [...authHandlers];
+const handlers = [...authHandlers, ...profileHandlers];
 
 // Setup MSW worker
 export const worker = setupWorker(...handlers);

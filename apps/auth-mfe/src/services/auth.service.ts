@@ -52,4 +52,23 @@ export const authService = {
     });
     return response.data;
   },
+
+  forgotPassword: async (email: string): Promise<{ message: string }> => {
+    const response = await axios.post(
+      `${API_BASE_URL}/api/auth/forgot-password`,
+      { email }
+    );
+    return response.data;
+  },
+
+  resetPassword: async (
+    token: string,
+    password: string
+  ): Promise<{ message: string }> => {
+    const response = await axios.post(
+      `${API_BASE_URL}/api/auth/reset-password/${token}`,
+      { password }
+    );
+    return response.data;
+  },
 };

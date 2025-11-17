@@ -17,7 +17,11 @@ Backend must be running on port 3000.
 ### Run with Mock API (No Backend Needed)
 
 ```bash
+# Shell app with mocks
 npm run dev:shell:mock
+
+# Profile MFE with mocks
+npm run dev:profile-mfe:mock
 ```
 
 All API calls will be intercepted and handled by MSW.
@@ -122,6 +126,8 @@ apps/shell/
 
 All endpoints have realistic delays and error handling:
 
+### Authentication (Auth MFE + Shell)
+
 ### POST /api/auth/register
 
 - ✅ Creates new user
@@ -157,6 +163,58 @@ All endpoints have realistic delays and error handling:
 - ✅ Validates refresh token
 - ❌ 401 if token invalid/expired
 - ❌ 400 if token missing
+- Delay: 400ms
+
+### Profile Management (Profile MFE)
+
+### GET /api/users/me
+
+- ✅ Returns full user profile
+- ✅ Validates Bearer token
+- ❌ 401 if token invalid
+- ❌ 404 if user not found
+- Delay: 300ms
+
+### PATCH /api/users/me
+
+- ✅ Updates name and/or avatar
+- ✅ Validates input (name length, URL format)
+- ❌ 401 if unauthorized
+- ❌ 400 if validation fails
+- Delay: 500ms
+
+### POST /api/users/change-password
+
+- ✅ Changes user password
+- ✅ Validates current password
+- ✅ Validates new password strength
+- ❌ 401 if unauthorized
+- ❌ 400 if validation fails
+- Delay: 600ms
+
+### GET /api/users/settings
+
+- ✅ Returns user preferences (theme, language, notifications)
+- ❌ 401 if unauthorized
+- Delay: 250ms
+
+### PATCH /api/users/settings
+
+- ✅ Updates user preferences
+- ❌ 401 if unauthorized
+- Delay: 400ms
+
+### GET /api/users/sessions
+
+- ✅ Returns list of active sessions
+- ❌ 401 if unauthorized
+- Delay: 300ms
+
+### DELETE /api/users/sessions/:id
+
+- ✅ Revokes session
+- ❌ 400 if trying to revoke current session
+- ❌ 401 if unauthorized
 - Delay: 400ms
 
 ## 🐛 Debugging
@@ -233,10 +291,11 @@ npm run dev:shell:mock
 ## 📦 Next Steps
 
 1. ✅ MSW is configured and working
-2. ⏳ Add more mock handlers (chatbot, admin endpoints)
-3. ⏳ Create MSW setup for testing (Vitest integration)
-4. ⏳ Add error scenario toggles (simulate network failures)
-5. ⏳ Add response delay controls (fast/slow/offline modes)
+2. ✅ Profile MFE handlers implemented
+3. ⏳ Add more mock handlers (chatbot, admin endpoints)
+4. ⏳ Create MSW setup for testing (Vitest integration)
+5. ⏳ Add error scenario toggles (simulate network failures)
+6. ⏳ Add response delay controls (fast/slow/offline modes)
 
 ## 🎉 Success!
 

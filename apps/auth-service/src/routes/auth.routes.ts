@@ -30,5 +30,11 @@ router.post('/reset-password/:token', (req, res) =>
 
 // Protected routes
 router.get('/me', authMiddleware, (req, res) => authController.getMe(req, res));
+router.patch('/profile', authMiddleware, (req, res) =>
+  authController.updateProfile(req, res)
+);
+router.post('/change-password', authMiddleware, (req, res) =>
+  authController.changePassword(req, res)
+);
 
 export default router;

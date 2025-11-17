@@ -403,4 +403,114 @@ export class AuthService {
       return false; // Fail open
     }
   }
+
+  /**
+   * Update user profile
+   */
+  async updateProfile(
+    userId: string,
+    input: { name?: string; avatar?: string | null }
+  ): Promise<{ message: string; user: any }> {
+    // Build dynamic update query
+    const updates: string[] = [];
+    const values: any[] = [];
+    let paramIndex = 1;
+
+    if (input.name !== undefined) {
+      updates.push(`name = $${paramIndex}`);
+      values.push(input.name);
+      paramIndex++;
+    }
+
+    if (input.avatar !== undefined) {
+      updates.push(`avatar = $${paramIndex}`);
+      values.push(input.avatar);
+      paramIndex++;
+    }
+
+    if (updates.length === 0) {
+      throw new Error('No fields to update');
+    }
+
+    updates.push(`"updatedAt" = NOW()`);
+    values.push(userId);
+
+    const updateQuery = `
+      UPDATE users 
+      SET ${updates.join(', ')}
+      WHERE id = $${paramIndex}
+      RETURNING id, email, name, role, avatar, "isActive", "createdAt", "updatedAt"
+    `;
+
+    const result = await query(updateQuery, values);
+
+    if (result.rows.length === 0) {
+      throw new Error('User not found');
+    }
+
+    const user = result.rows[0];
+
+    return {
+      message: 'Profile updated successfully',
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        avatar: user.avatar,
+        isActive: user.isActive,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      },
+    };
+  }
+
+  /**
+   * Change user password
+   */
+  async changePassword(
+    userId: string,
+    currentPassword: string,
+    newPassword: string
+  ): Promise<{ message: string }> {
+    // Get user with password
+    const userResult = await query(
+      'SELECT id, password FROM users WHERE id = $1',
+      [userId]
+    );
+
+    if (userResult.rows.length === 0) {
+      throw new Error('User not found');
+    }
+
+    const user = userResult.rows[0];
+
+    // Verify current password
+    const isPasswordValid = await bcrypt.compare(
+      currentPassword,
+      user.password
+    );
+
+    if (!isPasswordValid) {
+      throw new Error('Current password is incorrect');
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+
+    // Update password
+    await query(
+      `UPDATE users 
+       SET password = $1, "updatedAt" = NOW()
+       WHERE id = $2`,
+      [hashedPassword, userId]
+    );
+
+    // Invalidate all existing sessions for security
+    await query('DELETE FROM sessions WHERE "userId" = $1', [userId]);
+
+    return {
+      message: 'Password changed successfully. Please login again.',
+    };
+  }
 }

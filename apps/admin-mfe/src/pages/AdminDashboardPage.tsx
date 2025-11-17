@@ -1,40 +1,69 @@
-import { Card } from '@myapp/frontend/ui-components';
+import { useState, useEffect } from 'react';
+import { Card, Button } from '@myapp/frontend/ui-components';
+import { useToast } from '@myapp/frontend/hooks';
+import { adminAPI, DashboardStats } from '../api/admin.api';
 
 export function AdminDashboardPage() {
-  const stats = [
-    {
-      label: 'Total Users',
-      value: '1,234',
-      change: '+12%',
-      trend: 'up',
-      icon: '👥',
-      color: 'blue',
-    },
-    {
-      label: 'Active Users',
-      value: '856',
-      change: '+8%',
-      trend: 'up',
-      icon: '✅',
-      color: 'green',
-    },
-    {
-      label: 'Total Conversations',
-      value: '5,678',
-      change: '+23%',
-      trend: 'up',
-      icon: '💬',
-      color: 'purple',
-    },
-    {
-      label: 'AI Tokens Used',
-      value: '2.4M',
-      change: '+15%',
-      trend: 'up',
-      icon: '🎯',
-      color: 'orange',
-    },
-  ];
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const toast = useToast();
+
+  useEffect(() => {
+    loadStats();
+  }, []);
+
+  const loadStats = async () => {
+    try {
+      setLoading(true);
+      const data = await adminAPI.getStats();
+      setStats(data);
+    } catch (error: any) {
+      toast.error(
+        error.response?.data?.error || 'Failed to load dashboard data'
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatNumber = (num: number): string => {
+    if (num >= 1000000) {
+      return (num / 1000000).toFixed(1) + 'M';
+    }
+    if (num >= 1000) {
+      return (num / 1000).toFixed(1) + 'K';
+    }
+    return num.toString();
+  };
+
+  const statCards = stats
+    ? [
+        {
+          label: 'Total Users',
+          value: formatNumber(stats.totalUsers),
+          icon: '👥',
+          color: 'blue',
+        },
+        {
+          label: 'Active Users',
+          value: formatNumber(stats.activeUsers),
+          icon: '✅',
+          color: 'green',
+        },
+        {
+          label: 'Total Conversations',
+          value: formatNumber(stats.totalConversations),
+          icon: '💬',
+          color: 'purple',
+        },
+        {
+          label: 'Avg Messages/Conv',
+          value: stats.averageMessagesPerConversation.toFixed(1),
+          icon: '📊',
+          color: 'orange',
+        },
+      ]
+    : [];
 
   const recentActivity = [
     {
@@ -82,35 +111,44 @@ export function AdminDashboardPage() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => (
-          <Card key={index}>
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-sm text-gray-600 mb-1">{stat.label}</p>
-                <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
-                <div className="flex items-center gap-1 mt-2">
-                  <span className="text-sm text-green-600 font-medium">
-                    {stat.change}
-                  </span>
-                  <span className="text-xs text-gray-500">vs last month</span>
+        {loading ? (
+          <>
+            {[1, 2, 3, 4].map((i) => (
+              <Card key={i}>
+                <div className="animate-pulse">
+                  <div className="h-4 bg-gray-200 rounded w-24 mb-2"></div>
+                  <div className="h-8 bg-gray-200 rounded w-16"></div>
+                </div>
+              </Card>
+            ))}
+          </>
+        ) : (
+          statCards.map((stat, index) => (
+            <Card key={index}>
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">{stat.label}</p>
+                  <p className="text-3xl font-bold text-gray-900">
+                    {stat.value}
+                  </p>
+                </div>
+                <div
+                  className={`text-3xl ${
+                    stat.color === 'blue'
+                      ? 'text-blue-500'
+                      : stat.color === 'green'
+                        ? 'text-green-500'
+                        : stat.color === 'purple'
+                          ? 'text-purple-500'
+                          : 'text-orange-500'
+                  }`}
+                >
+                  {stat.icon}
                 </div>
               </div>
-              <div
-                className={`text-3xl ${
-                  stat.color === 'blue'
-                    ? 'text-blue-500'
-                    : stat.color === 'green'
-                      ? 'text-green-500'
-                      : stat.color === 'purple'
-                        ? 'text-purple-500'
-                        : 'text-orange-500'
-                }`}
-              >
-                {stat.icon}
-              </div>
-            </div>
-          </Card>
-        ))}
+            </Card>
+          ))
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

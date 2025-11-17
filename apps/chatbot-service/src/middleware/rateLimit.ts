@@ -1,8 +1,6 @@
-import Redis from 'ioredis';
 import { Request, Response, NextFunction } from 'express';
 import { AuthenticatedRequest } from './auth';
-
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+import redis from '../lib/redis';
 
 interface RateLimitConfig {
   maxRequests: number;

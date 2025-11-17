@@ -1,24 +1,142 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
 import chatRoutes from './routes/chat.routes';
+import { PrismaClient } from '@prisma/client';
+import Redis from 'ioredis';
+import OpenAI from 'openai';
 
-// Load environment variables
-dotenv.config();
+// Load environment variables with smart path resolution
+const envPath =
+  process.env.NODE_ENV === 'production'
+    ? path.join(__dirname, '../../../apps/chatbot-service/.env')
+    : path.join(__dirname, '../../.env');
+
+let result = dotenv.config({ path: envPath });
+
+// Try alternative paths if first attempt fails
+if (result.error) {
+  const altPaths = [
+    path.join(__dirname, '.env'),
+    path.join(__dirname, '../../../.env'),
+    path.join(__dirname, '../../apps/chatbot-service/.env'),
+  ];
+
+  for (const altPath of altPaths) {
+    result = dotenv.config({ path: altPath });
+    if (!result.error) {
+      console.log(
+        `[dotenv] Loaded ${Object.keys(result.parsed || {}).length} variables from ${altPath}`
+      );
+      break;
+    }
+  }
+}
+
+if (!result.error && result.parsed) {
+  console.log(`[dotenv] Loaded ${Object.keys(result.parsed).length} variables`);
+}
 
 const host = process.env.HOST ?? 'localhost';
 const port = process.env.PORT ? Number(process.env.PORT) : 3001;
 
 const app = express();
 
+// Initialize clients for health checks
+const prisma = new PrismaClient();
+const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY || 'mock-api-key',
+});
+
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Health check
-app.get('/health', (_req, res) => {
-  res.json({ status: 'ok', service: 'chatbot-service' });
+// Enhanced health check with dependency status
+app.get('/health', async (_req, res) => {
+  const startTime = Date.now();
+  const health: any = {
+    status: 'healthy',
+    service: 'chatbot-service',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    dependencies: {},
+    config: {
+      useMockAI: process.env.USE_MOCK_AI === 'true',
+    },
+  };
+
+  // Check database
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    health.dependencies.database = {
+      status: 'up',
+      responseTime: Date.now() - startTime,
+    };
+  } catch (error) {
+    health.dependencies.database = {
+      status: 'down',
+      error: error instanceof Error ? error.message : 'Unknown error',
+    };
+    health.status = 'degraded';
+  }
+
+  // Check Redis
+  const redisStart = Date.now();
+  try {
+    await redis.ping();
+    health.dependencies.redis = {
+      status: 'up',
+      responseTime: Date.now() - redisStart,
+    };
+  } catch (error) {
+    health.dependencies.redis = {
+      status: 'down',
+      error: error instanceof Error ? error.message : 'Unknown error',
+    };
+    health.status = 'degraded';
+  }
+
+  // Check OpenAI (only if not using mock)
+  if (process.env.USE_MOCK_AI !== 'true' && process.env.OPENAI_API_KEY) {
+    const openaiStart = Date.now();
+    try {
+      // Simple API check - list models endpoint
+      await openai.models.list();
+      health.dependencies.openai = {
+        status: 'up',
+        responseTime: Date.now() - openaiStart,
+      };
+    } catch (error) {
+      health.dependencies.openai = {
+        status: 'down',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      };
+      // OpenAI down is not critical if we have mock mode
+      if (process.env.USE_MOCK_AI !== 'true') {
+        health.status = 'degraded';
+      }
+    }
+  } else {
+    health.dependencies.openai = {
+      status: 'mock',
+      message: 'Using mock AI responses',
+    };
+  }
+
+  // Memory usage
+  const memUsage = process.memoryUsage();
+  health.memory = {
+    heapUsed: `${Math.round(memUsage.heapUsed / 1024 / 1024)}MB`,
+    heapTotal: `${Math.round(memUsage.heapTotal / 1024 / 1024)}MB`,
+    rss: `${Math.round(memUsage.rss / 1024 / 1024)}MB`,
+  };
+
+  const statusCode = health.status === 'healthy' ? 200 : 503;
+  res.status(statusCode).json(health);
 });
 
 // API routes

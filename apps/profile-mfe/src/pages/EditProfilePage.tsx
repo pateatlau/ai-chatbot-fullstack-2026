@@ -1,15 +1,108 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@myapp/frontend/stores';
-import { Card, FormField } from '@myapp/frontend/ui-components';
+import { useToast } from '@myapp/frontend/hooks';
+import { Card, FormField, Button } from '@myapp/frontend/ui-components';
+import { profileAPI } from '../api/profile.api';
 
 export function EditProfilePage() {
-  const { user } = useAuthStore();
-  const [name, setName] = useState(user?.name || '');
-  const [email, setEmail] = useState(user?.email || '');
+  const { user, setUser } = useAuthStore();
+  const navigate = useNavigate();
+  const toast = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [name, setName] = useState(user?.name || '');
+  const [avatar, setAvatar] = useState(user?.avatar || '');
+  const [avatarPreview, setAvatarPreview] = useState(user?.avatar || '');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleAvatarFileChange = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image size must be less than 5MB');
+      return;
+    }
+
+    try {
+      setIsUploadingAvatar(true);
+
+      // Create preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatarPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+
+      // Upload avatar
+      const result = await profileAPI.uploadAvatar(file);
+      setAvatar(result.url);
+
+      toast.success('Avatar uploaded successfully');
+    } catch (error: any) {
+      console.error('Avatar upload error:', error);
+      toast.error(error.response?.data?.error || 'Failed to upload avatar');
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement profile update
+
+    if (!name.trim()) {
+      toast.error('Name is required');
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+
+      const updateData: any = {};
+
+      // Only include changed fields
+      if (name !== user?.name) {
+        updateData.name = name.trim();
+      }
+
+      if (avatar !== user?.avatar) {
+        updateData.avatar = avatar || null;
+      }
+
+      if (Object.keys(updateData).length === 0) {
+        toast.info('No changes to save');
+        navigate('/profile');
+        return;
+      }
+
+      const response = await profileAPI.updateProfile(updateData);
+
+      // Update user in auth store
+      setUser(response.user);
+
+      toast.success('Profile updated successfully');
+      navigate('/profile');
+    } catch (error: any) {
+      console.error('Profile update error:', error);
+      toast.error(error.response?.data?.error || 'Failed to update profile');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCancel = () => {
+    navigate('/profile');
   };
 
   return (
@@ -21,6 +114,45 @@ export function EditProfilePage() {
 
       <Card>
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Avatar Upload */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Profile Picture
+            </label>
+            <div className="flex items-center space-x-6">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white text-2xl font-bold overflow-hidden">
+                {avatarPreview ? (
+                  <img
+                    src={avatarPreview}
+                    alt="Avatar"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span>{name.charAt(0).toUpperCase()}</span>
+                )}
+              </div>
+              <div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarFileChange}
+                  className="hidden"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploadingAvatar}
+                >
+                  {isUploadingAvatar ? 'Uploading...' : 'Change Avatar'}
+                </Button>
+                <p className="mt-1 text-xs text-gray-500">PNG, JPG up to 5MB</p>
+              </div>
+            </div>
+          </div>
+
           <FormField
             label="Full name"
             type="text"
@@ -32,24 +164,23 @@ export function EditProfilePage() {
           <FormField
             label="Email address"
             type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
+            value={user?.email || ''}
+            disabled
+            hint="Email cannot be changed"
           />
 
           <div className="flex justify-end space-x-3">
-            <a
-              href="/profile"
-              className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleCancel}
+              disabled={isLoading}
             >
               Cancel
-            </a>
-            <button
-              type="submit"
-              className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-            >
+            </Button>
+            <Button type="submit" disabled={isLoading} loading={isLoading}>
               Save Changes
-            </button>
+            </Button>
           </div>
         </form>
       </Card>

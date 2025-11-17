@@ -5,7 +5,7 @@ export function ProfilePage() {
   const { user } = useAuthStore();
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="max-w-4xl p-6 mx-auto">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Profile</h1>
         <p className="mt-2 text-gray-600">
@@ -18,7 +18,7 @@ export function ProfilePage() {
         <Card>
           <div className="flex items-center space-x-6">
             <div className="flex-shrink-0">
-              <div className="h-24 w-24 rounded-full bg-primary-100 flex items-center justify-center">
+              <div className="flex items-center justify-center w-24 h-24 rounded-full bg-primary-100">
                 <span className="text-3xl font-bold text-primary-600">
                   {user?.name?.charAt(0).toUpperCase()}
                 </span>
@@ -27,14 +27,14 @@ export function ProfilePage() {
             <div className="flex-1">
               <h2 className="text-2xl font-bold text-gray-900">{user?.name}</h2>
               <p className="text-gray-600">{user?.email}</p>
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary-100 text-primary-800 mt-2">
+              <span className="inline-flex items-center px-3 py-1 mt-2 text-xs font-medium rounded-full bg-primary-100 text-primary-800">
                 {user?.role}
               </span>
             </div>
             <div>
               <a
                 href="/profile/edit"
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                className="inline-flex items-center px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
               >
                 Edit Profile
               </a>
@@ -44,7 +44,7 @@ export function ProfilePage() {
 
         {/* Profile Information */}
         <Card>
-          <h3 className="text-lg font-medium text-gray-900 mb-4">
+          <h3 className="mb-4 text-lg font-medium text-gray-900">
             Profile Information
           </h3>
           <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
@@ -77,16 +77,16 @@ export function ProfilePage() {
 
         {/* Quick Actions */}
         <Card>
-          <h3 className="text-lg font-medium text-gray-900 mb-4">
+          <h3 className="mb-4 text-lg font-medium text-gray-900">
             Quick Actions
           </h3>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <a
               href="/profile/settings"
-              className="flex items-center p-4 border border-gray-200 rounded-lg hover:border-primary-500 hover:shadow-md transition-all"
+              className="flex items-center p-4 transition-all border border-gray-200 rounded-lg hover:border-primary-500 hover:shadow-md"
             >
               <div className="flex-shrink-0">
-                <div className="flex items-center justify-center h-12 w-12 rounded-md bg-primary-500 text-white">
+                <div className="flex items-center justify-center w-12 h-12 text-white rounded-md bg-primary-500">
                   ⚙️
                 </div>
               </div>
@@ -97,10 +97,10 @@ export function ProfilePage() {
             </a>
             <a
               href="/profile/security"
-              className="flex items-center p-4 border border-gray-200 rounded-lg hover:border-primary-500 hover:shadow-md transition-all"
+              className="flex items-center p-4 transition-all border border-gray-200 rounded-lg hover:border-primary-500 hover:shadow-md"
             >
               <div className="flex-shrink-0">
-                <div className="flex items-center justify-center h-12 w-12 rounded-md bg-primary-500 text-white">
+                <div className="flex items-center justify-center w-12 h-12 text-white rounded-md bg-primary-500">
                   🔒
                 </div>
               </div>

@@ -4,6 +4,8 @@ import {
   LoginSchema,
   CreateUserSchema,
   RefreshTokenSchema,
+  UpdateUserSchema,
+  ChangePasswordSchema,
 } from '@myapp/shared/types';
 
 const authService = new AuthService();
@@ -205,6 +207,72 @@ export class AuthController {
         if (error.message === 'Invalid or expired reset token') {
           return res.status(400).json({ error: error.message });
         }
+        return res.status(400).json({ error: error.message });
+      }
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+
+  async updateProfile(req: Request, res: Response) {
+    try {
+      // Get user ID from auth middleware
+      const userId = (req as any).user?.userId;
+
+      if (!userId) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
+      // Validate input
+      const validatedData = UpdateUserSchema.parse(req.body);
+
+      // Update profile
+      const result = await authService.updateProfile(userId, validatedData);
+
+      res.status(200).json(result);
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.message === 'User not found') {
+          return res.status(404).json({ error: error.message });
+        }
+        if (error.message === 'No fields to update') {
+          return res.status(400).json({ error: error.message });
+        }
+        // Zod validation error
+        return res.status(400).json({ error: error.message });
+      }
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+
+  async changePassword(req: Request, res: Response) {
+    try {
+      // Get user ID from auth middleware
+      const userId = (req as any).user?.userId;
+
+      if (!userId) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
+      // Validate input
+      const validatedData = ChangePasswordSchema.parse(req.body);
+
+      // Change password
+      const result = await authService.changePassword(
+        userId,
+        validatedData.currentPassword,
+        validatedData.newPassword
+      );
+
+      res.status(200).json(result);
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.message === 'Current password is incorrect') {
+          return res.status(400).json({ error: error.message });
+        }
+        if (error.message === 'User not found') {
+          return res.status(404).json({ error: error.message });
+        }
+        // Zod validation error
         return res.status(400).json({ error: error.message });
       }
       res.status(500).json({ error: 'Internal server error' });

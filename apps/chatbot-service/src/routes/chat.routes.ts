@@ -3,6 +3,18 @@ import prisma from '../lib/prisma';
 import { authenticateToken, AuthenticatedRequest } from '../middleware/auth';
 import { rateLimitMiddleware } from '../middleware/rateLimit';
 import { OpenAIService } from '../services/openai.service';
+import {
+  validateBody,
+  validateQuery,
+  validateParams,
+} from '../middleware/validate';
+import {
+  createConversationSchema,
+  updateConversationSchema,
+  createMessageSchema,
+  paginationSchema,
+  uuidParamSchema,
+} from '../schemas/chat.schemas';
 
 const router = Router();
 
@@ -15,6 +27,7 @@ router.use(authenticateToken);
  */
 router.post(
   '/conversations',
+  validateBody(createConversationSchema),
   async (req: AuthenticatedRequest, res: Response) => {
     try {
       const userId = req.user!.userId;
@@ -41,6 +54,7 @@ router.post(
  */
 router.get(
   '/conversations',
+  validateQuery(paginationSchema),
   async (req: AuthenticatedRequest, res: Response) => {
     try {
       const userId = req.user!.userId;
@@ -93,6 +107,7 @@ router.get(
  */
 router.get(
   '/conversations/:id',
+  validateParams(uuidParamSchema),
   async (req: AuthenticatedRequest, res: Response) => {
     try {
       const userId = req.user!.userId;
@@ -130,15 +145,13 @@ router.get(
  */
 router.patch(
   '/conversations/:id',
+  validateParams(uuidParamSchema),
+  validateBody(updateConversationSchema),
   async (req: AuthenticatedRequest, res: Response) => {
     try {
       const userId = req.user!.userId;
       const { id } = req.params;
       const { title } = req.body;
-
-      if (!title || title.trim().length === 0) {
-        return res.status(400).json({ error: 'Title is required' });
-      }
 
       const conversation = await prisma.conversation.findFirst({
         where: { id, userId, isDeleted: false },
@@ -167,6 +180,7 @@ router.patch(
  */
 router.delete(
   '/conversations/:id',
+  validateParams(uuidParamSchema),
   async (req: AuthenticatedRequest, res: Response) => {
     try {
       const userId = req.user!.userId;
@@ -199,22 +213,14 @@ router.delete(
  */
 router.post(
   '/conversations/:id/messages',
+  validateParams(uuidParamSchema),
+  validateBody(createMessageSchema),
   rateLimitMiddleware(),
   async (req: AuthenticatedRequest, res: Response) => {
     try {
       const userId = req.user!.userId;
       const conversationId = req.params.id as string;
       const { content } = req.body;
-
-      if (!content || content.trim().length === 0) {
-        return res.status(400).json({ error: 'Message content is required' });
-      }
-
-      if (content.length > 10000) {
-        return res
-          .status(400)
-          .json({ error: 'Message too long (max 10,000 characters)' });
-      }
 
       // Verify conversation exists and belongs to user
       const conversation = await prisma.conversation.findFirst({
@@ -320,6 +326,8 @@ router.post(
  */
 router.get(
   '/conversations/:id/messages',
+  validateParams(uuidParamSchema),
+  validateQuery(paginationSchema),
   async (req: AuthenticatedRequest, res: Response) => {
     try {
       const userId = req.user!.userId;
@@ -377,6 +385,7 @@ router.get(
  */
 router.delete(
   '/messages/:id',
+  validateParams(uuidParamSchema),
   async (req: AuthenticatedRequest, res: Response) => {
     try {
       const userId = req.user!.userId;

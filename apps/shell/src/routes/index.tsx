@@ -37,6 +37,22 @@ export const router = createBrowserRouter([
       </PublicRoute>
     ),
   },
+  {
+    path: '/forgot-password',
+    element: (
+      <PublicRoute>
+        <AuthMfe />
+      </PublicRoute>
+    ),
+  },
+  {
+    path: '/reset-password/:token',
+    element: (
+      <PublicRoute>
+        <AuthMfe />
+      </PublicRoute>
+    ),
+  },
   // Protected routes with DashboardLayout
   {
     path: '/',
@@ -51,9 +67,17 @@ export const router = createBrowserRouter([
         path: 'dashboard',
         element: <DashboardPage />,
       },
-      // Chatbot MFE
+      // Chatbot MFE - all chat routes
       {
-        path: 'chatbot',
+        path: 'chat',
+        element: <ChatbotMfe />,
+      },
+      {
+        path: 'chat/:conversationId',
+        element: <ChatbotMfe />,
+      },
+      {
+        path: 'chatbot', // Legacy route, redirect to /chat
         element: <ChatbotMfe />,
       },
       // Profile routes - delegated to Profile MFE
@@ -92,6 +116,14 @@ export const router = createBrowserRouter([
       },
       {
         path: 'admin/users/:userId',
+        element: (
+          <AdminRoute>
+            <AdminMfe />
+          </AdminRoute>
+        ),
+      },
+      {
+        path: 'admin/audit-logs',
         element: (
           <AdminRoute>
             <AdminMfe />

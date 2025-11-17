@@ -9,6 +9,7 @@ import { authService } from '../services/auth.service';
 
 export function Login() {
   const [isLoading, setIsLoading] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const { setAuth } = useAuthStore();
   const { addToast } = useToastStore();
 
@@ -25,7 +26,17 @@ export function Login() {
 
     try {
       const response = await authService.login(data);
+
+      // Store auth data with remember me preference
       setAuth(response.user, response.accessToken, response.refreshToken);
+
+      // Store remember me preference
+      if (rememberMe) {
+        localStorage.setItem('rememberMe', 'true');
+      } else {
+        localStorage.removeItem('rememberMe');
+      }
+
       addToast('Login successful!', 'success');
 
       // Use window.location.replace for reliable cross-MFE navigation
@@ -76,6 +87,8 @@ export function Login() {
                   id="remember-me"
                   name="remember-me"
                   type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
                   className="w-4 h-4 border-gray-300 rounded text-primary-600 focus:ring-primary-500"
                 />
                 <label
@@ -87,12 +100,12 @@ export function Login() {
               </div>
 
               <div className="text-sm">
-                <a
-                  href="#"
+                <Link
+                  to="/forgot-password"
                   className="font-medium text-primary-600 hover:text-primary-500"
                 >
                   Forgot password?
-                </a>
+                </Link>
               </div>
             </div>
 

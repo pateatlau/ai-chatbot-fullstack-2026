@@ -29,26 +29,20 @@ export function DashboardLayout() {
               <nav className="flex gap-6">
                 <Link
                   to="/dashboard"
-                  className="text-gray-600 hover:text-gray-900 transition-colors"
+                  className="text-gray-600 hover:text-gray-900 transition-colors font-medium"
                 >
                   Dashboard
                 </Link>
                 <Link
-                  to="/chatbot"
-                  className="text-gray-600 hover:text-gray-900 transition-colors"
+                  to="/chat"
+                  className="text-gray-600 hover:text-gray-900 transition-colors font-medium"
                 >
-                  Chatbot
-                </Link>
-                <Link
-                  to="/profile"
-                  className="text-gray-600 hover:text-gray-900 transition-colors"
-                >
-                  Profile
+                  Chat
                 </Link>
                 {hasRole('ADMIN') && (
                   <Link
                     to="/admin"
-                    className="text-gray-600 hover:text-gray-900 transition-colors"
+                    className="text-gray-600 hover:text-gray-900 transition-colors font-medium"
                   >
                     Admin
                   </Link>
@@ -57,12 +51,61 @@ export function DashboardLayout() {
             </div>
 
             <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-600">
-                {user?.name || user?.email}
-              </span>
-              <Button variant="outline" size="sm" onClick={handleLogout}>
-                Logout
-              </Button>
+              {/* User Dropdown */}
+              <div className="relative group">
+                <button className="flex items-center gap-2 text-sm text-gray-700 hover:text-gray-900 transition-colors">
+                  <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center text-white font-medium">
+                    {user?.name?.[0]?.toUpperCase() ||
+                      user?.email?.[0]?.toUpperCase() ||
+                      'U'}
+                  </div>
+                  <span className="font-medium">
+                    {user?.name || user?.email}
+                  </span>
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+
+                {/* Dropdown Menu */}
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                  <Link
+                    to="/profile"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    👤 Profile
+                  </Link>
+                  <Link
+                    to="/profile/settings"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    ⚙️ Settings
+                  </Link>
+                  <Link
+                    to="/profile/security"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    🔒 Security
+                  </Link>
+                  <hr className="my-1" />
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                  >
+                    🚪 Logout
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>

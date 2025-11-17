@@ -6,6 +6,10 @@ export interface User {
   email: string;
   name: string;
   role: string;
+  avatar?: string | null;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface AuthState {
