@@ -1,41 +1,59 @@
 # AI Chatbot Full-Stack Application
 
-[![Production Ready](https://img.shields.io/badge/Production-Ready-brightgreen)](docs/PRODUCTION_DEPLOYMENT.md)
-[![Tests](https://img.shields.io/badge/Tests-247%20Passing-success)](docs/E2E_TESTING.md)
-[![Coverage](https://img.shields.io/badge/Coverage-82%25-green)](#testing-coverage)
-[![Security](https://img.shields.io/badge/Vulnerabilities-0-success)](#security-features)
+[![Architecture](https://img.shields.io/badge/Architecture-Microservices%20%2B%20MFE-blue)](#architecture)
+[![API](https://img.shields.io/badge/API-REST%20%2B%20GraphQL-blue)](#architecture)
+[![Nx](https://img.shields.io/badge/Monorepo-Nx-purple)](https://nx.dev)
+[![Docker](https://img.shields.io/badge/Containerized-Docker-2496ED)](#quick-start)
 
-A production-ready, enterprise-grade AI chatbot application built with modern microservices backend and Module Federation micro-frontends, featuring comprehensive testing, CI/CD automation, and multi-platform deployment support.
+An enterprise-grade AI chatbot application built with modern microservices backend and Module Federation micro-frontends, featuring hybrid REST + GraphQL APIs, comprehensive testing, CI/CD automation, and multi-platform deployment support.
 
-**Status:** ✅ **PRODUCTION READY** | **Completion:** 98% | **Investment:** ~12 hours
+**Timeline:** 5 weeks (35 days) | **Team Size:** 4-8 developers
 
 ## ✨ Key Features
 
 - 🎯 **Modern Architecture** - Microservices + Module Federation MFEs
-- 🚀 **Production Ready** - Docker, Kubernetes, multi-cloud deployment
-- 🧪 **Comprehensive Testing** - 193+ unit tests, 54 E2E tests, load testing
-- 🔒 **Security Hardened** - 0 vulnerabilities, JWT auth, rate limiting
+- 🔀 **Hybrid API** - REST for CRUD + GraphQL for complex queries (Apollo Federation)
+- 🏭️ **Nx Monorepo** - Intelligent caching, affected detection, parallel execution
+- 🧪 **Comprehensive Testing** - Unit, E2E, integration, load testing
+- 🔒 **Security First** - JWT auth, rate limiting, input validation, RBAC
+- 🔐 **SSO + MFA** - Google/GitHub OAuth, TOTP/SMS 2FA (optional tiers)
 - 📊 **Real-time Chat** - OpenAI integration with SSE streaming
-- 🔄 **CI/CD Automated** - GitHub Actions for testing and deployment
-- 📚 **Fully Documented** - 2,400+ lines of comprehensive guides
-- 🌐 **Multi-platform** - Deploy to Docker, K8s, AWS, GCP, Azure
+- ⚡ **High Performance** - 50% faster dashboards with GraphQL optimization
+- 🐳 **Multi-platform Deploy** - Docker, K8s, AWS, GCP, Azure
+- 📚 **Fully Documented** - 3,700+ lines of implementation guides
+- 🔄 **CI/CD Ready** - GitHub Actions workflows included
 
 ## Architecture
 
-- **Backend**: 3 microservices (Auth, Admin, Chatbot) with Express + Prisma
+- **Backend**: 4 microservices (Auth, Admin, Chatbot, GraphQL Gateway) with Express + Prisma/Mongoose
+- **API Layer**: Hybrid REST + GraphQL (Apollo Federation v2)
+- **Authentication**: JWT + OAuth 2.0 SSO (Google, GitHub) + MFA (TOTP, SMS, WebAuthn)
 - **Frontend**: Shell host + 4 remote MFEs (Auth, Chatbot, Admin, Profile)
-- **Infrastructure**: PostgreSQL 15, Redis 7, Nginx reverse proxy
+- **Infrastructure**: PostgreSQL 15, MongoDB 7, Redis 7, Nginx reverse proxy
 - **Testing**: Playwright (E2E), Jest (Unit), k6 (Load)
 - **Build System**: Nx monorepo with intelligent caching
+
+**API Strategy:**
+
+- **REST**: Authentication, CRUD operations, file uploads, SSE streaming
+- **GraphQL**: Complex data queries, admin dashboards, federated data fetching
+- **Performance**: 50% faster admin dashboard (7 REST calls → 1 GraphQL query)
+
+**Security Features:**
+
+- **Priority 1** (🎉 Free): Google OAuth + TOTP MFA (self-hosted, $0/month)
+- **Priority 2** (Recommended): GitHub OAuth + SMS MFA (+$15-30/month)
+- **Priority 3** (Enterprise): WebAuthn + Auth0 SSO (+$25-240/month)
 
 ## Monorepo Structure
 
 ```
 ai-chatbot-fullstack-2026/
 ├── apps/
-│   ├── auth-service/        # Authentication microservice
-│   ├── chatbot-service/     # Chatbot microservice
-│   ├── admin-service/       # Admin microservice
+│   ├── auth-service/        # Authentication microservice (REST + GraphQL subgraph)
+│   ├── chatbot-service/     # Chatbot microservice (REST + GraphQL subgraph)
+│   ├── admin-service/       # Admin microservice (REST + GraphQL subgraph)
+│   ├── graphql-gateway/     # GraphQL Gateway (Apollo Federation - port 4000)
 │   ├── shell/               # Shell app (host for MFEs)
 │   ├── auth-mfe/            # Auth microfrontend (port 5174)
 │   ├── chatbot-mfe/         # Chatbot microfrontend (port 5175)
@@ -44,6 +62,7 @@ ai-chatbot-fullstack-2026/
 ├── libs/
 │   ├── shared/
 │   │   ├── types/           # Zod schemas (API contracts)
+│   │   ├── graphql-types/   # GraphQL schemas and types
 │   │   └── utils/           # Common utilities
 │   ├── backend/
 │   │   ├── logger/          # Logging library
@@ -52,7 +71,8 @@ ai-chatbot-fullstack-2026/
 │   │   └── database/        # Database utilities
 │   └── frontend/
 │       ├── ui-components/   # Shared UI components
-│       ├── api-client/      # API client
+│       ├── api-client/      # REST API client
+│       ├── graphql-client/  # Apollo Client (GraphQL)
 │       ├── stores/          # Shared stores (Zustand)
 │       └── utils/           # Frontend utilities
 └── docker-compose.yml       # Local development services
@@ -112,6 +132,7 @@ ai-chatbot-fullstack-2026/
 - **Chatbot MFE**: http://localhost:5175
 - **Admin MFE**: http://localhost:5176
 - **Profile MFE**: http://localhost:5177
+- **GraphQL Gateway**: http://localhost:4000/graphql (Apollo Studio)
 - **Prisma Studio**: `npm run prisma:studio`
 
 ## Available Scripts
@@ -271,10 +292,16 @@ ESLint enforces strict module boundaries:
 
 - Node.js v20 + TypeScript 5.3
 - Express 4.18
-- Prisma 6.x ORM
+- **GraphQL**: Apollo Server v4 + Apollo Federation v2
+- **Authentication**: Passport.js + OAuth 2.0 (Google, GitHub)
+- **MFA**: Speakeasy (TOTP), Twilio (SMS), @simplewebauthn (WebAuthn)
+- Prisma 6.x ORM (PostgreSQL)
+- Mongoose 8.x ODM (MongoDB)
 - PostgreSQL 16
+- MongoDB 7.0
 - Redis 7
 - Zod for validation
+- OpenAI API integration
 
 ### Frontend
 
@@ -282,8 +309,9 @@ ESLint enforces strict module boundaries:
 - TypeScript 5.3
 - Vite 5.x
 - React Router v7
+- **GraphQL**: Apollo Client v3
 - Zustand v5 (state management)
-- TanStack Query v5 (data fetching)
+- TanStack Query v5 (REST data fetching)
 - Tailwind CSS v4
 - Module Federation
 
@@ -294,47 +322,88 @@ ESLint enforces strict module boundaries:
 - Affected command detection
 - Task orchestration
 
-## 🏆 Project Status
+## 📋 Implementation Roadmap
 
-### Phase Completion
+This project follows a 5-week implementation plan with parallel frontend and backend development:
 
-✅ **Phase 1: Shell Integration** (100%) - 2 hours  
-✅ **Phase 2: Chatbot MFE** (100%) - 3 hours  
-✅ **Phase 3: E2E Testing** (100%) - 3 hours  
-✅ **Phase 4: Production Readiness** (95%) - 3 hours
+### Phase Breakdown
 
-**Overall: 98% Complete - Production Ready**
+**Phase 1: Foundation & Setup** (Week 1)
 
-### Testing Coverage
+- Nx monorepo initialization
+- Shared libraries and type definitions
+- Docker environment setup
+- Basic auth service implementation
 
-| Component            | Tests    | Status | Coverage |
-| -------------------- | -------- | ------ | -------- |
-| **Backend Services** | 48       | ✅     | ~82%     |
-| **Frontend MFEs**    | 145+     | ✅     | ~81%     |
-| **E2E Tests**        | 54       | ✅     | 100%     |
-| **Total**            | **247+** | **✅** | **~82%** |
+**Phase 2: Core Services + SSO/MFA (Priority 1)** (Week 2)
 
-### Infrastructure
+- Auth and Chatbot microservices
+- **Google OAuth 2.0 integration (8-12 hours)**
+- **TOTP-based MFA implementation (6-8 hours)**
+- Database schema updates for OAuth and MFA
+- Auth MFE with OAuth buttons and MFA setup
+- Profile MFE
+- REST API endpoints
+- Module Federation integration
 
-✅ Multi-stage Dockerfiles (4 services)  
-✅ Docker Compose orchestration  
-✅ Nginx reverse proxy  
-✅ CI/CD pipeline (GitHub Actions)  
-✅ Load testing suite (k6)  
-✅ Smoke tests  
-✅ Security audit (0 vulnerabilities)
+**Phase 3: Advanced Features + Optional Security** (Week 3)
+
+- GraphQL Gateway with Apollo Federation
+- Admin service and Admin MFE
+- Chatbot MFE with streaming
+- Complex data queries
+- **Optional: GitHub OAuth integration (4-6 hours)**
+- **Optional: SMS MFA with Twilio (4-6 hours)**
+
+**Phase 4: Testing & Quality** (Week 4)
+
+- Comprehensive E2E testing
+- Performance optimization
+- Security hardening
+- Load testing scenarios
+
+**Phase 5: Deployment** (Week 5)
+
+- CI/CD pipeline setup
+- Docker containerization
+- Production deployment
+- Monitoring and observability
+
+### Expected Deliverables
+
+| Component            | Target Tests | Coverage | Features              |
+| -------------------- | ------------ | -------- | --------------------- |
+| **Backend Services** | 60+          | >80%     | REST + GraphQL APIs   |
+| **Frontend MFEs**    | 150+         | >80%     | 5 microfrontends      |
+| **E2E Tests**        | 50+          | 100%     | Critical user flows   |
+| **Total**            | **260+**     | **>80%** | **Full-stack system** |
+
+### Infrastructure Components
+
+- Multi-stage Dockerfiles (4 services)
+- Docker Compose orchestration
+- Nginx reverse proxy
+- CI/CD pipeline (GitHub Actions)
+- Load testing suite (k6)
+- Smoke tests
+- Security audit tools
 
 ### Security Features
 
-✅ JWT authentication with refresh tokens  
-✅ Non-root container execution  
-✅ Security headers (XSS, CSP, HSTS)  
-✅ Rate limiting (10 msg/min)  
-✅ CORS protection  
-✅ Environment-based secrets  
-✅ SSL/TLS ready
+- JWT authentication with refresh tokens
+- Non-root container execution
+- Security headers (XSS, CSP, HSTS)
+- Rate limiting (10 msg/min)
+- CORS protection
+- Environment-based secrets
+- SSL/TLS ready
 
 ## 📚 Documentation
+
+**Product & Planning:**
+
+- [📋 Product Requirements Document (PRD)](./docs/PRODUCT_REQUIREMENTS_DOCUMENT.md) - Complete business requirements, user stories, use cases, success metrics, and product vision
+- [🗺️ Technical Implementation Roadmap](./docs/CONSOLIDATED_IMPLEMENTATION_ROADMAP-NX.md) - Detailed technical implementation guide (3,890+ lines)
 
 **Essential Guides:**
 
@@ -342,6 +411,10 @@ ESLint enforces strict module boundaries:
 - [🧪 E2E Testing Guide](./docs/E2E_TESTING.md) (600+ lines)
 - [⚡ Load Testing Guide](./k6/README.md) (200+ lines)
 - [📊 Project Summary](./docs/PROJECT_SUMMARY.md) (Complete overview)
+
+**Advanced Topics:**
+
+- [🚀 Advanced MFE Routing Optimizations](./docs/ADVANCED_MFE_ROUTING_OPTIMIZATIONS.md) - Intelligent prefetching, predictive loading, dynamic MFE selection, service worker caching (95% faster navigation)
 
 **Phase Reports:**
 
@@ -354,6 +427,11 @@ ESLint enforces strict module boundaries:
 - [Module Federation Guide](https://module-federation.io)
 - [Playwright Documentation](https://playwright.dev)
 - [k6 Load Testing](https://k6.io/docs)
+
+**Alternative Implementations:**
+
+- [📊 MongoDB Implementation Roadmap](./docs/MONGODB_IMPLEMENTATION_ROADMAP.md) - Adapt this project to use MongoDB + Mongoose instead of PostgreSQL + Prisma
+- [🚀 Hybrid PostgreSQL + MongoDB Roadmap](./docs/HYBRID_POSTGRES_MONGODB_ROADMAP.md) - Enterprise-scale architecture with polyglot persistence (PostgreSQL for auth/admin, MongoDB for chat) + Nginx load balancing for 10M+ users
 
 ## 🚀 Deployment Platforms
 

@@ -1,157 +1,18 @@
 # Full-Stack Implementation Roadmap
 
-## AI Chatbot Platform - Nx Monorepo Architecture
+## Parallel Frontend & Backend Development (Nx Monorepo)
 
-**Document Type:** Technical Implementation Guide  
-**Audience:** Development Teams, Technical Leads, Project Managers, Architects  
 **Version:** 5.0  
-**Last Updated:** November 17, 2025  
+**Date:** November 17, 2025  
 **Timeline:** 5 Weeks (35 days)  
 **Team Composition:** 4-8 developers (2-4 Backend, 2-4 Frontend)  
-**Architecture:** Unified Monorepo (Nx) with Hybrid REST + GraphQL  
-**Estimated Reading Time:** 45-60 minutes
-
-**Quick Navigation:** [Executive Summary](#executive-summary) | [Prerequisites](#prerequisites) | [Week-by-Week Implementation](#week-by-week-implementation) | [Troubleshooting](#troubleshooting-guide) | [FAQ](#frequently-asked-questions)
-
----
-
-## TABLE OF CONTENTS
-
-### 📘 PART I: STRATEGIC OVERVIEW
-
-- [Executive Summary](#executive-summary)
-- [Project Overview](#-project-overview)
-  - [Architecture Components](#architecture-components)
-  - [Key Technologies](#key-technologies)
-  - [Target Achievements](#-target-achievements)
-- [Success Criteria & Metrics](#-success-criteria--metrics)
-- [Team Structure](#team-structure)
-  - [Backend Team](#backend-team-2-4-developers)
-  - [Frontend Team](#frontend-team-2-4-developers)
-  - [Shared Responsibilities](#shared-responsibilities)
-
-### 🏗️ PART II: TECHNICAL ARCHITECTURE
-
-- [Monorepo Architecture (Nx)](#monorepo-architecture)
-  - [Why Nx?](#why-nx)
-  - [Nx Monorepo Structure](#nx-monorepo-structure)
-- [Hybrid API Architecture: REST + GraphQL](#hybrid-api-architecture-rest--graphql)
-  - [Why Hybrid REST + GraphQL?](#why-hybrid-rest--graphql)
-  - [Architecture Overview](#architecture-overview)
-  - [API Responsibility Matrix](#api-responsibility-matrix)
-  - [When to Use REST vs GraphQL](#when-to-use-rest-vs-graphql)
-- [State Management Strategy](#state-management-strategy-hybrid-approach)
-  - [Why Hybrid (Event Bus + Zustand)?](#why-hybrid-event-bus--zustand)
-  - [Architecture Decision](#architecture-decision)
-  - [State Management Decision Matrix](#state-management-decision-matrix)
-  - [Benefits Summary](#benefits-summary)
-
-### 📅 PART III: IMPLEMENTATION
-
-- [Prerequisites](#prerequisites) ⚡ **START HERE**
-  - [Development Environment](#development-environment)
-  - [Cloud Services & Access](#cloud-services--access)
-  - [Team Knowledge Requirements](#team-knowledge-requirements)
-  - [Pre-Development Checklist](#pre-development-checklist)
-- [Week-by-Week Implementation](#week-by-week-implementation)
-  - [Week 1: Foundation & Setup](#week-1-foundation--setup)
-  - [Week 2: Core Services & MFEs](#week-2-core-services--mfes)
-  - [Week 3: Admin Service, GraphQL Gateway & Advanced MFEs](#week-3-admin-service-graphql-gateway--advanced-mfes)
-  - [Week 4: Testing, Integration & Optimization](#week-4-testing-integration--optimization)
-  - [Week 5: Deployment & Launch](#week-5-deployment--launch)
-- [Coordination Mechanisms](#coordination-mechanisms)
-- [Success Metrics](#success-metrics)
-- [Risk Mitigation](#risk-mitigation)
-- [Definition of Done](#definition-of-done)
-
-### ⚙️ PART IV: OPERATIONS & TROUBLESHOOTING
-
-- [Quick Start Guide](#quick-start-checklist)
-  - [Day 1 Setup](#day-1-both-teams)
-  - [Backend Team Day 1](#backend-team-day-1)
-  - [Frontend Team Day 1](#frontend-team-day-1)
-- [Risk Mitigation](#risk-mitigation)
-  - [Technical Risks](#technical-risks)
-  - [Process Risks](#process-risks)
-  - [Deployment Risks](#deployment-risks)
-- [Post-Launch Operations](#post-launch-ongoing)
-- [Troubleshooting Guide](#troubleshooting-guide) 🔧
-  - [Development Environment Issues](#development-environment-issues)
-  - [Database Issues](#database-issues)
-  - [API Integration Issues](#api-integration-issues)
-  - [Docker & Deployment Issues](#docker--deployment-issues)
-  - [Performance Issues](#performance-issues)
-  - [Testing Issues](#testing-issues)
-- [Frequently Asked Questions](#frequently-asked-questions) 💡
-  - [Architecture & Design](#architecture--design)
-  - [Development Workflow](#development-workflow)
-  - [Testing](#testing)
-  - [Deployment](#deployment)
-  - [Security](#security)
-  - [Performance](#performance)
-  - [Nx Monorepo](#nx-monorepo)
-  - [Cost & Scaling](#cost--scaling)
-
-### 📎 APPENDICES
-
-- [Appendix A: Detailed Feature Specifications](#appendix-a-detailed-feature-specifications)
-- [Appendix B: GraphQL Implementation Details](#appendix-b-graphql-implementation-details)
-- [Appendix C: Code Examples](#appendix-c-code-examples)
-- [Appendix D: Glossary](#appendix-d-glossary)
-- [Appendix E: Resources & References](#appendix-e-resources--references)
-
----
-
-## EXECUTIVE SUMMARY
-
-> **Document Purpose:** This roadmap guides parallel development of an enterprise AI chatbot platform using Nx monorepo architecture with hybrid REST + GraphQL APIs.
-
-### What We're Building
-
-An enterprise-grade AI chatbot application with a modern microservices backend and Module Federation micro-frontends. The platform enables:
-
-- **Real-time AI conversations** with streaming responses (OpenAI integration)
-- **Multi-tenant user management** with JWT authentication, SSO, and MFA
-- **Admin analytics dashboard** with comprehensive user and conversation insights
-- **Scalable architecture** supporting millions of users with horizontal scaling
-
-### Strategic Approach
-
-This roadmap enables **parallel development** of the microservices backend and micro-frontend architecture in a **unified Nx monorepo** with a **hybrid REST + GraphQL API strategy**.
-
-**Key Differentiators:**
-
-- **Monorepo Architecture:** Single Nx workspace housing frontend, backend, and shared packages
-- **Hybrid API Layer:** REST for CRUD/streaming operations, GraphQL for complex data fetching
-- **Nx Build System:** Intelligent task scheduling, computation caching, distributed execution
-- **Code Generators:** Scaffolding tools for consistent project structure
-- **Apollo Federation:** Unified GraphQL gateway across microservices
-- **Event-Driven MFEs:** True micro-frontend independence with custom event bus
-
-### Timeline & Deliverables
-
-| Week  | Focus Area    | Backend Deliverables                          | Frontend Deliverables                          |
-| ----- | ------------- | --------------------------------------------- | ---------------------------------------------- |
-| **1** | Foundation    | Auth Service, shared types, Docker setup      | Shell app, shared libraries, Module Federation |
-| **2** | Core Services | Chatbot Service + SSE streaming, OAuth/MFA    | Auth MFE, Profile MFE                          |
-| **3** | Advanced      | Admin Service, GraphQL Gateway, Federation    | Chatbot MFE, Admin MFE                         |
-| **4** | Testing       | Integration tests, load testing, optimization | E2E tests, performance tuning                  |
-| **5** | Deployment    | CI/CD pipelines, production deployment        | Production builds, monitoring                  |
-
-### Success Factors
-
-✅ Unified Nx monorepo with intelligent caching and incremental builds  
-✅ Hybrid REST + GraphQL with Apollo Federation  
-✅ Shared Zod schemas ensuring type safety  
-✅ Mock APIs enabling parallel development  
-✅ Comprehensive testing (250+ tests, >80% coverage)
+**Architecture:** **Unified Monorepo (Nx) with Hybrid REST + GraphQL**
 
 ---
 
 ## 📋 PROJECT OVERVIEW
 
-> **Audience:** All team members, stakeholders  
-> **Purpose:** Provide a high-level understanding of system architecture and components### Architecture Components
+### Architecture Components
 
 #### Backend Services
 
@@ -159,7 +20,7 @@ This roadmap enables **parallel development** of the microservices backend and m
 - **Chatbot Service** - OpenAI integration, SSE streaming, REST + GraphQL subgraph
 - **Admin Service** - User management, analytics, REST + GraphQL subgraph
 - **GraphQL Gateway** - Apollo Federation, unified API layer (Port 4000)
-- **Database** - PostgreSQL 16 with Prisma ORM
+- **Database** - PostgreSQL 15 with Prisma ORM, MongoDB 7.0 with Mongoose
 - **Cache** - Redis 7 for sessions
 
 #### Frontend Applications
@@ -182,67 +43,126 @@ This roadmap enables **parallel development** of the microservices backend and m
 - **@myapp/frontend/ui-components** - Shared UI components
 - **@myapp/frontend/api-client** - REST API client with auth
 - **@myapp/frontend/graphql-client** - Apollo Client for GraphQL
-- **@myapp/frontend/event-bus** - Cross-MFE event communication
-- **@myapp/frontend/stores** - Local Zustand stores (per MFE)
+- **@myapp/frontend/stores** - Zustand stores
 - **@myapp/frontend/hooks** - Custom React hooks
 - **@myapp/frontend/utils** - Frontend utilities
 
-### Key Technologies
+### Planned Features
 
-| Layer              | Technologies                                                                                                  |
-| ------------------ | ------------------------------------------------------------------------------------------------------------- |
-| **Backend**        | Node.js 20, TypeScript 5.3, Express 4.18, PostgreSQL 16, Prisma 6.x, Redis 7.x, Apollo Federation, OpenAI API |
-| **Frontend**       | React 18, Vite 5.x, Module Federation, Apollo Client, TanStack Query, Zustand, Tailwind CSS                   |
-| **Infrastructure** | Docker, Kubernetes, GitHub Actions, Nx 22.x monorepo                                                          |
-| **Testing**        | Playwright, Vitest, k6                                                                                        |
-| **Shared**         | TypeScript 5.3, Zod 3.24 schemas                                                                              |
+**Backend:**
 
-> 📝 See [Appendix A](#appendix-a-detailed-feature-specifications) for detailed specifications.
+- User authentication (JWT, refresh tokens) - REST
+- User registration with validation - REST
+- Password reset flow - REST
+- **SSO with OAuth 2.0** - Google, GitHub (Priority 1-2)
+- **Multi-Factor Authentication (MFA)** - TOTP, SMS, WebAuthn (Priority 1-3)
+- Session management (Redis) - REST
+- Chat conversations (CRUD) - REST
+- Chat messages with OpenAI integration - REST + SSE
+- Server-Sent Events (SSE) streaming - REST
+- Rate limiting (10 msg/min)
+- Admin user management - REST
+- Admin analytics dashboard - **GraphQL (optimized)**
+- Complex data queries - **GraphQL Federation**
+- User profile aggregation - **GraphQL**
+- Conversation list with stats - **GraphQL**
+- Audit logging
+- Database migrations (Prisma)
+- Health check endpoints (database, Redis, OpenAI status)
+- Health check metrics (response time, memory, uptime)
+- CORS configuration
+- Input validation (Zod)
+
+**Frontend:**
+
+- Module Federation architecture
+- Shell host application
+- Auth MFE (login, register, password reset)
+- Chatbot MFE (chat interface, streaming)
+- Admin MFE (user management, analytics)
+- Profile MFE (settings, security)
+- Responsive design (mobile, tablet, desktop)
+- Dark/Light theme toggle
+- Toast notifications
+- Loading states
+- Error boundaries
+- Protected routes
+- Role-based access control
+- Markdown rendering for AI responses
+- Code syntax highlighting
+
+**Infrastructure:**
+
+- Docker multi-stage builds (4 services)
+- Docker Compose orchestration
+- Nginx reverse proxy
+- PostgreSQL 15 database
+- MongoDB 7.0 database
+- Redis 7 cache
+- GitHub Actions CI/CD
+- E2E testing automation
+- Load testing scenarios (k6)
+- Smoke test scripts
+- Environment templates
+- Health checks
+- Security hardening
+
+### 🔮 Optional Enhancements
+
+**Priority 1 (High Value, Low Effort):**
+
+- SSO with Google OAuth (~8-12 hours, $0/month)
+- TOTP-based MFA (~6-8 hours, $0/month)
+- Enhanced health checks with dependency status (~20 min)
+- Profile MFE MSW handlers (~15 min)
+- Swagger/OpenAPI documentation (~60 min) COMPLETED
+
+**Priority 2 (Recommended):**
+
+- GitHub OAuth integration (~4-6 hours, $0/month)
+- SMS MFA with Twilio (~4-6 hours, $15-30/month)
+- Prometheus metrics integration (~2 hours)
+
+**Priority 3 (Long Term):**
+
+- WebAuthn/FIDO2 support (~8-10 hours, $0/month)
+- Auth0 enterprise SSO (~6-8 hours, $23-240/month)
+- Multi-region deployment
+- Advanced caching strategies
+- WebSocket support for real-time features
+- Machine learning model optimization
+- Mobile applications (React Native)
+- Advanced analytics platform
 
 ### 🎯 Target Achievements
 
-**Core Deliverables:**
-✅ Microservices + MFE architecture with 250+ tests (>80% coverage)  
-✅ Production-ready deployment (Docker, K8s, multi-cloud)  
-✅ Real-time SSE streaming with end-to-end type safety  
-✅ Zero critical security vulnerabilities
+- **Modern Architecture** - Microservices + Module Federation MFEs
+- **Comprehensive Testing** - 250+ tests (unit, E2E, load)
+- **Production Ready** - Docker, K8s, multi-cloud deployment
+- **Security Hardened** - 0 vulnerabilities, best practices
+- **Fully Documented** - 3,700+ lines of guides
+- **Real-time Features** - SSE streaming for chat
+- **Type Safe** - TypeScript + Zod throughout
+- **Scalable** - Horizontal and vertical scaling ready
+- **Fast Development** - Nx monorepo with intelligent caching
 
-**Optional Enhancements:**
+### 📊 Project Statistics
 
-- **P1:** Google OAuth SSO, TOTP MFA (~14-20 hours)
-- **P2:** GitHub OAuth, SMS MFA, Prometheus (~10-12 hours)
-- **P3:** WebAuthn, Auth0 SSO, multi-region (post-launch)
-
----
-
-## 🎯 SUCCESS CRITERIA & METRICS
-
-> **Purpose:** Define measurable success criteria and key performance indicators
-
-### Quality Metrics
-
-| Metric                       | Target     | Priority    | Notes                           |
-| ---------------------------- | ---------- | ----------- | ------------------------------- |
-| **Test Coverage**            | >80%       | Must Have   | Unit, integration, E2E tests    |
-| **Total Tests**              | 250+       | Must Have   | 200+ unit, 50+ E2E              |
-| **Security Vulnerabilities** | 0 critical | Must Have   | Regular npm audit               |
-| **API Response Time (p95)**  | <500ms     | Must Have   | Normal load conditions          |
-| **Error Rate**               | <1%        | Must Have   | Production traffic              |
-| **Lighthouse Score**         | >90        | Should Have | Performance, accessibility, SEO |
-| **Documentation**            | Complete   | Must Have   | Architecture, API, deployment   |
-| **Deployment Options**       | 3+         | Must Have   | Docker, K8s, cloud platforms    |
-
-### Performance Benchmarks
-
-| Operation                | Target | Acceptable | Notes                  |
-| ------------------------ | ------ | ---------- | ---------------------- |
-| Page Load Time           | <2s    | <3s        | First contentful paint |
-| API Response (REST)      | <200ms | <500ms     | Simple queries (p95)   |
-| API Response (GraphQL)   | <300ms | <600ms     | Complex queries (p95)  |
-| Message Streaming Start  | <1s    | <2s        | Time to first token    |
-| Database Query           | <50ms  | <100ms     | Typical queries (p95)  |
-| Build Time (Full)        | <5min  | <10min     | CI/CD pipeline         |
-| Build Time (Incremental) | <30s   | <1min      | Affected projects only |
+| Metric                | Base Project                              | With SSO/MFA (P1)          | With SSO/MFA (Full)        |
+| --------------------- | ----------------------------------------- | -------------------------- | -------------------------- |
+| **Total Projects**    | 20 (9 apps, 11 libs)                      | 20 (9 apps, 11 libs)       | 20 (9 apps, 11 libs)       |
+| **Backend Services**  | 4 (Auth, Chatbot, Admin, GraphQL Gateway) | 4 + OAuth/MFA              | 4 + OAuth/MFA              |
+| **API Protocols**     | REST + GraphQL (Hybrid)                   | REST + GraphQL + OAuth 2.0 | REST + GraphQL + OAuth 2.0 |
+| **GraphQL Subgraphs** | 3 (Auth, Chatbot, Admin)                  | 3                          | 3                          |
+| **Lines of Code**     | ~17,000+                                  | ~18,500+                   | ~20,000+                   |
+| **Total Tests**       | 270+ (target)                             | 290+ (target)              | 310+ (target)              |
+| **Test Coverage**     | ~85% (target)                             | ~85% (target)              | ~85% (target)              |
+| **Documentation**     | 3,700+ lines                              | 4,500+ lines               | 5,000+ lines               |
+| **Code Files**        | 330+                                      | 350+                       | 370+                       |
+| **Dependencies**      | 90+ packages                              | 95+ packages               | 100+ packages              |
+| **Development Time**  | ~14 hours                                 | ~26-30 hours               | ~44+ hours                 |
+| **Target Completion** | 5 weeks (35 days)                         | 6 weeks (42 days)          | 7-8 weeks (49-56 days)     |
+| **Monthly Cost**      | $5,750                                    | $5,750                     | $5,790-6,020               |
 
 ### 🚦 Production Readiness Checklist
 
@@ -338,9 +258,40 @@ This roadmap enables **parallel development** of the microservices backend and m
 
 ---
 
-# PART II: TECHNICAL ARCHITECTURE
+## EXECUTIVE SUMMARY
 
-> **Section Overview:** Detailed look at architectural decisions, technology choices, and system design
+This consolidated roadmap enables **parallel development** of the microservices backend and microfrontend architecture in a **unified Nx monorepo** with a **hybrid REST + GraphQL API strategy**. By using **Nx** for advanced build orchestration, intelligent caching, and code generation, both teams can work independently while maintaining tight integration with maximum efficiency and future scalability.
+
+**Key Strategy:**
+
+- **Monorepo Architecture:** Single Nx workspace housing frontend, backend, and shared packages
+- **Hybrid API Layer:** REST for CRUD/streaming, GraphQL for complex data fetching
+- **Nx Build System:** Intelligent task scheduling, computation caching, distributed execution
+- **Code Generators:** Scaffolding tools for consistent project structure
+- **Dependency Graph:** Visual understanding of project dependencies
+- **Apollo Federation:** Unified GraphQL gateway across microservices
+- **Week 1:** Foundation (Nx monorepo setup + shared types)
+- **Week 2:** Core Services (Backend: Auth + Chatbot with REST, Frontend: Auth + Profile MFEs)
+- **Week 3:** Advanced Features (Backend: Admin + GraphQL Gateway, Frontend: Chatbot + Admin MFEs)
+- **Week 4:** Testing & Integration (both teams integrate + E2E testing + GraphQL queries)
+- **Week 5:** Deployment (parallel staging/production deployment)
+
+**Success Factors:**
+
+Unified Nx monorepo with intelligent caching  
+Shared Zod schemas as API contract  
+**Hybrid REST + GraphQL for optimal performance**  
+**Apollo Federation for microservices integration**  
+Incremental builds (rebuild only affected projects)  
+Distributed task execution (local & CI)  
+Code generators for consistency  
+Dependency graph visualization  
+Mock APIs for frontend independence  
+Daily sync meetings between teams  
+Clear API documentation (OpenAPI + GraphQL Schema)  
+Parallel CI/CD pipelines with Nx Cloud
+
+---
 
 ## TEAM STRUCTURE
 
@@ -368,9 +319,9 @@ This roadmap enables **parallel development** of the microservices backend and m
 
 **Responsibilities:**
 
-- Micro-frontend development (Shell, Auth, Chatbot, Admin, Profile)
+- Microfrontend development (Shell, Auth, Chatbot, Admin, Profile)
 - UI/UX implementation
-- State management (Event Bus for cross-MFE + Zustand for local + TanStack Query)
+- State management (Zustand + TanStack Query)
 - Frontend testing (unit, integration, E2E)
 - Design system implementation
 - Frontend CI/CD pipeline
@@ -378,7 +329,7 @@ This roadmap enables **parallel development** of the microservices backend and m
 **Tech Stack:**
 
 - React 18 + TypeScript 5.3 + Vite 5.x
-- React Router v7 + Custom Event Bus + Zustand v5 + TanStack Query v5
+- React Router v7 + Zustand v5 + TanStack Query v5
 - **Apollo Client (GraphQL) + REST API client**
 - Tailwind CSS v4 + Radix UI
 - Module Federation
@@ -397,324 +348,36 @@ This roadmap enables **parallel development** of the microservices backend and m
 
 ---
 
-## STATE MANAGEMENT STRATEGY: HYBRID APPROACH
-
-### Why Hybrid (Event Bus + Zustand)?
-
-For true MFE independence and scalability, we use a **hybrid state management approach**:
-
-**Event Bus** - Cross-MFE communication (loose coupling)
-**Zustand** - Local state within each MFE (developer experience)
-
-### Architecture Decision
-
-| Use Case             | Solution        | Why                                  |
-| -------------------- | --------------- | ------------------------------------ |
-| User login/logout    | Event Bus       | All MFEs need to react independently |
-| Theme changes        | Event Bus       | Global UI preference                 |
-| Navigation commands  | Event Bus       | MFE-to-MFE routing                   |
-| Global notifications | Event Bus       | Toast messages across boundaries     |
-| Form state           | Zustand (local) | Isolated to single MFE               |
-| Chat messages        | Zustand (local) | Chatbot MFE only                     |
-| Admin filters        | Zustand (local) | Admin MFE only                       |
-| API cache            | TanStack Query  | Server state management              |
-
-### Benefits
-
-**True MFE Independence:** Each MFE deploys independently with version freedom  
-**Loose Coupling:** Events-based communication via contracts, not implementations  
-**Clear Boundaries:** Namespaced events (`auth:*`, `chat:*`, `admin:*`) prevent conflicts
-
-### Event Bus Implementation
-
-**Library:** `libs/frontend/event-bus`
-
-```typescript
-// libs/frontend/event-bus/src/index.ts
-type EventCallback<T = any> = (data: T) => void;
-
-class EventBus {
-  private events: Map<string, Set<EventCallback>> = new Map();
-
-  subscribe<T>(event: string, callback: EventCallback<T>) {
-    if (!this.events.has(event)) {
-      this.events.set(event, new Set());
-    }
-    this.events.get(event)!.add(callback);
-
-    // Return unsubscribe function
-    return () => {
-      this.events.get(event)?.delete(callback);
-    };
-  }
-
-  publish<T>(event: string, data?: T) {
-    this.events.get(event)?.forEach((callback) => {
-      try {
-        callback(data);
-      } catch (error) {
-        console.error(`Error in event handler for ${event}:`, error);
-      }
-    });
-  }
-
-  clear(event?: string) {
-    if (event) {
-      this.events.delete(event);
-    } else {
-      this.events.clear();
-    }
-  }
-}
-
-export const eventBus = new EventBus();
-
-// Type-safe event definitions
-export const Events = {
-  // Authentication
-  USER_LOGIN: 'auth:user:login',
-  USER_LOGOUT: 'auth:user:logout',
-  TOKEN_REFRESH: 'auth:token:refresh',
-
-  // Theme
-  THEME_CHANGE: 'ui:theme:change',
-  LANGUAGE_CHANGE: 'ui:language:change',
-
-  // Navigation
-  NAVIGATE_TO: 'nav:navigate:to',
-
-  // Notifications
-  SHOW_TOAST: 'ui:toast:show',
-  SHOW_ERROR: 'ui:error:show',
-
-  // Chat
-  CONVERSATION_CREATED: 'chat:conversation:created',
-  MESSAGE_RECEIVED: 'chat:message:received',
-} as const;
-
-// Type-safe event data interfaces
-export interface UserLoginEvent {
-  userId: string;
-  email: string;
-  role: 'USER' | 'ADMIN' | 'MODERATOR';
-  accessToken: string;
-}
-
-export interface ThemeChangeEvent {
-  theme: 'light' | 'dark' | 'auto';
-}
-
-export interface NavigateEvent {
-  path: string;
-  replace?: boolean;
-}
-
-export interface ToastEvent {
-  message: string;
-  type: 'success' | 'error' | 'info' | 'warning';
-  duration?: number;
-}
-```
-
-### Usage Examples
-
-**Shell App (Publisher):**
-
-```typescript
-// apps/shell/src/App.tsx
-import { eventBus, Events } from '@myapp/frontend/event-bus';
-
-function App() {
-  const handleLogin = (userData: UserLoginEvent) => {
-    // Publish login event - all MFEs will react
-    eventBus.publish(Events.USER_LOGIN, userData);
-  };
-
-  const handleThemeToggle = () => {
-    eventBus.publish(Events.THEME_CHANGE, { theme: 'dark' });
-  };
-
-  return <RouterProvider router={router} />;
-}
-```
-
-**Auth MFE (Publisher + Subscriber):**
-
-```typescript
-// apps/auth-mfe/src/hooks/useAuth.ts
-import { eventBus, Events, UserLoginEvent } from '@myapp/frontend/event-bus';
-import { create } from 'zustand';
-
-// Local Zustand store for Auth MFE
-interface AuthStore {
-  isAuthenticated: boolean;
-  user: UserLoginEvent | null;
-  setUser: (user: UserLoginEvent) => void;
-  logout: () => void;
-}
-
-const useAuthStore = create<AuthStore>((set) => ({
-  isAuthenticated: false,
-  user: null,
-  setUser: (user) => set({ isAuthenticated: true, user }),
-  logout: () => set({ isAuthenticated: false, user: null }),
-}));
-
-export function useAuth() {
-  const store = useAuthStore();
-
-  useEffect(() => {
-    // Listen for logout events from other MFEs
-    const unsubscribe = eventBus.subscribe(Events.USER_LOGOUT, () => {
-      store.logout();
-    });
-
-    return unsubscribe;
-  }, []);
-
-  const login = async (credentials: LoginInput) => {
-    const response = await apiClient.post('/auth/login', credentials);
-    const userData = response.data;
-
-    // Update local store
-    store.setUser(userData);
-
-    // Publish event for other MFEs
-    eventBus.publish(Events.USER_LOGIN, userData);
-  };
-
-  return { ...store, login };
-}
-```
-
-**Chatbot MFE (Subscriber):**
-
-```typescript
-// apps/chatbot-mfe/src/App.tsx
-import { eventBus, Events } from '@myapp/frontend/event-bus';
-import { create } from 'zustand';
-
-// Local Zustand store for Chatbot MFE
-interface ChatStore {
-  messages: Message[];
-  currentUser: UserLoginEvent | null;
-  addMessage: (msg: Message) => void;
-  setUser: (user: UserLoginEvent | null) => void;
-}
-
-const useChatStore = create<ChatStore>((set) => ({
-  messages: [],
-  currentUser: null,
-  addMessage: (msg) => set((state) => ({ messages: [...state.messages, msg] })),
-  setUser: (user) => set({ currentUser: user }),
-}));
-
-function ChatbotApp() {
-  const setUser = useChatStore((state) => state.setUser);
-
-  useEffect(() => {
-    // Listen for authentication events
-    const unsubLogin = eventBus.subscribe(Events.USER_LOGIN, (data) => {
-      setUser(data);
-    });
-
-    const unsubLogout = eventBus.subscribe(Events.USER_LOGOUT, () => {
-      setUser(null);
-    });
-
-    return () => {
-      unsubLogin();
-      unsubLogout();
-    };
-  }, []);
-
-  return <ChatInterface />;
-}
-```
-
-**Profile MFE (Subscriber):**
-
-```typescript
-// apps/profile-mfe/src/App.tsx
-import { eventBus, Events } from '@myapp/frontend/event-bus';
-import { useState } from 'react';
-
-function ProfileApp() {
-  // This MFE uses simple React state instead of Zustand
-  const [user, setUser] = useState<UserLoginEvent | null>(null);
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
-
-  useEffect(() => {
-    // Listen for auth events
-    const unsubLogin = eventBus.subscribe(Events.USER_LOGIN, setUser);
-    const unsubLogout = eventBus.subscribe(Events.USER_LOGOUT, () => setUser(null));
-
-    // Listen for theme changes
-    const unsubTheme = eventBus.subscribe(Events.THEME_CHANGE, (data) => {
-      setTheme(data.theme);
-    });
-
-    return () => {
-      unsubLogin();
-      unsubLogout();
-      unsubTheme();
-    };
-  }, []);
-
-  return <ProfileSettings user={user} theme={theme} />;
-}
-```
-
-### State Management Decision Matrix
-
-| Data Type            | Scope  | Solution                 | Example                             |
-| -------------------- | ------ | ------------------------ | ----------------------------------- |
-| Authentication state | Global | Event Bus → Local Store  | User login broadcasts to all MFEs   |
-| Current user object  | Global | Event Bus → Local Store  | Each MFE stores user in own way     |
-| Theme preference     | Global | Event Bus → Local Store  | UI preference across all MFEs       |
-| Form input values    | Local  | Zustand/React State      | Login form in Auth MFE              |
-| Modal open/closed    | Local  | Zustand/React State      | Delete confirmation in Admin MFE    |
-| Chat messages        | Local  | Zustand + TanStack Query | Only Chatbot MFE needs these        |
-| API responses        | Cache  | TanStack Query           | Server state management             |
-| Optimistic updates   | Local  | Zustand + TanStack Query | Send message before server confirms |
-
-### Benefits Summary
-
-**For Development:**
-
-- Each MFE team has full autonomy
-- Can refactor internal state without affecting others
-- Easy to understand ownership (events vs local state)
-- Better testing (mock events easily)
-
-**For Deployment:**
-
-- True independent deployments
-- No risk of state shape breaking changes
-- Can hotfix one MFE without touching others
-- Easier rollback strategies
-
-**For Scaling:**
-
-- Add new MFEs that listen to existing events
-- No need to modify shared store structure
-- Clear event contracts act as API documentation
-- Future-proof for additional MFEs
-
----
-
 ## MONOREPO ARCHITECTURE
 
 ### Why Nx?
 
-**Key Advantages:**
+**Nx Advantages for Scalability:**
 
-✅ **Intelligent Caching** - Never rebuild unchanged code (85% faster CI)
-✅ **Affected Detection** - Test/build only changed projects  
-✅ **Dependency Graph** - Visual project relationships (`nx graph`)  
-✅ **Code Generators** - Consistent scaffolding for services/components  
-✅ **Plugin Ecosystem** - Official support for Node, React, Vite, Next.js  
-✅ **Boundary Enforcement** - Tags prevent architectural violations
+- **Intelligent Task Scheduling** - Runs tasks in optimal order based on dependency graph
+- **Computation Caching** - Never rebuild the same code twice (local + distributed)
+- **Dependency Graph Visualization** - Understand project relationships (`nx graph`)
+- **Code Generators** - Scaffold services, components, libraries with consistent structure
+- **Affected Commands** - Run tasks only for changed projects (`nx affected:test`)
+- **Nx Cloud** - Distributed task execution and remote caching (optional)
+- **Plugin Ecosystem** - Official plugins for Node, React, Vite, Next.js, etc.
+- **Migration Scripts** - Automated updates for breaking changes
+- **Built for Scale** - Used by Google, Microsoft, Cisco (1000+ projects)
+- **Integrated Tooling** - ESLint, Jest, Cypress, Storybook preconfigured
+
+**Nx vs Alternatives:**
+
+| Feature            | Nx                | Turborepo | pnpm/yarn workspaces |
+| ------------------ | ----------------- | --------- | -------------------- |
+| Build Caching      | Advanced          | Good      | None                 |
+| Task Orchestration | Intelligent       | Simple    | Manual               |
+| Dependency Graph   | Visual + Analysis | Basic     | None                 |
+| Code Generators    | Extensive         | None      | None                 |
+| Affected Detection | Built-in          | Basic     | None                 |
+| Plugin Ecosystem   | Rich              | Limited   | None                 |
+| Remote Caching     | Nx Cloud          | Built-in  | None                 |
+| Learning Curve     | Medium            | Low       | Low                  |
+| Scalability        | Excellent         | Good      | Limited              |
 
 ### Nx Monorepo Structure
 
@@ -795,13 +458,26 @@ my-app-nx-monorepo/
 
 ### Why Hybrid REST + GraphQL?
 
-**REST for:** Auth flows, CRUD operations, file uploads, SSE streaming
-**GraphQL for:** Complex queries, reducing over/under-fetching, flexible data needs
+This architecture combines the strengths of both REST and GraphQL to optimize different use cases:
 
-**Performance Gains:**
-- Admin dashboard: 50% faster (7 REST calls → 1 GraphQL query)
-- User profile: 60% less data transfer
-- Mobile: 40% fewer round trips
+**REST APIs are ideal for:**
+- Authentication flows (login, logout, token refresh)
+- Simple CRUD operations (create user, update profile)
+- File uploads/downloads
+- Streaming responses (Server-Sent Events for chat)
+- Operations that map cleanly to HTTP verbs
+
+**GraphQL is ideal for:**
+- Complex data fetching with multiple relationships (admin dashboards)
+- Reducing network requests (5+ REST calls → 1 GraphQL query)
+- Flexible client-driven queries (mobile vs web different data needs)
+- Real-time subscriptions (chat notifications, live updates)
+- Reducing over-fetching and under-fetching
+
+**Performance Impact:**
+- Admin dashboard: **50% faster** (350ms → 175ms) by combining 7 REST calls into 1 GraphQL query
+- User profile page: **60% less data transferred** by requesting only needed fields
+- Mobile app: **40% fewer round trips** with nested query support
 
 ### Architecture Overview
 
@@ -1784,112 +1460,11 @@ test('Admin dashboard loads GraphQL data', async ({ page }) => {
 
 ---
 
-# PART III: IMPLEMENTATION
-
-> **Section Overview:** Hands-on implementation guide with prerequisites, week-by-week tasks, coordination mechanisms, and definition of done
-
-## PREREQUISITES
-
-> **Target Audience:** 🎯 DevOps, Backend & Frontend Developers
-> **Purpose:** Ensure all team members have required tools, access, and knowledge before starting development
-
-### Development Environment
-
-**Required Software:**
-
-| Tool | Minimum Version | Purpose | Installation |
-|------|----------------|---------|--------------|
-| Node.js | v20.x LTS | Runtime environment | [nodejs.org](https://nodejs.org/) |
-| npm | 10.x | Package manager | Bundled with Node.js |
-| Nx CLI | 17.0.0+ | Monorepo orchestration | `npm i -g nx` |
-| Docker Desktop | 24.x | Containerization | [docker.com](https://www.docker.com/) |
-| PostgreSQL | 16.x | Database | [postgresql.org](https://www.postgresql.org/) or Docker |
-| Git | 2.40+ | Version control | [git-scm.com](https://git-scm.com/) |
-| VS Code | Latest | IDE (recommended) | [code.visualstudio.com](https://code.visualstudio.com/) |
-
-**Recommended VS Code Extensions:**
-- ESLint (`dbaeumer.vscode-eslint`)
-- Prettier (`esbenp.prettier-vscode`)
-- TypeScript and JavaScript Language Features
-- Nx Console (`nrwl.angular-console`)
-- Prisma (`prisma.prisma`)
-- GraphQL (`graphql.vscode-graphql`)
-- Docker (`ms-azuretools.vscode-docker`)
-- REST Client (`humao.rest-client`)
-
-**Optional Tools:**
-- Postman or Insomnia (API testing)
-- pgAdmin or DBeaver (Database GUI)
-- k6 (Load testing)
-- kubectl (Kubernetes deployment)
-
-### Cloud Services & Access
-
-**Required Accounts:**
-
-✅ **GitHub** - Repository access, CI/CD workflows
-✅ **Docker Hub** - Container registry (or alternative: AWS ECR, Google GCR)
-✅ **OpenAI** - API access for chatbot service ($5 minimum credit)
-
-**Optional Accounts** (for enhanced features):
-- AWS (EC2, RDS, S3, CloudFront) - Cloud deployment
-- Google Cloud (OAuth, Cloud Run) - SSO integration
-- Sentry - Error tracking
-- Nx Cloud - Distributed task execution & remote caching
-
-**Required Environment Variables Template:**
-
-Create `.env.template` files in each service directory:
-
-```bash
-# Auth Service
-DATABASE_URL=postgresql://user:password@localhost:5432/auth_db
-JWT_SECRET=your-super-secret-jwt-key-min-32-chars
-JWT_REFRESH_SECRET=your-refresh-secret-key-min-32-chars
-PORT=3001
-NODE_ENV=development
-
-# Chatbot Service
-DATABASE_URL=postgresql://user:password@localhost:5432/chatbot_db
-OPENAI_API_KEY=sk-...your-key-here
-PORT=3002
-NODE_ENV=development
-
-# Admin Service
-DATABASE_URL=postgresql://user:password@localhost:5432/admin_db
-AUTH_SERVICE_URL=http://localhost:3001
-PORT=3003
-NODE_ENV=development
-```
-
-### Team Knowledge Requirements
-
-**Backend:** TypeScript, Node.js/Express, PostgreSQL, REST APIs, JWT, Docker, Git
-**Frontend:** React 18+, TypeScript, React Router, Module Federation, Vite, Git
-**Bonus:** GraphQL, Prisma, Nx, TanStack Query, Playwright
-
-### Pre-Development Checklist
-
-**Setup:**
-- [ ] GitHub repo + communication channels (Slack/Discord)
-- [ ] Project management board (Jira/Linear/GitHub Projects)
-- [ ] Daily standup (9 AM, 15 min) + weekly review (Friday, 1 hour)
-- [ ] All software installed (Node.js, Docker, PostgreSQL, Git, VS Code)
-- [ ] Environment variables configured
-- [ ] OpenAI API account with credits
-
-**Knowledge:**
-- [ ] Teams review Nx, Express/Prisma (backend), Module Federation (frontend) docs
-- [ ] Architecture diagrams reviewed
-- [ ] TypeScript refresher completed if needed
-
----
-
 ## WEEK-BY-WEEK IMPLEMENTATION
 
 ## WEEK 1: Foundation & Setup
 
-**Objective:** Set up unified Nx monorepo infrastructure, tooling, and shared contracts
+**Objective:** Establish unified Nx monorepo infrastructure, tooling, and shared contracts
 
 ### Day 1-2: Nx Monorepo Initialization (BOTH TEAMS TOGETHER)
 
@@ -2151,7 +1726,7 @@ nx generate @nx/node:application admin-service \
   --framework=express \
   --tags=type:backend,scope:admin
 
-# Create frontend applications (micro-frontends)
+# Create frontend applications (microfrontends)
 nx generate @nx/react:application shell \
   --directory=apps/shell \
   --bundler=vite \
@@ -3058,11 +2633,9 @@ MSW handlers match real APIs
     - Error handling (reconnection logic)
     - Cancellation support
   - **State Management:**
-    - Event Bus subscriptions (auth events, theme changes)
-    - ChatStore (Zustand) for active conversation state (local to MFE)
+    - ChatStore (Zustand) for active conversation
     - TanStack Query for conversation list + history
     - Optimistic updates for sent messages
-    - Publish conversation events for other MFEs if needed
   - **Integration:**
     - Module Federation exposed
     - Routes: `/chat`, `/chat/:conversationId`
@@ -3938,864 +3511,7 @@ Post-launch report
 
 ---
 
-# PART IV: OPERATIONS & TROUBLESHOOTING
-
-> **Section Overview:** Production operations guidance, common issues, troubleshooting, and frequently asked questions
-
-## TROUBLESHOOTING GUIDE
-
-> **Target Audience:** 🎯 All Developers, DevOps, Support Teams  
-> **Purpose:** Quick reference for common issues and their resolutions
-
-### Development Environment Issues
-
-#### Issue: Nx commands not working
-
-**Symptoms:**
-
-- `nx` command not found
-- `nx serve` fails with module errors
-- Cache corruption warnings
-
-**Solutions:**
-
-```bash
-# Solution 1: Reinstall dependencies
-rm -rf node_modules package-lock.json
-npm install
-
-# Solution 2: Clear Nx cache
-nx reset
-
-# Solution 3: Reinstall Nx globally
-npm uninstall -g nx
-npm install -g nx@latest
-
-# Solution 4: Use npx instead
-npx nx serve auth-service
-```
-
-**Prevention:**
-
-- Keep Nx version consistent across team (`package.json` lock file)
-- Use `.nvmrc` file to lock Node.js version
-- Regularly run `nx migrate latest` for updates
-
----
-
-#### Issue: Port already in use
-
-**Symptoms:**
-
-- `Error: listen EADDRINUSE: address already in use :::3001`
-- Service won't start
-
-**Solutions:**
-
-```bash
-# Find process using port
-lsof -i :3001  # macOS/Linux
-netstat -ano | findstr :3001  # Windows
-
-# Kill process by PID
-kill -9 <PID>  # macOS/Linux
-taskkill /PID <PID> /F  # Windows
-
-# Or change port in project.json
-```
-
-**Prevention:**
-
-- Use different ports for each service (3001, 3002, 3003...)
-- Configure `project.json` port options
-- Use Docker Compose for consistent port mapping
-
----
-
-#### Issue: TypeScript errors after pulling changes
-
-**Symptoms:**
-
-- Type errors for existing code
-- `Cannot find module` errors
-- Zod schema mismatch errors
-
-**Solutions:**
-
-```bash
-# Solution 1: Rebuild TypeScript
-nx reset
-nx build shared-types --skip-nx-cache
-
-# Solution 2: Restart TypeScript server (VS Code)
-# Cmd+Shift+P → "TypeScript: Restart TS Server"
-
-# Solution 3: Clean install
-rm -rf node_modules dist
-npm install
-nx build shared-types
-```
-
-**Prevention:**
-
-- Always run `nx build shared-types` after pulling schema changes
-- Configure IDE to auto-rebuild on file changes
-- Use pre-commit hooks to validate TypeScript compilation
-
----
-
-### Database Issues
-
-#### Issue: Prisma migration failures
-
-**Symptoms:**
-
-- `Migration failed to apply`
-- Database schema drift detected
-- `Foreign key constraint violation`
-
-**Solutions:**
-
-```bash
-# Solution 1: Reset database (DEVELOPMENT ONLY!)
-cd apps/auth-service
-npx prisma migrate reset --force
-
-# Solution 2: Manual migration resolution
-npx prisma migrate resolve --applied <migration_name>
-
-# Solution 3: Generate new migration from schema
-npx prisma migrate dev --name fix_schema
-
-# Solution 4: Check database state
-npx prisma migrate status
-```
-
-**Prevention:**
-
-- Never edit applied migrations
-- Always test migrations locally before pushing
-- Use `prisma migrate dev --create-only` to review before applying
-- Keep database schema in sync with Prisma schema
-
----
-
-#### Issue: Database connection failures
-
-**Symptoms:**
-
-- `Error: Can't reach database server`
-- `Connection terminated unexpectedly`
-- Timeout errors
-
-**Solutions:**
-
-```bash
-# Check PostgreSQL running
-docker ps | grep postgres  # If using Docker
-pg_isready -h localhost -p 5432  # If installed locally
-
-# Restart PostgreSQL
-docker-compose restart postgres  # Docker
-brew services restart postgresql@16  # Homebrew
-
-# Verify DATABASE_URL
-echo $DATABASE_URL
-# Should match: postgresql://user:password@localhost:5432/db_name
-
-# Test connection
-psql $DATABASE_URL -c "SELECT 1"
-```
-
-**Prevention:**
-
-- Use Docker Compose for consistent database setup
-- Document DATABASE_URL format in README
-- Add database health check to service startup
-- Use connection pooling (Prisma default)
-
----
-
-### API Integration Issues
-
-#### Issue: CORS errors in browser
-
-**Symptoms:**
-
-- `Access to fetch blocked by CORS policy`
-- Preflight request fails
-- Credentials not included
-
-**Solutions:**
-
-```typescript
-// Backend: Update CORS configuration (Express)
-app.use(
-  cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-  })
-);
-
-// Frontend: Include credentials in fetch
-fetch(url, {
-  credentials: 'include',
-  headers: { 'Content-Type': 'application/json' },
-});
-```
-
-**Prevention:**
-
-- Configure CORS early in project setup
-- Use environment variables for allowed origins
-- Test with real frontend during development
-- Document CORS requirements in API docs
-
----
-
-#### Issue: JWT token expiration/invalid
-
-**Symptoms:**
-
-- 401 Unauthorized errors
-- Token expired messages
-- User logged out unexpectedly
-
-**Solutions:**
-
-```typescript
-// Frontend: Implement token refresh logic
-const refreshToken = async () => {
-  const response = await fetch('/api/auth/refresh', {
-    method: 'POST',
-    credentials: 'include', // Send refresh token cookie
-  });
-
-  if (response.ok) {
-    const { accessToken } = await response.json();
-    // Update token in state/storage
-    return accessToken;
-  }
-
-  // Redirect to login
-  window.location.href = '/login';
-};
-
-// Backend: Verify token properly
-import { verifyAccessToken } from '@myapp/shared/utils';
-
-const token = req.headers.authorization?.split(' ')[1];
-if (!token) throw new UnauthorizedError();
-
-const payload = verifyAccessToken(token);
-// Use payload.userId, payload.role, etc.
-```
-
-**Prevention:**
-
-- Implement automatic token refresh (10 min before expiry)
-- Use refresh tokens with longer expiration (7 days)
-- Store tokens securely (httpOnly cookies for refresh, memory for access)
-- Add token expiration monitoring
-
----
-
-### Docker & Deployment Issues
-
-#### Issue: Docker container won't start
-
-**Symptoms:**
-
-- Container exits immediately
-- `Exited (1)` status
-- Port binding failures
-
-**Solutions:**
-
-```bash
-# Check container logs
-docker logs <container-name>
-
-# Check all containers
-docker-compose logs
-
-# Rebuild without cache
-docker-compose build --no-cache
-
-# Remove all containers and start fresh
-docker-compose down -v
-docker-compose up --build
-
-# Check port conflicts
-docker ps -a
-```
-
-**Common Fixes:**
-
-- Missing environment variables → Add to `docker-compose.yml`
-- Database not ready → Add `depends_on` with health check
-- Port already in use → Change port mapping `3001:3001` → `3011:3001`
-
-**Prevention:**
-
-- Use `.dockerignore` to exclude `node_modules`
-- Add health checks to all services
-- Use Docker Compose v3+ with proper `depends_on` conditions
-- Test Docker build locally before pushing
-
----
-
-#### Issue: Kubernetes pod crashes
-
-**Symptoms:**
-
-- `CrashLoopBackOff` status
-- `ImagePullBackOff` error
-- Liveness probe failures
-
-**Solutions:**
-
-```bash
-# Check pod status
-kubectl get pods
-kubectl describe pod <pod-name>
-
-# Check pod logs
-kubectl logs <pod-name>
-kubectl logs <pod-name> --previous  # Previous crashed instance
-
-# Check resource limits
-kubectl top pods
-
-# Restart deployment
-kubectl rollout restart deployment/<deployment-name>
-```
-
-**Common Fixes:**
-
-- Image not found → Push to registry: `docker push`
-- Resource limits too low → Increase in `deployment.yaml`
-- Health check failing → Fix `/health` endpoint or increase timeout
-- Environment variables missing → Add to ConfigMap/Secret
-
-**Prevention:**
-
-- Test Docker images locally before deploying
-- Set appropriate resource requests/limits
-- Implement proper health check endpoints
-- Use readiness probes distinct from liveness probes
-
----
-
-### Performance Issues
-
-#### Issue: Slow API response times
-
-**Symptoms:**
-
-- Requests taking >2 seconds
-- Database queries timing out
-- High CPU usage
-
-**Diagnostic Steps:**
-
-```bash
-# Enable Prisma query logging
-DATABASE_URL="postgresql://...?connection_limit=10&pool_timeout=20"
-
-# Backend code - Add timing
-console.time('getUserProfile');
-const user = await prisma.user.findUnique({ where: { id } });
-console.timeEnd('getUserProfile');
-
-# Check database query performance
-EXPLAIN ANALYZE SELECT * FROM users WHERE email = 'test@example.com';
-
-# Monitor with k6 load testing
-k6 run load-test.js
-```
-
-**Solutions:**
-
-```typescript
-// 1. Add database indexes
-// In Prisma schema:
-model User {
-  id       String   @id @default(uuid())
-  email    String   @unique
-  username String   @unique
-
-  @@index([email])  // Add index
-  @@index([username])
-}
-
-// 2. Implement caching
-import NodeCache from 'node-cache';
-const cache = new NodeCache({ stdTTL: 600 }); // 10 min
-
-// 3. Use select to fetch only needed fields
-const user = await prisma.user.findUnique({
-  where: { id },
-  select: { id: true, username: true, email: true }
-});
-
-// 4. Implement pagination
-const users = await prisma.user.findMany({
-  skip: (page - 1) * 20,
-  take: 20
-});
-```
-
-**Prevention:**
-
-- Add indexes during schema design
-- Implement caching for read-heavy operations
-- Use database query analysis tools
-- Set up performance monitoring (APM)
-- Load test during development
-
----
-
-#### Issue: Frontend slow rendering
-
-**Symptoms:**
-
-- Page takes >3 seconds to render
-- Sluggish interactions
-- High JavaScript execution time
-
-**Diagnostic Steps:**
-
-```bash
-# Run Lighthouse audit
-npm run lighthouse
-
-# Profile in Chrome DevTools
-# 1. Open DevTools → Performance tab
-# 2. Click Record
-# 3. Interact with app
-# 4. Stop recording
-# 5. Analyze flame graph
-```
-
-**Solutions:**
-
-```typescript
-// 1. Lazy load routes
-const ChatbotMFE = React.lazy(() => import('chatbotMfe/App'));
-
-// 2. Memoize expensive computations
-const sortedUsers = useMemo(
-  () => users.sort((a, b) => a.name.localeCompare(b.name)),
-  [users]
-);
-
-// 3. Virtualize long lists
-import { FixedSizeList } from 'react-window';
-
-// 4. Debounce search inputs
-import { useDebouncedCallback } from 'use-debounce';
-const debouncedSearch = useDebouncedCallback(search, 300);
-
-// 5. Use React.memo for expensive components
-export const UserCard = React.memo(({ user }) => {
-  // ...
-});
-```
-
-**Prevention:**
-
-- Code split by route
-- Use production builds for testing
-- Implement virtual scrolling for long lists
-- Profile during development
-- Set performance budgets
-
----
-
-### Testing Issues
-
-#### Issue: E2E tests flaky/failing
-
-**Symptoms:**
-
-- Tests pass locally, fail in CI
-- Random timeouts
-- "Element not found" errors
-
-**Solutions:**
-
-```typescript
-// 1. Add proper waits
-await page.waitForSelector('[data-testid="user-list"]', { state: 'visible' });
-
-// 2. Increase timeouts for slow operations
-await expect(page.locator('.toast')).toBeVisible({ timeout: 10000 });
-
-// 3. Stabilize selectors
-// ❌ Bad: await page.click('.button');
-// ✅ Good: await page.click('[data-testid="submit-button"]');
-
-// 4. Mock external APIs
-await page.route('**/api/external/**', (route) => {
-  route.fulfill({ status: 200, body: JSON.stringify({ data: 'mock' }) });
-});
-
-// 5. Run tests in order
-test.describe.serial('User flow', () => {
-  // Tests run sequentially
-});
-```
-
-**Prevention:**
-
-- Use `data-testid` attributes consistently
-- Mock all external dependencies
-- Add retry logic for flaky tests: `test.describe.configure({ retries: 2 })`
-- Run tests in Docker for consistency
-- Record videos on failure: `use: { video: 'retain-on-failure' }`
-
----
-
-## FREQUENTLY ASKED QUESTIONS
-
-> **Quick answers to common questions during development**
-
-### Architecture & Design
-
-**Q: Why use both REST and GraphQL?**
-
-**A:** Hybrid approach leverages strengths of both:
-
-- **REST:** CRUD operations, file uploads, SSE streaming, simple caching
-- **GraphQL:** Complex data fetching, reducing over-fetching, type safety
-
-Each service exposes REST endpoints and can optionally implement GraphQL resolvers federated through Apollo Gateway.
-
----
-
-**Q: Why Nx monorepo instead of separate repositories?**
-
-**A:** Nx monorepo provides:
-
-- **Shared code** - Common types, utilities, UI components
-- **Atomic changes** - Update API contract and consumers in single PR
-- **Intelligent caching** - Only rebuild affected projects (85% faster CI)
-- **Dependency graph** - Visual understanding of project relationships
-- **Consistency** - Code generators enforce structure
-
-For microservices in production, Nx can build separate Docker images per service.
-
----
-
-**Q: Can we deploy microservices independently?**
-
-**A:** Yes! Despite monorepo, services are deployable independently:
-
-- Each service has its own `Dockerfile`
-- Nx builds only affected projects
-- Separate deployment manifests per service
-- Can version and rollback services independently
-
-Monorepo != monolith. You get independent deployment with shared code benefits.
-
----
-
-### Development Workflow
-
-**Q: How do frontend and backend teams coordinate API changes?**
-
-**A:** Three-step process:
-
-1. **Contract First** - Update Zod schemas in `libs/shared/types`
-2. **Backend Implementation** - Implement endpoint matching schema
-3. **Frontend Integration** - Types auto-generated from Zod schemas
-
-Daily standups ensure both teams aware of API changes. Shared schema is single source of truth.
-
----
-
-**Q: Can frontend develop without backend being ready?**
-
-**A:** Yes, using Mock Service Worker (MSW) based on shared Zod schemas. Switch from mocks to real API by changing `VITE_API_URL` environment variable.
-
----
-
-**Q: How do we handle database migrations across services?**
-
-**A:** Each service owns its database and runs migrations independently using Prisma. Production: `prisma migrate deploy` in CI/CD.
-
----
-
-**Q: What if I need data from another service's database?**
-
-**A:** Never access directly. Use: (1) REST API calls between services, (2) GraphQL Federation via Apollo Gateway, or (3) Event-driven architecture.
-
----
-
-### Testing
-
-**Q: What's the difference between unit, integration, and E2E tests?**
-
-**A:** Unit tests validate single functions (fast), integration tests verify modules work together (medium), E2E tests confirm full user flows (slow). Target: 80%+ unit coverage, integration for critical flows, 20-30 E2E tests for happy/error paths.
-
----
-
-**Q: How do we test Module Federation integration?**
-
-**A:** Three levels: (1) Component tests in isolation, (2) Integration tests loading remote MFEs in shell, (3) Playwright E2E tests navigating between MFEs.
-
----
-
-### Deployment
-
-**Q: What's the deployment strategy for production?**
-
-**A:** Blue-green deployment with canary: Build → Staging tests → 10% canary → Monitor 1hr → Full rollout or instant rollback.
-
----
-
-**Q: How do we handle environment variables in production?**
-
-**A:** Use Kubernetes ConfigMaps (non-sensitive), Secrets (API keys, passwords), and External Secrets (AWS Secrets Manager). Never commit secrets to Git.
-
----
-
-**Q: Can we deploy frontend and backend separately?**
-
-**A:** Yes! They're decoupled:
-
-- **Backend** - Deployed to AWS ECS, Google Cloud Run, or K8s
-- **Frontend** - Deployed to S3 + CloudFront, Vercel, or Netlify
-
-Frontend calls backend via `VITE_API_URL` environment variable. Update frontend environment config to point to production API URL.
-
----
-
-### Security
-
-**Q: How do we secure JWT tokens?**
-
-**A:** Multi-layer security:
-
-1. **Access tokens** - Short-lived (15 min), stored in memory
-2. **Refresh tokens** - Long-lived (7 days), httpOnly cookies
-3. **Token rotation** - New refresh token on each refresh
-4. **Secure cookies** - `httpOnly`, `secure`, `sameSite: strict`
-
-```typescript
-// Backend: Set refresh token cookie
-res.cookie('refreshToken', token, {
-  httpOnly: true, // Not accessible via JavaScript
-  secure: true, // HTTPS only
-  sameSite: 'strict',
-  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-});
-
-// Frontend: Access token in memory (Zustand store)
-// Automatically included in requests via interceptor
-```
-
-Never store tokens in localStorage (vulnerable to XSS).
-
----
-
-**Q: How do we implement role-based access control (RBAC)?**
-
-**A:** Three-tier system:
-
-1. **User model** - Has `role` field (`USER`, `ADMIN`, `SUPER_ADMIN`)
-2. **Middleware** - Checks role before allowing access
-3. **Frontend guards** - Hide UI elements based on role
-
-```typescript
-// Backend middleware
-const requireRole = (roles: Role[]) => {
-  return (req, res, next) => {
-    if (!roles.includes(req.user.role)) {
-      return res.status(403).json({ error: 'Forbidden' });
-    }
-    next();
-  };
-};
-
-// Route protection
-app.delete('/api/users/:id',
-  authenticate,
-  requireRole(['ADMIN', 'SUPER_ADMIN']),
-  deleteUser
-);
-
-// Frontend guard
-{user.role === 'ADMIN' && (
-  <Button onClick={deleteUser}>Delete User</Button>
-)}
-```
-
----
-
-**Q: How do we prevent SQL injection and XSS attacks?**
-
-**A:** Built-in protections: Prisma ORM uses parameterized queries (SQL injection), React escapes values by default (XSS), SameSite cookies prevent CSRF. Additional: Zod input validation, DOMPurify for rich text, express-rate-limit for API protection.
-
----
-
-### Performance
-
-**Q: What's the expected API latency?**
-
-**A:** Targets (p95): Simple GET <100ms, Complex GET <300ms, POST/PUT <200ms, GraphQL <400ms, SSE streaming <500ms. Monitor with k6 and APM tools.
-
----
-
-**Q: How do we optimize Module Federation performance?**
-
-**A:** Strategies: Prefetching, code splitting, shared dependencies, CDN delivery, versioned caching. Results: 83% faster first load, 98% faster navigation, 60% smaller bundles. See [ADVANCED_MFE_ROUTING_OPTIMIZATIONS.md](./ADVANCED_MFE_ROUTING_OPTIMIZATIONS.md).
-
----
-
-### Nx Monorepo
-
-**Q: How do Nx caching and affected commands work?**
-
-**A:** Nx hashes task inputs; if unchanged, restores cached output (85% faster CI). Remote caching via Nx Cloud shares cache across team. Commands: `nx affected:build`, `nx affected:test`, `nx affected:graph`.
-
----
-
-**Q: How do we add a new microservice or MFE?**
-
-**A:** Use Nx generators: `nx g @nx/node:application my-service` (backend) or `nx g @nx/react:application my-mfe` (frontend). Then update docker-compose.yml (service) or Module Federation config (MFE).
-
----
-
-### Cost & Scaling
-
-**Q: What's the estimated monthly cost for production?**
-
-**A:** ~$180-470/month (10K users, 1M requests): Compute $50-100, Database $30-70, Redis $15-30, Storage $5-10, CDN $10-20, OpenAI $50-200, Monitoring $20-40. Optimize with spot instances, caching, compression.
-
----
-
-**Q: How many users can this architecture handle?**
-
-**A:** MVP: 1K-10K (single region), Growth: 10K-100K (load balancer + cache), Scale: 100K-1M (multi-region + replicas), Enterprise: 1M+ (K8s auto-scale). Bottlenecks: DB connections, OpenAI limits, memory, bandwidth. Load test with k6.
-
----
-
-# APPENDICES
-
-> **Reference materials, glossary, and supplementary documentation**
-
-## APPENDIX A: DETAILED FEATURE SPECIFICATIONS
-
-See [Key Technologies](#key-technologies) section for comprehensive technology stack including:
-
-- Backend technologies (Node.js, Express, PostgreSQL, Prisma, Redis)
-- Frontend technologies (React, Vite, Module Federation, Zustand, TanStack Query)
-- Infrastructure & DevOps (Docker, Kubernetes, AWS/GCP, GitHub Actions)
-- Shared utilities (Zod schemas, TypeScript types, ESLint, Prettier)
-
-For feature-specific implementation details, refer to:
-
-- [Week-by-Week Implementation](#week-by-week-implementation) - Development timeline
-- [Backend Implementation](./MICROSERVICES_IMPLEMENTATION_ROADMAP.md) - Microservices details
-- [Frontend Implementation](./MICROFRONTEND_IMPLEMENTATION_ROADMAP.md) - MFE architecture
-
----
-
-## APPENDIX B: GRAPHQL IMPLEMENTATION DETAILS
-
-See [Hybrid API Architecture: REST + GraphQL](#hybrid-api-architecture-rest--graphql) section for:
-
-- Apollo Federation architecture
-- Schema stitching strategies
-- Query optimization patterns
-- Resolver implementation examples
-- GraphQL vs REST decision matrix
-
-Key code examples:
-
-- GraphQL Gateway setup (Week 3 implementation)
-- Apollo Client integration with React
-- GraphQL subscriptions for real-time data
-- Error handling and caching strategies
-
----
-
-## APPENDIX C: CODE EXAMPLES
-
-Code examples are embedded throughout this document in relevant sections:
-
-**Backend Examples:**
-
-- [Week 1](#week-1-foundation--setup) - Nx monorepo setup, Prisma schema
-- [Week 2](#week-2-core-services--mfes) - Auth service, JWT middleware, API endpoints
-- [Week 3](#week-3-admin-service-graphql-gateway--advanced-mfes) - GraphQL resolvers, Apollo Federation
-- [Week 4](#week-4-testing-integration--optimization) - Unit tests, integration tests, E2E tests
-
-**Frontend Examples:**
-
-- [Week 2](#week-2-core-services--mfes) - MFE setup, Module Federation config, auth flow
-- [Week 3](#week-3-admin-service-graphql-gateway--advanced-mfes) - Apollo Client, GraphQL queries
-- [Week 4](#week-4-testing-integration--optimization) - Playwright tests, MSW mocks
-
-**Infrastructure Examples:**
-
-- [Week 5](#week-5-deployment--launch) - Dockerfile, docker-compose.yml, Kubernetes manifests
-
----
-
-## APPENDIX D: GLOSSARY
-
-> **Key terms and acronyms used throughout this document**
-
-| Term                      | Definition                                                                                               |
-| ------------------------- | -------------------------------------------------------------------------------------------------------- |
-| **MFE**                   | Micro-Frontend - Independent frontend application loaded at runtime via Module Federation                |
-| **Module Federation**     | Webpack 5+ feature allowing dynamic loading of JavaScript modules from separate builds                   |
-| **Nx**                    | Build system and monorepo tool providing intelligent caching, code generation, and dependency management |
-| **Monorepo**              | Single repository containing multiple related projects (services, apps, libraries)                       |
-| **Prisma**                | TypeScript ORM (Object-Relational Mapping) for type-safe database access                                 |
-| **Zod**                   | TypeScript-first schema validation library used for API contracts and runtime validation                 |
-| **JWT**                   | JSON Web Token - Compact, URL-safe token format for authentication                                       |
-| **SSE**                   | Server-Sent Events - HTTP streaming protocol for real-time server-to-client communication                |
-| **GraphQL**               | Query language for APIs allowing clients to request exactly the data they need                           |
-| **Apollo Federation**     | Architecture for combining multiple GraphQL services into single unified graph                           |
-| **REST**                  | Representational State Transfer - Architectural style for designing networked applications               |
-| **CORS**                  | Cross-Origin Resource Sharing - Browser security feature controlling cross-origin requests               |
-| **Docker**                | Containerization platform for packaging applications with their dependencies                             |
-| **Kubernetes (K8s)**      | Container orchestration platform for automating deployment, scaling, and management                      |
-| **CI/CD**                 | Continuous Integration / Continuous Deployment - Automated testing and deployment pipelines              |
-| **MSW**                   | Mock Service Worker - API mocking library for testing and development                                    |
-| **Playwright**            | End-to-end testing framework for web applications                                                        |
-| **Vitest**                | Fast unit test framework for JavaScript/TypeScript                                                       |
-| **TanStack Query**        | Data fetching and caching library (formerly React Query)                                                 |
-| **Zustand**               | Lightweight state management library for React                                                           |
-| **CDN**                   | Content Delivery Network - Distributed network for delivering content with low latency                   |
-| **APM**                   | Application Performance Monitoring - Tools for tracking app performance and errors                       |
-| **RPS**                   | Requests Per Second - Measure of throughput for APIs                                                     |
-| **p95/p99**               | 95th/99th percentile - Metric showing latency for 95%/99% of requests                                    |
-| **TTL**                   | Time To Live - Duration before cached data expires                                                       |
-| **RBAC**                  | Role-Based Access Control - Security model assigning permissions based on user roles                     |
-| **TOTP**                  | Time-Based One-Time Password - Algorithm for generating temporary authentication codes (MFA)             |
-| **SSO**                   | Single Sign-On - Authentication scheme allowing one login for multiple systems                           |
-| **XSS**                   | Cross-Site Scripting - Security vulnerability allowing injection of malicious scripts                    |
-| **CSRF**                  | Cross-Site Request Forgery - Attack forcing authenticated users to execute unwanted actions              |
-| **ORM**                   | Object-Relational Mapping - Technique for converting between incompatible type systems                   |
-| **Canary Release**        | Deployment strategy releasing new version to small subset of users first                                 |
-| **Blue-Green Deployment** | Strategy running two identical production environments, switching traffic between them                   |
-| **Lighthouse**            | Automated tool for measuring web page quality (performance, accessibility, SEO)                          |
-| **Hot Reload**            | Development feature updating application in browser without full refresh                                 |
-| **Tree Shaking**          | Build optimization removing unused code from bundles                                                     |
-| **Code Splitting**        | Technique dividing code into smaller chunks loaded on demand                                             |
-| **Hydration**             | Process of attaching event listeners to server-rendered HTML                                             |
-| **Idempotent**            | Operation that produces same result regardless of how many times it's executed                           |
-
----
-
-## APPENDIX E: RESOURCES & REFERENCES
+## RESOURCES
 
 ### Documentation
 
