@@ -4,91 +4,444 @@
 
 **Document Type:** Technical Implementation Guide  
 **Audience:** Development Teams, Technical Leads, Project Managers, Architects  
-**Version:** 6.0  
+**Version:** 7.0 (Updated November 18, 2025)  
 **Last Updated:** November 18, 2025  
-**Timeline:** 11-12 Weeks (Strategic Prioritization with 3 Parallel Initiatives)  
-**Team Composition:** 6-8 developers (3-4 Backend, 3-4 Frontend)  
-**Architecture:** Unified Monorepo (Nx) with Hybrid REST + GraphQL + Event Bus  
+**Timeline:** 10 Weeks (70 days) - Sequential 3-Phase Implementation  
+**Team Composition:** 3-4 developers  
+**Architecture:** Unified Monorepo (Nx) with REST + GraphQL + Event Bus + Hybrid Database  
 **Estimated Reading Time:** 60-90 minutes
 
 **Quick Navigation:** [Strategic Priority Roadmap](#strategic-priority-roadmap-new) | [Executive Summary](#executive-summary) | [Prerequisites](#prerequisites) | [Week-by-Week Implementation](#week-by-week-implementation) | [Troubleshooting](#troubleshooting-guide) | [FAQ](#frequently-asked-questions)
 
 ---
 
-## 🎯 STRATEGIC PRIORITY ROADMAP (NEW)
+## 🎯 REVISED IMPLEMENTATION ROADMAP (10-Week Plan)
 
-> **Important Update:** November 18, 2025
+> **Strategic Update:** November 18, 2025
 >
-> This section provides strategic prioritization for three major initiatives:
->
-> 1. **JWT Token Security Fix** (2-3 hours) - 🔴 CRITICAL
-> 2. **Event Bus Implementation** (3 weeks) - Zero-coupling MFEs
-> 3. **PostgreSQL + MongoDB Hybrid** (6-8 weeks) - 10M+ user scale
+> This represents the **optimal sequential implementation strategy** based on dependency analysis, risk mitigation, and architectural synergies. Following this order ensures each phase provides a foundation for the next, maximizing team productivity and minimizing rework.
 
-### Recommended Implementation Order
+### ✅ Phase 1: MFE Event Bus (Weeks 1-2, 10 dev-days)
 
-**Phase 1 (Weeks 1-2):** JWT Security + Event Bus Foundation (Parallel)
+**Objective:** Establish event-driven foundation for cross-MFE communication
 
-- **JWT Fix**: Complete authentication security vulnerability (HttpOnly cookies)
-- **Event Bus Phase 1**: Establish event-driven foundation for MFE communication
+| Aspect             | Details                                          |
+| ------------------ | ------------------------------------------------ |
+| **Priority**       | 🟢 HIGH - Foundational                           |
+| **Duration**       | 2 weeks (10 dev-days)                            |
+| **Risk**           | 🟢 Low complexity, high confidence               |
+| **Dependencies**   | None - completely independent                    |
+| **Deliverables**   | Event bus library, auth sync, notifications      |
+| **Success Metric** | All MFEs properly listening/responding to events |
 
-**Phase 2 (Weeks 3-6):** Hybrid Database + Event Bus Completion (Parallel)
+**Week 1 Breakdown:**
 
-- **Event Bus Phases 2-5**: Local stores, component refactoring, testing
-- **Hybrid Phases 1-2**: Auth on PostgreSQL, Chatbot on MongoDB
+- Day 1-2: Create `libs/frontend/event-bus` library with EventEmitter3
+- Day 3-4: Implement auth events (login, logout, refresh, session-expired)
+- Day 5: Testing and documentation
 
-**Phase 3 (Weeks 7-10):** Testing & Scaling
+**Week 2 Breakdown:**
 
-- **Hybrid Phases 3-5**: Admin service, cross-service integration
-- **Load testing**: 10M users, 100M messages/day simulation
+- Day 1-2: Toast/notification events implementation
+- Day 3-4: Cross-MFE navigation and data sync events
+- Day 5: Integration testing, complete event catalog
 
-**Phase 4 (Weeks 11-12):** Production Deployment
+**Why Phase 1 First:**
 
-- **Deployment**: Blue-green, monitoring, launch readiness
+- ✅ Low complexity, high confidence builder
+- ✅ No backend dependencies or database changes
+- ✅ Immediate user experience improvements
+- ✅ Enables foundation for Phase 2 (GraphQL cache coordination)
+- ✅ Team confidence booster before complex phases
 
-### Key Statistics
+**Key Code Patterns:**
 
-| Initiative       | Duration        | Effort       | Priority    | Status                  |
-| ---------------- | --------------- | ------------ | ----------- | ----------------------- |
-| JWT Security Fix | 2-3 hrs         | 3 hrs        | 🔴 CRITICAL | Documented ✅           |
-| Event Bus        | 3 weeks         | 72 hrs       | 🟡 HIGH     | Documented ✅           |
-| Hybrid Database  | 6-8 weeks       | 200+ hrs     | 🟢 MEDIUM   | Documented ✅           |
-| **TOTAL**        | **11-12 weeks** | **275+ hrs** | -           | **Ready to Execute** ✅ |
+```typescript
+// Event bus foundation
+import EventEmitter3 from 'eventemitter3';
+const eventBus = new EventEmitter3();
 
-### Team Allocation (6-8 Developers)
+// Auth events
+eventBus.emit('auth:login', { user, accessToken });
+eventBus.emit('auth:logout', {});
+eventBus.emit('auth:token-refreshed', { accessToken });
+
+// Cache invalidation events (used by Phase 2)
+eventBus.emit('user:profile:updated', { userId, data });
+```
+
+---
+
+### ✅ Phase 2: GraphQL + REST Hybrid API (Weeks 3-6, 18 dev-days)
+
+**Objective:** Implement Apollo Federation gateway, build GraphQL subgraphs, migrate admin dashboard
+
+| Aspect               | Details                                                 |
+| -------------------- | ------------------------------------------------------- |
+| **Priority**         | 🟡 MEDIUM-HIGH - Performance                            |
+| **Duration**         | 4 weeks (18 dev-days)                                   |
+| **Risk**             | 🟡 Medium - new technology, clear migration path        |
+| **Dependencies**     | Phase 1 (Event Bus) - for cache coordination            |
+| **Deliverables**     | GraphQL gateway, 3 subgraphs, Apollo Client integration |
+| **Performance Gain** | Admin dashboard: 378ms → 185ms (51% faster)             |
+| **Success Metric**   | Dashboard loads in <200ms, 86% fewer API requests       |
+
+**Week 3: GraphQL Gateway Setup (5 dev-days)**
+
+- Day 1-2: Apollo Federation gateway setup (port 4000)
+- Day 3-4: Auth service GraphQL subgraph
+- Day 5: Gateway routing, schema composition
+
+**Week 4: Chatbot Subgraph & Frontend Integration (5 dev-days)**
+
+- Day 1-2: Chatbot service GraphQL subgraph
+- Day 3-4: Apollo Client v5 setup in frontend
+- Day 5: Chat interface GraphQL queries, caching strategy
+
+**Week 5: Admin Subgraph & Dashboard Migration (4 dev-days)**
+
+- Day 1-2: Admin service GraphQL subgraph
+- Day 3: Admin dashboard query migration
+- Day 4: Performance verification, optimization
+
+**Week 6: Testing & Stability (4 dev-days)**
+
+- Day 1-2: Comprehensive testing (unit + E2E)
+- Day 3: Performance profiling and optimization
+- Day 4: Documentation, deployment readiness
+
+**Why Phase 2 After Phase 1:**
+
+- ✅ Event Bus provides cache invalidation mechanism
+- ✅ REST APIs remain functional (zero breaking changes during rollout)
+- ✅ Can migrate MFEs gradually
+- ✅ Clear performance metrics for validation
+- ✅ Team gains confidence before database migration
+
+**Performance Impact:**
 
 ```
-Week 1-2:  2-3 devs (JWT) + 2-3 devs (Event Bus)
-Week 3-6:  3-4 devs (Hybrid) + 3 devs (Event Bus)
-Week 7-12: All teams integrated (testing, optimization, deployment)
+Admin Dashboard Current: 7 REST calls
+GET /api/users
+GET /api/conversations
+GET /api/messages
+GET /api/analytics
+GET /api/stats
+GET /api/trends
+GET /api/export
+
+Admin Dashboard GraphQL: 1 query
+{
+  users { id name email createdAt }
+  conversations { id title messageCount }
+  messages { id content timestamp }
+  analytics { dashboardStats }
+  stats { activeUsers conversionRate }
+}
+
+Result: 378ms → 185ms (51% faster)
+Bandwidth: 2.4MB → 0.8MB (67% savings on mobile)
 ```
 
-### Documentation References
+**Key Technologies:**
 
-📘 **Complete Priority Roadmap:** `IMPLEMENTATION_PRIORITY_ROADMAP.md`
+- Apollo Server v4 with Apollo Federation v2
+- Apollo Client v5 for frontend
+- GraphQL subscriptions for real-time updates
+- Automatic field-level caching
 
-- Week-by-week breakdown
-- Team allocation strategies
-- Go/no-go decision points
-- Risk mitigation approach
+---
 
-📘 **JWT Security Fix:** `TOKEN_SECURITY_QUICK_REFERENCE.md`, `HTTPONLY_COOKIES_QUICK_START.md`
+### ✅ Phase 3: MongoDB + PostgreSQL Hybrid Database (Weeks 7-10, 15 dev-days)
 
-- Copy-paste implementation
-- Testing checklist
-- Security validation
+**Objective:** Implement polyglot persistence - PostgreSQL for auth, MongoDB for chat
 
-📘 **Event Bus:** `EVENT_BUS_IMPLEMENTATION_PLAN.md`, `EVENT_BUS_CODE_EXAMPLES.md`
+| Aspect               | Details                                           |
+| -------------------- | ------------------------------------------------- |
+| **Priority**         | 🟡 MEDIUM - Optimization, not critical            |
+| **Duration**         | 4 weeks (15 dev-days)                             |
+| **Risk**             | 🔴 High - data migration, requires validation     |
+| **Dependencies**     | Phase 1 & 2 - abstract database complexity        |
+| **Deliverables**     | MongoDB setup, dual-write pattern, data migration |
+| **Performance Gain** | Message queries 30-40% faster                     |
+| **Success Metric**   | Zero data loss, <2% query time increase           |
 
-- 5-phase detailed roadmap
-- 50+ code examples
-- State management clarification
+**Week 7: MongoDB Setup & Connection (4 dev-days)**
 
-📘 **Hybrid Database:** `HYBRID_POSTGRES_MONGODB_ROADMAP.md`
+- Day 1: MongoDB cluster setup, indexing strategy
+- Day 2-3: Connection pooling, backpressure handling
+- Day 4: Replica set configuration, backup procedures
 
-- 6-8 week implementation plan
-- Infrastructure setup
-- Schema design patterns
+**Week 8: Data Migration Strategy (3 dev-days)**
+
+- Day 1: Identify conversation/message records for migration
+- Day 2: Implement dual-write pattern (write to both DBs)
+- Day 3: Validate data consistency, run migration batches
+
+**Week 9: Read Path Switching (4 dev-days)**
+
+- Day 1-2: Switch read paths to MongoDB gradually
+- Day 3: Monitor performance and query patterns
+- Day 4: Rollback procedures, performance tuning
+
+**Week 10: Complete Cutover & Validation (4 dev-days)**
+
+- Day 1: Final dual-write validation
+- Day 2: Complete cutover from PostgreSQL reads
+- Day 3: Archive PostgreSQL data, cleanup
+- Day 4: Load testing, production readiness
+
+**Why Phase 3 After Phases 1 & 2:**
+
+- ✅ Most complex, highest risk (requires extensive testing)
+- ✅ By now, exact pain points known from GraphQL metrics
+- ✅ Event Bus + GraphQL abstract database details
+- ✅ Safer after other phases validated in production
+- ✅ Gives team time to understand query patterns
+
+**Database Allocation:**
+
+```
+PostgreSQL (Optimized):
+├── users (auth, profiles, permissions)
+├── sessions (JWT refresh tokens, blacklist)
+├── analytics (user aggregates, statistics)
+└── admin_logs (audit trail, compliance)
+
+MongoDB (Document model):
+├── conversations (hierarchical structure)
+├── messages (time-series, indexed by timestamp)
+├── attachments (files, metadata)
+└── chat_analytics (message patterns)
+```
+
+**Data Migration Approach:**
+
+```
+Week 8: Dual-write phase
+  PostgreSQL write → (mirror) → MongoDB write
+  Queries still from PostgreSQL
+
+Week 9: Gradual read switching
+  10% → 25% → 50% → 75% → 90% traffic to MongoDB
+  Monitor performance at each step
+
+Week 10: Complete cutover
+  100% reads from MongoDB
+  PostgreSQL becomes archive/backup
+```
+
+---
+
+### 🎯 Implementation Order Rationale
+
+**Why this exact sequence? (Not parallel, not different order)**
+
+#### ❌ Anti-Patterns to Avoid:
+
+**Anti-Pattern 1: Start with Hybrid Database First**
+
+```
+Problem: Complex data sync without event bus foundation
+- No way to coordinate state across MFEs
+- Dual-write pattern causes stale data issues
+- MFEs don't know database has changed
+- High likelihood of data inconsistency bugs
+Result: ❌ FAILED - Rollback required
+```
+
+**Anti-Pattern 2: Start with GraphQL First**
+
+```
+Problem: Cache invalidation nightmare without event bus
+- Multiple copies of same data in Apollo cache
+- No mechanism to invalidate caches across MFEs
+- Stale data issues in different MFEs
+- Complex cache coordination logic scattered everywhere
+Result: ❌ FAILED - Architecture debt
+```
+
+**Anti-Pattern 3: Do All Three Simultaneously**
+
+```
+Problem: Overwhelming complexity, hard to debug
+- Event bus bugs mixed with GraphQL bugs mixed with DB bugs
+- Can't roll back individual phases
+- Team context switching overload
+- Production incidents likely
+Result: ❌ FAILED - Emergency rollback
+```
+
+#### ✅ Why Event Bus → GraphQL → Hybrid DB is Optimal:
+
+```
+Phase 1: Event Bus (Foundation)
+├─ Establishes event-driven thinking
+├─ Creates cache invalidation mechanism
+└─ Zero breaking changes to existing code
+
+Phase 2: GraphQL (Performance Layer)
+├─ Depends on: Event Bus for cache coordination ✅
+├─ Builds on: Existing REST API (no breaking changes) ✅
+├─ Enables: Clear performance metrics for Phase 3 ✅
+└─ Risk reduced by: Previous phase groundwork
+
+Phase 3: Hybrid Database (Optimization)
+├─ Depends on: Event Bus for cross-DB coordination ✅
+├─ Depends on: GraphQL abstraction (queries don't care about DB) ✅
+├─ Benefits from: 4+ weeks of understanding query patterns
+└─ Risk minimized by: Two successful previous phases ✅
+```
+
+---
+
+### 🔗 Synergy Benefits
+
+**Event Bus + GraphQL Synergy:**
+
+```typescript
+// GraphQL mutation emits event to invalidate caches
+const mutation = gql`
+  mutation updateUserProfile($data: UpdateUserInput!) {
+    updateUserProfile(data: $data) {
+      id
+      name
+      email
+    }
+  }
+`;
+
+// On completion, invalidate cache AND emit event
+onCompleted: (data) => {
+  eventBus.emit('user:profile:updated', {
+    userId: data.updateUserProfile.id,
+    timestamp: Date.now(),
+  });
+  // Apollo automatically evicts cached data
+  apolloClient.cache.evict({
+    id: `User:${data.updateUserProfile.id}`,
+  });
+};
+```
+
+**GraphQL + Hybrid Database Synergy:**
+
+```typescript
+// GraphQL subgraphs abstract database choice
+// This query doesn't know or care which database it's reading from
+
+const query = gql`
+  query getConversation($id: ID!) {
+    conversation(id: $id) {
+      id
+      messages {
+        id
+        content
+        timestamp
+      }
+    }
+  }
+`;
+
+// Resolver can point to MongoDB OR PostgreSQL
+// Frontend doesn't change, only backend swaps database
+```
+
+**All Three Together (Complete Flow):**
+
+```
+1. User sends message
+   ↓
+2. Chatbot MFE → GraphQL mutation sendMessage
+   ↓
+3. API stores in PostgreSQL (Week 1-10) / MongoDB (Week 7-10)
+   ↓
+4. Event Bus emits 'message:sent' event
+   ↓
+5. Other MFEs listening to event bus receive update
+   ↓
+6. Admin MFE receiving 'message:sent' event
+   ├─ Invalidates Apollo cache for conversation
+   ├─ Fetches fresh GraphQL query
+   ├─ Renders updated conversation view
+   └─ All without polling or WebSocket
+
+Result: Real-time synchronized MFEs with minimal coupling
+```
+
+---
+
+### 📊 10-Week Timeline At A Glance
+
+```
+WEEK 1-2:  Event Bus Foundation
+  Mon 1  Tue  Wed  Thu  Fri  Mon 2  Tue  Wed  Thu  Fri
+  ████████████████████████████████████  (10 dev-days)
+
+WEEK 3-6:  GraphQL + REST Hybrid
+  Mon 3  Tue  Wed  Thu  Fri  Mon 4  Tue  Wed  Thu  Fri  ... Week 5-6
+  ████████████████████████████████████████████████████████████  (18 dev-days)
+
+WEEK 7-10: MongoDB + PostgreSQL Hybrid
+  Mon 7  Tue  Wed  Thu  Fri  Mon 8  Tue  Wed  Thu  Fri  ... Week 9-10
+  ████████████████████████████████████████████████████████  (15 dev-days)
+
+TOTAL: 10 weeks = 70 calendar days = 43 dev-days work = 344 dev-hours
+```
+
+---
+
+### 👥 Team Allocation
+
+**Week 1-2 (Event Bus):**
+
+- **Full team (3-4 devs):** All hands on deck
+- **Goal:** High-quality foundation everyone understands
+
+**Week 3-6 (GraphQL):**
+
+- **Primary team (3 devs):** GraphQL gateway + subgraphs
+- **Secondary team (1 dev):** Frontend Apollo Client integration
+- **Parallel work:** Coordinate via established patterns
+
+**Week 7-10 (Hybrid Database):**
+
+- **Primary team (2 devs):** Database migration, dual-write pattern
+- **Secondary team (1 dev):** Performance monitoring, optimization
+- **Tertiary (1 dev):** Load testing, production readiness
+
+### 📋 Success Criteria
+
+| Phase              | Success Metric                        | Target           | Status        |
+| ------------------ | ------------------------------------- | ---------------- | ------------- |
+| Phase 1: Event Bus | All MFEs properly listening to events | 100%             | ✅ Verifiable |
+| Phase 2: GraphQL   | Admin dashboard <200ms load time      | 185ms            | ✅ Measurable |
+| Phase 2: GraphQL   | 86% reduction in API requests         | 1 query vs 7     | ✅ Measurable |
+| Phase 3: Hybrid DB | Message queries 30-40% faster         | 30%+             | ✅ Verifiable |
+| Phase 3: Hybrid DB | Zero data loss during migration       | 100% consistency | ✅ Critical   |
+| Overall            | Production ready and documented       | Full coverage    | ✅ Achievable |
+
+---
+
+### 📁 Documentation References
+
+**Phase 1 (Event Bus):**
+
+- 📘 `EVENT_BUS_IMPLEMENTATION_PLAN.md` - 5-phase detailed roadmap
+- 📘 `EVENT_BUS_CODE_EXAMPLES.md` - 50+ code examples
+- 📘 `EVENT_BUS_STATE_MANAGEMENT_CLARIFICATION.md` - Architecture decisions
+
+**Phase 2 (GraphQL):**
+
+- 📘 `GRAPHQL_IMPLEMENTATION_PLAN.md` - Comprehensive strategy (50+ pages)
+- 📘 `Appendix B: GraphQL Implementation Details` (below)
+- 📘 Related: `COMPREHENSIVE_TEST_REPORT.md` - Testing patterns
+
+**Phase 3 (Hybrid Database):**
+
+- 📘 `HYBRID_POSTGRES_MONGODB_ROADMAP.md` - 6-8 week migration plan
+- 📘 `HYBRID_MONGODB_POSTGRES_IMPLEMENTATION.md` - Schema design
+- 📘 Related: `PRODUCTION_DEPLOYMENT.md` - Deployment strategy
 
 ---
 

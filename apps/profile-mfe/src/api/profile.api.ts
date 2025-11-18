@@ -3,22 +3,6 @@ import axios, { AxiosInstance } from 'axios';
 const API_BASE_URL =
   import.meta.env.VITE_AUTH_API_URL || 'http://localhost:3000/api';
 
-/**
- * Helper to get access token from Zustand auth storage
- * The auth store persists tokens under 'auth-storage' key
- */
-function getAccessToken(): string | null {
-  try {
-    const authStorage = localStorage.getItem('auth-storage');
-    if (!authStorage) return null;
-
-    const parsed = JSON.parse(authStorage);
-    return parsed?.state?.accessToken || null;
-  } catch {
-    return null;
-  }
-}
-
 export interface User {
   id: string;
   email: string;
@@ -59,15 +43,7 @@ class ProfileAPI {
       headers: {
         'Content-Type': 'application/json',
       },
-    });
-
-    // Add auth token interceptor
-    this.client.interceptors.request.use((config) => {
-      const token = getAccessToken();
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-      return config;
+      withCredentials: true, // Include cookies in requests
     });
 
     // Add response interceptor for error handling

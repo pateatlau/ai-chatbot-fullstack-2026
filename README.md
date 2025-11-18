@@ -7,7 +7,7 @@
 
 An enterprise-grade AI chatbot application built with modern microservices backend and Module Federation micro-frontends, featuring hybrid REST + GraphQL APIs, comprehensive testing, CI/CD automation, and multi-platform deployment support.
 
-**Timeline:** 5 weeks (35 days) | **Team Size:** 4-8 developers
+**Timeline:** 10 weeks (70 days) | **Team Size:** 3-4 developers | **Phases:** Event Bus → GraphQL → Hybrid Database
 
 ## ✨ Key Features
 
@@ -324,50 +324,63 @@ ESLint enforces strict module boundaries:
 
 ## 📋 Implementation Roadmap
 
-This project follows a 5-week implementation plan with parallel frontend and backend development:
+This project follows a **strategic 10-week implementation plan** with three sequential phases, each building on the foundation of the previous one:
 
-### Phase Breakdown
+### 🔵 Phase 1: MFE Event Bus (Weeks 1-2, 10 dev-days)
 
-**Phase 1: Foundation & Setup** (Week 1)
+**Goal:** Establish event-driven architecture for cross-MFE communication
 
-- Nx monorepo initialization
-- Shared libraries and type definitions
-- Docker environment setup
-- Basic auth service implementation
+- Event bus library in `libs/frontend/event-bus`
+- Auth state synchronization (login, logout, token refresh)
+- Toast notifications and cross-MFE events
+- **Risk:** 🟢 Low | **Dependencies:** None | **Impact:** Immediate UX improvement
 
-**Phase 2: Core Services + SSO/MFA (Priority 1)** (Week 2)
+**Why First:** Foundation for other phases, no backend dependencies, high confidence builder
 
-- Auth and Chatbot microservices
-- **Google OAuth 2.0 integration (8-12 hours)**
-- **TOTP-based MFA implementation (6-8 hours)**
-- Database schema updates for OAuth and MFA
-- Auth MFE with OAuth buttons and MFA setup
-- Profile MFE
-- REST API endpoints
-- Module Federation integration
+### 🟣 Phase 2: GraphQL + REST Hybrid API (Weeks 3-6, 18 dev-days)
 
-**Phase 3: Advanced Features + Optional Security** (Week 3)
+**Goal:** Implement Apollo Federation gateway for 50% faster dashboards
 
-- GraphQL Gateway with Apollo Federation
-- Admin service and Admin MFE
-- Chatbot MFE with streaming
-- Complex data queries
-- **Optional: GitHub OAuth integration (4-6 hours)**
-- **Optional: SMS MFA with Twilio (4-6 hours)**
+- Apollo Federation gateway with auth, chatbot, admin subgraphs
+- Apollo Client v5 frontend integration
+- Admin dashboard migration (7 calls → 1 query)
+- **Performance:** 378ms → 185ms (51% faster) | **Risk:** 🟡 Medium | **Backwards Compatible:** Yes
 
-**Phase 4: Testing & Quality** (Week 4)
+**Why Second:** Event Bus provides cache coordination, REST APIs remain functional, clear performance metrics
 
-- Comprehensive E2E testing
-- Performance optimization
-- Security hardening
-- Load testing scenarios
+### 🟠 Phase 3: MongoDB + PostgreSQL Hybrid Database (Weeks 7-10, 15 dev-days)
 
-**Phase 5: Deployment** (Week 5)
+**Goal:** Optimize storage with polyglot persistence (PostgreSQL for auth, MongoDB for chat)
 
-- CI/CD pipeline setup
-- Docker containerization
-- Production deployment
-- Monitoring and observability
+- MongoDB cluster setup with indexing
+- Dual-write pattern and data migration
+- Gradual read path switching (10% → 25% → 100%)
+- **Performance:** 30-40% faster message queries | **Risk:** 🔴 High | **Validation:** Critical
+
+**Why Third:** Most complex phase, benefits from Phase 1-2 foundation, time to understand query patterns
+
+### Key Statistics
+
+| Phase                  | Duration     | Effort          | Deliverables                               |
+| ---------------------- | ------------ | --------------- | ------------------------------------------ |
+| **Phase 1: Event Bus** | 2 weeks      | 10 dev-days     | Event bus library, 4+ event types          |
+| **Phase 2: GraphQL**   | 4 weeks      | 18 dev-days     | Apollo gateway, 3 subgraphs, Apollo Client |
+| **Phase 3: Hybrid DB** | 4 weeks      | 15 dev-days     | MongoDB setup, data migration, cutover     |
+| **TOTAL**              | **10 weeks** | **43 dev-days** | **Production-ready system**                |
+
+### Implementation Order Rationale
+
+**Why This Exact Sequence (Not Parallel)?**
+
+- ✅ **Event Bus First:** No dependencies, enables foundation for cache coordination in Phase 2
+- ✅ **GraphQL Second:** Uses Event Bus for cache invalidation, REST APIs work during migration, clear success metrics
+- ✅ **Hybrid DB Last:** Most complex & risky, benefits from 4+ weeks of understanding query patterns, event bus + GraphQL abstract database complexity
+
+**Anti-Patterns Avoided:**
+
+- ❌ Database first: Complex sync without event bus
+- ❌ GraphQL first: Cache invalidation nightmare without events
+- ❌ All simultaneous: Impossible to debug or rollback
 
 ### Expected Deliverables
 
@@ -378,25 +391,12 @@ This project follows a 5-week implementation plan with parallel frontend and bac
 | **E2E Tests**        | 50+          | 100%     | Critical user flows   |
 | **Total**            | **260+**     | **>80%** | **Full-stack system** |
 
-### Infrastructure Components
+### 📚 Detailed Documentation
 
-- Multi-stage Dockerfiles (4 services)
-- Docker Compose orchestration
-- Nginx reverse proxy
-- CI/CD pipeline (GitHub Actions)
-- Load testing suite (k6)
-- Smoke tests
-- Security audit tools
-
-### Security Features
-
-- JWT authentication with refresh tokens
-- Non-root container execution
-- Security headers (XSS, CSP, HSTS)
-- Rate limiting (10 msg/min)
-- CORS protection
-- Environment-based secrets
-- SSL/TLS ready
+- **[CONSOLIDATED_IMPLEMENTATION_ROADMAP-NX.md](./docs/CONSOLIDATED_IMPLEMENTATION_ROADMAP-NX.md)** - Full technical roadmap with week-by-week breakdown
+- **[EVENT_BUS_IMPLEMENTATION_PLAN.md](./docs/EVENT_BUS_IMPLEMENTATION_PLAN.md)** - Phase 1 detailed guide
+- **[GRAPHQL_IMPLEMENTATION_PLAN.md](./docs/GRAPHQL_IMPLEMENTATION_PLAN.md)** - Phase 2 comprehensive strategy (50+ pages)
+- **[HYBRID_POSTGRES_MONGODB_ROADMAP.md](./docs/HYBRID_POSTGRES_MONGODB_ROADMAP.md)** - Phase 3 migration plan
 
 ## 📚 Documentation
 

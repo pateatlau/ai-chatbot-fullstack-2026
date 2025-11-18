@@ -3,22 +3,6 @@ import axios, { AxiosInstance } from 'axios';
 const API_BASE_URL =
   import.meta.env.VITE_CHATBOT_API_URL || 'http://localhost:3001/api';
 
-/**
- * Helper to get access token from Zustand auth storage
- * The auth store persists tokens under 'auth-storage' key
- */
-function getAccessToken(): string | null {
-  try {
-    const authStorage = localStorage.getItem('auth-storage');
-    if (!authStorage) return null;
-
-    const parsed = JSON.parse(authStorage);
-    return parsed?.state?.accessToken || null;
-  } catch {
-    return null;
-  }
-}
-
 export interface Conversation {
   id: string;
   userId: string;
@@ -83,15 +67,7 @@ class ChatbotAPI {
       headers: {
         'Content-Type': 'application/json',
       },
-    });
-
-    // Add auth token interceptor
-    this.client.interceptors.request.use((config) => {
-      const token = getAccessToken();
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-      return config;
+      withCredentials: true, // Include cookies in requests automatically
     });
 
     // Add response interceptor for error handling
@@ -175,16 +151,14 @@ class ChatbotAPI {
     conversationId: string,
     content: string
   ): Promise<Response> {
-    const token = getAccessToken();
-
     const response = await fetch(
       `${API_BASE_URL}/chat/conversations/${conversationId}/messages`,
       {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
+        credentials: 'include', // Include cookies in fetch requests
         body: JSON.stringify({ content }),
       }
     );

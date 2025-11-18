@@ -1,0 +1,85 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e6]:
+      - generic [ref=e7]:
+        - link "AI Chatbot" [ref=e8] [cursor=pointer]:
+          - /url: /dashboard
+        - navigation [ref=e9]:
+          - link "Dashboard" [ref=e10] [cursor=pointer]:
+            - /url: /dashboard
+          - link "Chat" [ref=e11] [cursor=pointer]:
+            - /url: /chat
+          - link "Admin" [ref=e12] [cursor=pointer]:
+            - /url: /admin
+      - button "T Test Admin" [ref=e15]:
+        - generic [ref=e16]: T
+        - generic [ref=e17]: Test Admin
+        - img [ref=e18]
+  - main [ref=e20]:
+    - generic [ref=e21]:
+      - generic [ref=e22]:
+        - heading "Welcome back, Test Admin! 👋" [level=1] [ref=e23]
+        - paragraph [ref=e24]: Ready to continue your AI-powered conversations?
+      - generic [ref=e25]:
+        - generic [ref=e28]:
+          - generic [ref=e29]:
+            - paragraph [ref=e30]: Conversations
+            - paragraph [ref=e31]: "0"
+          - generic [ref=e32]: 💬
+        - generic [ref=e35]:
+          - generic [ref=e36]:
+            - paragraph [ref=e37]: Messages
+            - paragraph [ref=e38]: "0"
+          - generic [ref=e39]: ✉️
+        - generic [ref=e42]:
+          - generic [ref=e43]:
+            - paragraph [ref=e44]: AI Tokens Used
+            - paragraph [ref=e45]: "0"
+          - generic [ref=e46]: 🎯
+        - generic [ref=e49]:
+          - generic [ref=e50]:
+            - paragraph [ref=e51]: Active Sessions
+            - paragraph [ref=e52]: "1"
+          - generic [ref=e53]: ⚡
+      - generic [ref=e54]:
+        - generic [ref=e55]:
+          - heading "Quick Actions" [level=2] [ref=e56]
+          - generic [ref=e57]:
+            - link "💬 New Conversation Start chatting with AI" [ref=e58] [cursor=pointer]:
+              - /url: /chatbot
+              - generic [ref=e59]: 💬
+              - heading "New Conversation" [level=3] [ref=e60]
+              - paragraph [ref=e61]: Start chatting with AI
+            - link "👤 View Profile Manage your account" [ref=e62] [cursor=pointer]:
+              - /url: /profile
+              - generic [ref=e63]: 👤
+              - heading "View Profile" [level=3] [ref=e64]
+              - paragraph [ref=e65]: Manage your account
+            - link "⚙️ Settings Customize preferences" [ref=e66] [cursor=pointer]:
+              - /url: /profile/settings
+              - generic [ref=e67]: ⚙️
+              - heading "Settings" [level=3] [ref=e68]
+              - paragraph [ref=e69]: Customize preferences
+        - generic [ref=e70]:
+          - heading "Recent Activity" [level=2] [ref=e71]
+          - generic [ref=e74]:
+            - generic [ref=e75]:
+              - generic [ref=e76]: 🔐
+              - generic [ref=e77]:
+                - paragraph [ref=e78]: You logged in
+                - paragraph [ref=e79]: Just now
+            - paragraph [ref=e81]: Start using the chatbot to see more activity
+      - generic [ref=e84]:
+        - generic [ref=e85]: 🚀
+        - generic [ref=e86]:
+          - heading "Getting Started" [level=3] [ref=e87]
+          - paragraph [ref=e88]: "Welcome to your AI Chatbot Dashboard! Here's how to get started:"
+          - list [ref=e89]:
+            - listitem [ref=e90]: Click "New Conversation" to start chatting with the AI
+            - listitem [ref=e91]: Visit your profile to customize your account settings
+            - listitem [ref=e92]: Check out the settings to personalize your experience
+            - listitem [ref=e93]: Access the Admin panel to manage users and system settings
+```

@@ -26,7 +26,8 @@ export function Register() {
     try {
       const { confirmPassword, ...registerData } = data;
       const response = await authService.register(registerData);
-      setAuth(response.user, response.accessToken, response.refreshToken);
+      // Tokens are now in HttpOnly cookies, not in the response
+      setAuth(response.user);
       addToast('Account created successfully!', 'success');
 
       // Use window.location.replace for reliable cross-MFE navigation

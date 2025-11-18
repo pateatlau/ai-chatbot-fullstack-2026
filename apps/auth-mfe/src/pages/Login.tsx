@@ -27,8 +27,8 @@ export function Login() {
     try {
       const response = await authService.login(data);
 
-      // Store auth data with remember me preference
-      setAuth(response.user, response.accessToken, response.refreshToken);
+      // Store auth data - tokens are now in HttpOnly cookies, not in the response
+      setAuth(response.user);
 
       // Store remember me preference
       if (rememberMe) {

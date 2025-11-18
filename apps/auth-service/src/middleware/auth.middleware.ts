@@ -21,21 +21,21 @@ export const authMiddleware = async (
   next: NextFunction
 ) => {
   try {
-    // Get token from Authorization header
-    const authHeader = req.headers.authorization;
+    let token: string | null = null;
 
-    if (!authHeader) {
+    // Try to get token from Authorization header first (for backward compatibility)
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.substring(7);
+    }
+    // Fall back to HttpOnly cookie
+    else if ((req as any).cookies?.accessToken) {
+      token = (req as any).cookies.accessToken;
+    }
+
+    if (!token) {
       return res.status(401).json({ error: 'No token provided' });
     }
-
-    // Check if it's a Bearer token
-    const parts = authHeader.split(' ');
-
-    if (parts.length !== 2 || parts[0] !== 'Bearer') {
-      return res.status(401).json({ error: 'Token format invalid' });
-    }
-
-    const token = parts[1];
 
     // Check if token is blacklisted
     try {
