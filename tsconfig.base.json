@@ -36,7 +36,10 @@
       "@myapp/frontend/utils": ["libs/frontend/utils/src/index.ts"],
       "@myapp/frontend/mocks": ["libs/frontend/mocks/src/index.ts"],
       "@myapp/frontend/hooks": ["libs/frontend/hooks/src/index.ts"],
-      "@ai-chatbot/hooks": ["libs/frontend/hooks/src/index.ts"]
+      "@ai-chatbot/hooks": ["libs/frontend/hooks/src/index.ts"],
+      "@ai-chatbot/chatbot-stores": ["libs/chatbot/stores/src/index.ts"],
+      "@ai-chatbot/admin-stores": ["libs/admin/stores/src/index.ts"],
+      "@ai-chatbot/profile-stores": ["libs/profile/stores/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
