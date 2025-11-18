@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { getEventBus, EVENT_NAMES } from '@myapp/shared/event-bus';
 
 export interface User {
   id: string;
@@ -40,25 +41,81 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
       isLoading: false,
 
-      setAuth: (user, accessToken, refreshToken) =>
+      setAuth: (user, accessToken, refreshToken) => {
         set({
           user,
           accessToken: null, // Never store tokens in state that persists
           refreshToken: null, // Tokens are in HttpOnly cookies
           isAuthenticated: true,
           isLoading: false,
-        }),
+        });
 
-      clearAuth: () =>
+        // Emit user logged in event
+        const eventBus = getEventBus();
+        eventBus.emit(EVENT_NAMES.USER_LOGGED_IN, {
+          user: {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role as 'user' | 'admin',
+          },
+          timestamp: Date.now(),
+        });
+      },
+
+      clearAuth: () => {
+        const currentUser = useAuthStore.getState().user;
+
         set({
           user: null,
           accessToken: null,
           refreshToken: null,
           isAuthenticated: false,
           isLoading: false,
-        }),
+        });
 
-      setUser: (user) => set({ user }),
+        // Emit user logged out event
+        if (currentUser) {
+          const eventBus = getEventBus();
+          eventBus.emit(EVENT_NAMES.USER_LOGGED_OUT, {
+            userId: currentUser.id,
+            timestamp: Date.now(),
+          });
+        }
+      },
+
+      setUser: (user) => {
+        const currentUser = useAuthStore.getState().user;
+        set({ user });
+
+        // Emit user profile updated event if there are changes
+        if (currentUser && user) {
+          const changes: {
+            name?: string;
+            email?: string;
+            avatar?: string;
+          } = {};
+
+          if (currentUser.name !== user.name) {
+            changes.name = user.name;
+          }
+          if (currentUser.email !== user.email) {
+            changes.email = user.email;
+          }
+          if (currentUser.avatar !== user.avatar && user.avatar) {
+            changes.avatar = user.avatar;
+          }
+
+          if (Object.keys(changes).length > 0) {
+            const eventBus = getEventBus();
+            eventBus.emit(EVENT_NAMES.USER_PROFILE_UPDATED, {
+              userId: user.id,
+              changes,
+              timestamp: Date.now(),
+            });
+          }
+        }
+      },
 
       setTokens: (accessToken, refreshToken) =>
         set({ accessToken: null, refreshToken: null }), // Never store in state

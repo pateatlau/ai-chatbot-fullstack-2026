@@ -218,7 +218,7 @@ export function getEventBus(): EventBus {
     globalEventBus = new EventBus({
       enableHistory: true,
       maxHistorySize: 1000,
-      enableLogging: process.env.NODE_ENV === 'development',
+      enableLogging: process.env['NODE_ENV'] === 'development',
     });
   }
   return globalEventBus;

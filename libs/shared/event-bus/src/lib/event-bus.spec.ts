@@ -48,7 +48,8 @@ describe('EventBus', () => {
 
     it('should handle async listeners', async () => {
       const mockAsyncListener = jest.fn(
-        async () => new Promise((resolve) => setTimeout(resolve, 10))
+        async (): Promise<void> =>
+          new Promise((resolve) => setTimeout(resolve, 10))
       );
 
       eventBus.subscribe('test:event', mockAsyncListener);
@@ -203,8 +204,8 @@ describe('EventBus', () => {
 
       const history = busWithHistory.getEventHistory();
       expect(history).toHaveLength(2);
-      expect(history[0].name).toBe('test:event1');
-      expect(history[1].name).toBe('test:event2');
+      expect(history[0]?.name).toBe('test:event1');
+      expect(history[1]?.name).toBe('test:event2');
     });
 
     it('should not record events when history is disabled', async () => {
@@ -228,7 +229,7 @@ describe('EventBus', () => {
 
       const history = busWithLimitedHistory.getEventHistory();
       expect(history).toHaveLength(3);
-      expect(history[0].data.data).toBe('event2'); // First 2 events trimmed
+      expect(history[0]?.data.data).toBe('event2'); // First 2 events trimmed
     });
 
     it('should clear history', async () => {
