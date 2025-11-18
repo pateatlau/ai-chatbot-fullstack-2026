@@ -4,14 +4,93 @@
 
 **Document Type:** Technical Implementation Guide  
 **Audience:** Development Teams, Technical Leads, Project Managers, Architects  
-**Version:** 5.0  
-**Last Updated:** November 17, 2025  
-**Timeline:** 5 Weeks (35 days)  
-**Team Composition:** 4-8 developers (2-4 Backend, 2-4 Frontend)  
-**Architecture:** Unified Monorepo (Nx) with Hybrid REST + GraphQL  
-**Estimated Reading Time:** 45-60 minutes
+**Version:** 6.0  
+**Last Updated:** November 18, 2025  
+**Timeline:** 11-12 Weeks (Strategic Prioritization with 3 Parallel Initiatives)  
+**Team Composition:** 6-8 developers (3-4 Backend, 3-4 Frontend)  
+**Architecture:** Unified Monorepo (Nx) with Hybrid REST + GraphQL + Event Bus  
+**Estimated Reading Time:** 60-90 minutes
 
-**Quick Navigation:** [Executive Summary](#executive-summary) | [Prerequisites](#prerequisites) | [Week-by-Week Implementation](#week-by-week-implementation) | [Troubleshooting](#troubleshooting-guide) | [FAQ](#frequently-asked-questions)
+**Quick Navigation:** [Strategic Priority Roadmap](#strategic-priority-roadmap-new) | [Executive Summary](#executive-summary) | [Prerequisites](#prerequisites) | [Week-by-Week Implementation](#week-by-week-implementation) | [Troubleshooting](#troubleshooting-guide) | [FAQ](#frequently-asked-questions)
+
+---
+
+## 🎯 STRATEGIC PRIORITY ROADMAP (NEW)
+
+> **Important Update:** November 18, 2025
+>
+> This section provides strategic prioritization for three major initiatives:
+>
+> 1. **JWT Token Security Fix** (2-3 hours) - 🔴 CRITICAL
+> 2. **Event Bus Implementation** (3 weeks) - Zero-coupling MFEs
+> 3. **PostgreSQL + MongoDB Hybrid** (6-8 weeks) - 10M+ user scale
+
+### Recommended Implementation Order
+
+**Phase 1 (Weeks 1-2):** JWT Security + Event Bus Foundation (Parallel)
+
+- **JWT Fix**: Complete authentication security vulnerability (HttpOnly cookies)
+- **Event Bus Phase 1**: Establish event-driven foundation for MFE communication
+
+**Phase 2 (Weeks 3-6):** Hybrid Database + Event Bus Completion (Parallel)
+
+- **Event Bus Phases 2-5**: Local stores, component refactoring, testing
+- **Hybrid Phases 1-2**: Auth on PostgreSQL, Chatbot on MongoDB
+
+**Phase 3 (Weeks 7-10):** Testing & Scaling
+
+- **Hybrid Phases 3-5**: Admin service, cross-service integration
+- **Load testing**: 10M users, 100M messages/day simulation
+
+**Phase 4 (Weeks 11-12):** Production Deployment
+
+- **Deployment**: Blue-green, monitoring, launch readiness
+
+### Key Statistics
+
+| Initiative       | Duration        | Effort       | Priority    | Status                  |
+| ---------------- | --------------- | ------------ | ----------- | ----------------------- |
+| JWT Security Fix | 2-3 hrs         | 3 hrs        | 🔴 CRITICAL | Documented ✅           |
+| Event Bus        | 3 weeks         | 72 hrs       | 🟡 HIGH     | Documented ✅           |
+| Hybrid Database  | 6-8 weeks       | 200+ hrs     | 🟢 MEDIUM   | Documented ✅           |
+| **TOTAL**        | **11-12 weeks** | **275+ hrs** | -           | **Ready to Execute** ✅ |
+
+### Team Allocation (6-8 Developers)
+
+```
+Week 1-2:  2-3 devs (JWT) + 2-3 devs (Event Bus)
+Week 3-6:  3-4 devs (Hybrid) + 3 devs (Event Bus)
+Week 7-12: All teams integrated (testing, optimization, deployment)
+```
+
+### Documentation References
+
+📘 **Complete Priority Roadmap:** `IMPLEMENTATION_PRIORITY_ROADMAP.md`
+
+- Week-by-week breakdown
+- Team allocation strategies
+- Go/no-go decision points
+- Risk mitigation approach
+
+📘 **JWT Security Fix:** `TOKEN_SECURITY_QUICK_REFERENCE.md`, `HTTPONLY_COOKIES_QUICK_START.md`
+
+- Copy-paste implementation
+- Testing checklist
+- Security validation
+
+📘 **Event Bus:** `EVENT_BUS_IMPLEMENTATION_PLAN.md`, `EVENT_BUS_CODE_EXAMPLES.md`
+
+- 5-phase detailed roadmap
+- 50+ code examples
+- State management clarification
+
+📘 **Hybrid Database:** `HYBRID_POSTGRES_MONGODB_ROADMAP.md`
+
+- 6-8 week implementation plan
+- Infrastructure setup
+- Schema design patterns
+
+---
 
 ---
 
@@ -117,10 +196,13 @@ An enterprise-grade AI chatbot application with a modern microservices backend a
 
 ### Strategic Approach
 
-This roadmap enables **parallel development** of the microservices backend and micro-frontend architecture in a **unified Nx monorepo** with a **hybrid REST + GraphQL API strategy**.
+This roadmap follows a **security-first, architecture-second, scaling-third** approach with **three parallel initiatives** in a **unified Nx monorepo** with **hybrid REST + GraphQL API strategy** and **event-driven MFE architecture**.
 
 **Key Differentiators:**
 
+- **Security First (Week 1):** Fix critical JWT vulnerability (HttpOnly cookies) before scaling
+- **Architecture Foundation (Weeks 1-3):** Event bus establishes zero-coupling MFE patterns
+- **Scalable Infrastructure (Weeks 3-10):** PostgreSQL + MongoDB hybrid for 10M+ users
 - **Monorepo Architecture:** Single Nx workspace housing frontend, backend, and shared packages
 - **Hybrid API Layer:** REST for CRUD/streaming operations, GraphQL for complex data fetching
 - **Nx Build System:** Intelligent task scheduling, computation caching, distributed execution
@@ -128,23 +210,25 @@ This roadmap enables **parallel development** of the microservices backend and m
 - **Apollo Federation:** Unified GraphQL gateway across microservices
 - **Event-Driven MFEs:** True micro-frontend independence with custom event bus
 
-### Timeline & Deliverables
+### Timeline & Deliverables (11-12 Week Strategic Roadmap)
 
-| Week  | Focus Area    | Backend Deliverables                          | Frontend Deliverables                          |
-| ----- | ------------- | --------------------------------------------- | ---------------------------------------------- |
-| **1** | Foundation    | Auth Service, shared types, Docker setup      | Shell app, shared libraries, Module Federation |
-| **2** | Core Services | Chatbot Service + SSE streaming, OAuth/MFA    | Auth MFE, Profile MFE                          |
-| **3** | Advanced      | Admin Service, GraphQL Gateway, Federation    | Chatbot MFE, Admin MFE                         |
-| **4** | Testing       | Integration tests, load testing, optimization | E2E tests, performance tuning                  |
-| **5** | Deployment    | CI/CD pipelines, production deployment        | Production builds, monitoring                  |
+| Phase       | Weeks | Focus Area            | Backend Deliverables                               | Frontend Deliverables                            | Priority    |
+| ----------- | ----- | --------------------- | -------------------------------------------------- | ------------------------------------------------ | ----------- |
+| **Phase 1** | 1-2   | Security + Foundation | JWT HttpOnly cookies, Auth Service, Docker setup   | Shell app, Event Bus Phase 1, shared libraries   | 🔴 CRITICAL |
+| **Phase 2** | 3-6   | Hybrid Database       | PostgreSQL (Auth), MongoDB (Chatbot), hybrid setup | Event Bus Phases 2-5, MFE stores, components     | 🟡 HIGH     |
+| **Phase 3** | 7-10  | Scaling & Integration | Admin Service, cross-service patterns, federation  | Chatbot MFE, Admin MFE, integration tests        | 🟢 MEDIUM   |
+| **Phase 4** | 11-12 | Production Deployment | Blue-green deployment, monitoring, CI/CD           | Production builds, E2E tests, performance tuning | ✅ COMPLETE |
 
 ### Success Factors
 
-✅ Unified Nx monorepo with intelligent caching and incremental builds  
-✅ Hybrid REST + GraphQL with Apollo Federation  
-✅ Shared Zod schemas ensuring type safety  
-✅ Mock APIs enabling parallel development  
-✅ Comprehensive testing (250+ tests, >80% coverage)
+✅ **Security First:** JWT tokens in HttpOnly cookies (OWASP-compliant, eliminates XSS vulnerability)  
+✅ **Zero-Coupling MFEs:** Event bus + local Zustand stores enable true micro-frontend independence  
+✅ **Enterprise Scale:** PostgreSQL + MongoDB hybrid handles 10M+ users, 100M+ messages/day  
+✅ **Unified Nx Monorepo:** Intelligent caching and incremental builds (85% faster CI)  
+✅ **Hybrid REST + GraphQL:** Apollo Federation with unified gateway for complex queries  
+✅ **Shared Zod Schemas:** Type safety across all services and frontends  
+✅ **Comprehensive Testing:** 275+ tests (>80% coverage) across all three initiatives  
+✅ **Production-Ready:** Blue-green deployment, monitoring, observability, rollback strategies
 
 ---
 
@@ -201,17 +285,24 @@ This roadmap enables **parallel development** of the microservices backend and m
 
 ### 🎯 Target Achievements
 
-**Core Deliverables:**
-✅ Microservices + MFE architecture with 250+ tests (>80% coverage)  
+**Phase 1 Deliverables (Security Foundation):**
+✅ JWT tokens in HttpOnly Secure Cookies (eliminates XSS vulnerability)  
+✅ CSRF protection with SameSite=Strict  
+✅ Zero user experience impact from security migration
+
+**Phase 1-3 Deliverables (Architecture + Scale):**
+✅ Event-driven MFE architecture with zero coupling  
+✅ PostgreSQL + MongoDB hybrid infrastructure for 10M+ users  
+✅ Microservices + MFE architecture with 275+ tests (>80% coverage)  
 ✅ Production-ready deployment (Docker, K8s, multi-cloud)  
 ✅ Real-time SSE streaming with end-to-end type safety  
 ✅ Zero critical security vulnerabilities
 
-**Optional Enhancements:**
+**Optional Enhancements (Post-Launch):**
 
 - **P1:** Google OAuth SSO, TOTP MFA (~14-20 hours)
 - **P2:** GitHub OAuth, SMS MFA, Prometheus (~10-12 hours)
-- **P3:** WebAuthn, Auth0 SSO, multi-region (post-launch)
+- **P3:** WebAuthn, Auth0 SSO, multi-region deployment
 
 ---
 
@@ -221,16 +312,16 @@ This roadmap enables **parallel development** of the microservices backend and m
 
 ### Quality Metrics
 
-| Metric                       | Target     | Priority    | Notes                           |
-| ---------------------------- | ---------- | ----------- | ------------------------------- |
-| **Test Coverage**            | >80%       | Must Have   | Unit, integration, E2E tests    |
-| **Total Tests**              | 250+       | Must Have   | 200+ unit, 50+ E2E              |
-| **Security Vulnerabilities** | 0 critical | Must Have   | Regular npm audit               |
-| **API Response Time (p95)**  | <500ms     | Must Have   | Normal load conditions          |
-| **Error Rate**               | <1%        | Must Have   | Production traffic              |
-| **Lighthouse Score**         | >90        | Should Have | Performance, accessibility, SEO |
-| **Documentation**            | Complete   | Must Have   | Architecture, API, deployment   |
-| **Deployment Options**       | 3+         | Must Have   | Docker, K8s, cloud platforms    |
+| Metric                       | Target     | Priority    | Notes                              |
+| ---------------------------- | ---------- | ----------- | ---------------------------------- |
+| **Test Coverage**            | >80%       | Must Have   | Unit, integration, E2E tests       |
+| **Total Tests**              | 275+       | Must Have   | 220+ unit, 55+ E2E (3 initiatives) |
+| **Security Vulnerabilities** | 0 critical | Must Have   | JWT fix, regular npm audit         |
+| **API Response Time (p95)**  | <500ms     | Must Have   | Normal load conditions             |
+| **Error Rate**               | <1%        | Must Have   | Production traffic                 |
+| **Lighthouse Score**         | >90        | Should Have | Performance, accessibility, SEO    |
+| **Documentation**            | Complete   | Must Have   | Architecture, API, deployment      |
+| **Deployment Options**       | 3+         | Must Have   | Docker, K8s, cloud platforms       |
 
 ### Performance Benchmarks
 
@@ -246,12 +337,41 @@ This roadmap enables **parallel development** of the microservices backend and m
 
 ### 🚦 Production Readiness Checklist
 
-#### Development Phase
+#### Development Phase (Weeks 1-10)
 
-- [ ] All tests passing (270+ tests target)
-- [ ] Security audit complete (0 vulnerabilities)
+**JWT Security Fix (Week 1, Days 1-2):**
+
+- [ ] HttpOnly Secure Cookies implemented
+- [ ] CSRF protection enabled (SameSite=Strict)
+- [ ] No tokens in localStorage
+- [ ] Auto-refresh on 401 working
+- [ ] All MFEs functioning post-migration
+- [ ] Security test validated in F12
+
+**Event Bus Foundation (Week 1-3):**
+
+- [ ] Event-bus package created
+- [ ] TypeScript types defined (15+ events)
+- [ ] React hooks working (useEventListener, useEventEmitter)
+- [ ] Unit tests passing (50+)
+- [ ] Local Zustand stores per MFE
+- [ ] Component refactoring complete
+
+**Hybrid Database (Weeks 3-10):**
+
+- [ ] PostgreSQL running with Prisma
+- [ ] MongoDB running with Mongoose
+- [ ] Auth Service on PostgreSQL
+- [ ] Chatbot Service on MongoDB
+- [ ] Admin Service on PostgreSQL
+- [ ] Cross-service integration working
+
+**General Development:**
+
+- [ ] All tests passing (275+ tests target)
+- [ ] Security audit complete (0 vulnerabilities, including JWT fix)
 - [ ] Performance benchmarks validated
-- [ ] Documentation complete
+- [ ] Documentation complete (all 3 initiatives)
 - [ ] Docker images built and tested
 - [ ] CI/CD pipelines configured
 - [ ] Environment templates created
@@ -260,7 +380,7 @@ This roadmap enables **parallel development** of the microservices backend and m
 - [ ] Logging configured
 - [ ] Rate limiting enabled
 
-#### Pre-Launch Tasks
+#### Pre-Launch Tasks (Week 11)
 
 - [ ] Generate production secrets (openssl rand -base64 64)
 - [ ] Create .env.prod files with real values
@@ -269,35 +389,36 @@ This roadmap enables **parallel development** of the microservices backend and m
 - [ ] Configure Slack webhook for notifications
 - [ ] Set up monitoring dashboards
 - [ ] Configure backup scripts
-- [ ] Test rollback procedures
-- [ ] Perform security penetration testing
-- [ ] Run final load tests on staging
+- [ ] Test rollback procedures (all 3 initiatives)
+- [ ] Perform security penetration testing (JWT + APIs)
+- [ ] Run final load tests on staging (10M users simulation)
 
-#### Post-Launch Tasks
+#### Post-Launch Tasks (Week 12+)
 
 - [ ] 24-hour intensive monitoring
 - [ ] User feedback collection
 - [ ] Performance monitoring (RUM)
 - [ ] Error tracking (Sentry)
 - [ ] Weekly performance reviews
-- [ ] Monthly security audits
+- [ ] Monthly security audits (JWT, Event Bus, Hybrid DB)
 - [ ] Quarterly dependency updates
 - [ ] Feature usage analytics
 
 ### 🎯 Success Criteria
 
-| Criteria                     | Target   | Notes                           |
-| ---------------------------- | -------- | ------------------------------- |
-| **Test Coverage**            | >80%     | Unit, integration, E2E tests    |
-| **Unit Tests**               | >200     | Comprehensive component tests   |
-| **E2E Tests**                | >50      | Critical user flows             |
-| **Security Vulnerabilities** | 0        | Regular npm audit               |
-| **API Response Time (p95)**  | <500ms   | Normal load conditions          |
-| **Error Rate**               | <1%      | Production traffic              |
-| **Lighthouse Score**         | >90      | Performance, accessibility, SEO |
-| **Documentation**            | Complete | Architecture, API, deployment   |
-| **Deployment Options**       | 3+       | Docker, K8s, cloud platforms    |
-| **Timeline**                 | 5 weeks  | 35 days with parallel teams     |
+| Criteria                     | Target          | Initiative Focus   | Notes                                         |
+| ---------------------------- | --------------- | ------------------ | --------------------------------------------- |
+| **Test Coverage**            | >80%            | All 3              | Unit, integration, E2E tests                  |
+| **Unit Tests**               | >220            | All 3              | Comprehensive component tests                 |
+| **E2E Tests**                | >55             | All 3              | Critical user flows                           |
+| **Security Vulnerabilities** | 0               | JWT Fix            | Regular npm audit + JWT validation            |
+| **JWT Security**             | OWASP-compliant | JWT Fix            | HttpOnly, Secure, SameSite=Strict             |
+| **API Response Time (p95)**  | <500ms          | Event Bus + Hybrid | Normal load conditions                        |
+| **Error Rate**               | <1%             | Hybrid DB          | Production traffic                            |
+| **Lighthouse Score**         | >90             | All 3              | Performance, accessibility, SEO               |
+| **Documentation**            | Complete        | All 3              | Architecture, API, deployment                 |
+| **Deployment Options**       | 3+              | All 3              | Docker, K8s, cloud platforms                  |
+| **Timeline**                 | 11-12 weeks     | All 3              | Strategic prioritization with parallelization |
 
 ### 📝 Implementation Steps
 
@@ -1887,9 +2008,19 @@ NODE_ENV=development
 
 ## WEEK-BY-WEEK IMPLEMENTATION
 
-## WEEK 1: Foundation & Setup
+> **⚠️ IMPORTANT:** This section has been updated to align with the **Strategic Priority Roadmap** (Section: 🎯 STRATEGIC PRIORITY ROADMAP)
+>
+> **Implementation Order:**
+> 1. **Week 1-2:** JWT Security Fix (CRITICAL) + Event Bus Foundation
+> 2. **Week 3-6:** Hybrid Database (PostgreSQL + MongoDB) + Event Bus Phases 2-5
+> 3. **Week 7-10:** Testing, Scaling, Cross-service Integration
+> 4. **Week 11-12:** Production Deployment
+>
+> For complete details on prioritization, team allocation, and dependencies, see: **`IMPLEMENTATION_PRIORITY_ROADMAP.md`**
 
-**Objective:** Set up unified Nx monorepo infrastructure, tooling, and shared contracts
+## WEEK 1: Foundation & Setup (JWT Security Fix + Event Bus Phase 1)
+
+**Objective:** Fix critical JWT security vulnerability and establish event-driven MFE foundation
 
 ### Day 1-2: Nx Monorepo Initialization (BOTH TEAMS TOGETHER)
 
