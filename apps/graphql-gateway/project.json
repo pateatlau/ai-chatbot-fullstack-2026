@@ -1,0 +1,88 @@
+{
+  "name": "graphql-gateway",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/graphql-gateway/src",
+  "projectType": "application",
+  "tags": ["type:backend", "scope:gateway"],
+  "targets": {
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "platform": "node",
+        "outputPath": "dist/apps/graphql-gateway",
+        "format": ["cjs"],
+        "bundle": false,
+        "main": "apps/graphql-gateway/src/main.ts",
+        "tsConfig": "apps/graphql-gateway/tsconfig.app.json",
+        "assets": ["apps/graphql-gateway/src/assets"],
+        "generatePackageJson": true,
+        "esbuildOptions": {
+          "sourcemap": true,
+          "outExtension": {
+            ".js": ".js"
+          }
+        }
+      },
+      "configurations": {
+        "development": {},
+        "production": {
+          "esbuildOptions": {
+            "sourcemap": false,
+            "outExtension": {
+              ".js": ".js"
+            }
+          }
+        }
+      }
+    },
+    "prune-lockfile": {
+      "dependsOn": ["build"],
+      "cache": true,
+      "executor": "@nx/js:prune-lockfile",
+      "outputs": [
+        "{workspaceRoot}/dist/apps/graphql-gateway/package.json",
+        "{workspaceRoot}/dist/apps/graphql-gateway/package-lock.json"
+      ],
+      "options": {
+        "buildTarget": "build"
+      }
+    },
+    "copy-workspace-modules": {
+      "dependsOn": ["build"],
+      "cache": true,
+      "outputs": [
+        "{workspaceRoot}/dist/apps/graphql-gateway/workspace_modules"
+      ],
+      "executor": "@nx/js:copy-workspace-modules",
+      "options": {
+        "buildTarget": "build"
+      }
+    },
+    "prune": {
+      "dependsOn": ["prune-lockfile", "copy-workspace-modules"],
+      "executor": "nx:noop"
+    },
+    "serve": {
+      "continuous": true,
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "dependsOn": ["build"],
+      "options": {
+        "buildTarget": "graphql-gateway:build",
+        "runBuildTargetDependencies": false,
+        "inspect": "localhost:9222",
+        "port": 4000
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "graphql-gateway:build:development"
+        },
+        "production": {
+          "buildTarget": "graphql-gateway:build:production"
+        }
+      }
+    }
+  }
+}
