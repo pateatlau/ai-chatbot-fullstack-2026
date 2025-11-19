@@ -72,11 +72,15 @@ describe('EventBus', () => {
       eventBus.subscribe('test:event', errorListener);
       eventBus.subscribe('test:event', successListener);
 
+      // Emit event and wait for promises to settle
       await eventBus.emit('test:event', { data: 'test' });
 
       expect(errorListener).toHaveBeenCalledTimes(1);
       expect(successListener).toHaveBeenCalledTimes(1);
-      expect(consoleErrorSpy).toHaveBeenCalled();
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        '[EventBus] Error in listener for "test:event":',
+        expect.any(Error)
+      );
 
       consoleErrorSpy.mockRestore();
     });
