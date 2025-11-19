@@ -4,6 +4,7 @@ import { useToastStore } from '@myapp/frontend/stores';
 import { Toast } from '@myapp/frontend/ui-components';
 import { router } from '../routes';
 import { Component, ErrorInfo, ReactNode, useEffect } from 'react';
+import { useShellEventCoordination } from '../hooks/useEventDrivenStores';
 
 // Error Boundary Component
 class ErrorBoundary extends Component<
@@ -76,6 +77,9 @@ function ToastContainer() {
 }
 
 export function App() {
+  // Initialize shell-level event coordination
+  useShellEventCoordination();
+
   return (
     <ErrorBoundary>
       <QueryProvider>
