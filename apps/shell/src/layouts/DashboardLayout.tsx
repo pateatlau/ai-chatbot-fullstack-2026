@@ -1,6 +1,7 @@
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { useAuth, useToast } from '@ai-chatbot/hooks';
 import { Button } from '@myapp/frontend/ui-components';
+import { getEventBus, EVENT_NAMES } from '@myapp/shared/event-bus';
 
 export function DashboardLayout() {
   const { user, logout, hasRole } = useAuth();
@@ -9,6 +10,11 @@ export function DashboardLayout() {
 
   const handleLogout = async () => {
     await logout();
+
+    // Emit logout event for cross-MFE coordination
+    const eventBus = getEventBus();
+    eventBus.emit(EVENT_NAMES.USER_LOGGED_OUT, {});
+
     toast.success('Logged out successfully');
     navigate('/login');
   };

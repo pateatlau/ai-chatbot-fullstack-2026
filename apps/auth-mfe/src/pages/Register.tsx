@@ -6,6 +6,7 @@ import { FormField, Card } from '@myapp/frontend/ui-components';
 import { useAuthStore, useToastStore } from '@myapp/frontend/stores';
 import { registerSchema, RegisterFormData } from '../schemas/auth.schema';
 import { authService } from '../services/auth.service';
+import { getEventBus, EVENT_NAMES } from '@myapp/shared/event-bus';
 
 export function Register() {
   const [isLoading, setIsLoading] = useState(false);
@@ -28,6 +29,16 @@ export function Register() {
       const response = await authService.register(registerData);
       // Tokens are now in HttpOnly cookies, not in the response
       setAuth(response.user);
+
+      // Emit USER_LOGGED_IN event for cross-MFE coordination
+      const eventBus = getEventBus();
+      eventBus.emit(EVENT_NAMES.USER_LOGGED_IN, {
+        userId: response.user.id,
+        email: response.user.email,
+        name: response.user.name,
+        role: response.user.role,
+      });
+
       addToast('Account created successfully!', 'success');
 
       // Use window.location.replace for reliable cross-MFE navigation
