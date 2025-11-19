@@ -8,6 +8,11 @@ import { PrismaClient } from '@prisma/client';
 import Redis from 'ioredis';
 import OpenAI from 'openai';
 import { swaggerSpec } from './swagger';
+import jwt from 'jsonwebtoken';
+import { ApolloServer } from '@apollo/server';
+import { expressMiddleware } from '@apollo/server/express4';
+import { typeDefs } from './graphql/schema';
+import { resolvers } from './graphql/resolvers';
 
 // Load environment variables with smart path resolution
 const envPath =
@@ -193,6 +198,67 @@ app.use(
   }
 );
 
-app.listen(port, host, () => {
-  console.log(`[ ready ] Chatbot Service running at http://${host}:${port}`);
-});
+// JWT context builder for GraphQL
+const buildContext = (req: any) => {
+  const token = req.headers.authorization?.replace('Bearer ', '');
+  let userId: string | undefined;
+
+  if (token) {
+    try {
+      const decoded: any = jwt.verify(
+        token,
+        process.env.JWT_SECRET || 'default-secret'
+      );
+      userId = decoded.userId;
+    } catch (err) {
+      // Token invalid or expired
+    }
+  }
+
+  return { userId, token };
+};
+
+// Initialize Apollo Server
+let apolloServer: ApolloServer;
+
+const startApolloServer = async () => {
+  apolloServer = new ApolloServer({
+    typeDefs,
+    resolvers,
+  });
+
+  await apolloServer.start();
+  return apolloServer;
+};
+
+// Start server with GraphQL support
+const startServer = async () => {
+  try {
+    // Start Apollo Server
+    await startApolloServer();
+
+    // Mount Apollo GraphQL middleware BEFORE REST routes
+    app.use(
+      '/graphql',
+      expressMiddleware(apolloServer, {
+        context: async ({ req }) => buildContext(req),
+      })
+    );
+
+    // Then start Express server
+    app.listen(port, host, () => {
+      console.log(
+        `[ ready ] Chatbot Service running at http://${host}:${port}`
+      );
+      console.log(
+        `[ ready ] GraphQL endpoint at http://${host}:${port}/graphql`
+      );
+      console.log(`[ ready ] REST API at http://${host}:${port}/api/chat`);
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
+};
+
+startServer();
