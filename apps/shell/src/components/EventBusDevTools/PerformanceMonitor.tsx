@@ -34,6 +34,9 @@ export function PerformanceMonitor() {
         (e: any) => e.timestamp > oneSecondAgo
       );
 
+      // Get stats from event bus
+      const stats = eventBus.getStats();
+
       // Count events by type
       const counts: Record<string, number> = {};
       history.forEach((e: any) => {
@@ -41,10 +44,10 @@ export function PerformanceMonitor() {
       });
 
       setMetrics({
-        totalEvents: history.length,
+        totalEvents: stats.totalEvents,
         eventsPerSecond: recentEvents.length,
         averageExecutionTime: 0, // TODO: Add execution time tracking
-        listenerCount: 0, // TODO: Add listener counting
+        listenerCount: stats.totalListeners,
         memoryUsage: JSON.stringify(history).length / 1024, // KB
       });
 
@@ -61,7 +64,7 @@ export function PerformanceMonitor() {
     <div className="p-4 overflow-y-auto h-full">
       <div className="space-y-4">
         {/* Overall Metrics */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
             <div className="text-sm text-blue-600 font-medium">
               Total Events
@@ -77,6 +80,15 @@ export function PerformanceMonitor() {
             </div>
             <div className="text-3xl font-bold text-green-900">
               {metrics.eventsPerSecond}
+            </div>
+          </div>
+
+          <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-lg">
+            <div className="text-sm text-indigo-600 font-medium">
+              Active Listeners
+            </div>
+            <div className="text-3xl font-bold text-indigo-900">
+              {metrics.listenerCount}
             </div>
           </div>
 

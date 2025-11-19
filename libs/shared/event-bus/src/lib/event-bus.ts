@@ -205,6 +205,30 @@ export class EventBus {
   hasListeners(eventName: string): boolean {
     return this.getListenerCount(eventName) > 0;
   }
+
+  /**
+   * Get event bus statistics
+   */
+  getStats() {
+    const totalListeners = Array.from(this.listeners.values()).reduce(
+      (sum, listeners) => sum + listeners.size,
+      0
+    );
+
+    const listenersByEvent: Record<string, number> = {};
+    this.listeners.forEach((listeners, eventName) => {
+      listenersByEvent[eventName] = listeners.size;
+    });
+
+    return {
+      totalEvents: this.eventHistory.length,
+      totalListeners,
+      eventTypes: this.listeners.size,
+      listenersByEvent,
+      maxHistorySize: this.options.maxHistorySize,
+      historyEnabled: this.options.enableHistory,
+    };
+  }
 }
 
 // Singleton instance
