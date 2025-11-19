@@ -1,27 +1,46 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { ConversationSidebar } from './ConversationSidebar';
 import { MessageList } from './MessageList';
 import { MessageInput } from './MessageInput';
 import { useStreamingMessage } from '../hooks/useStreamingMessage';
 import { useRateLimit } from '../hooks/useRateLimit';
 import {
-  chatbotAPI,
-  type Conversation,
-  type Message,
-} from '../api/chatbot.api';
+  useChatbotStore,
+  useChatbotStoreInitialization,
+} from '../store/chatbot.store';
+import { chatbotAPI, type Message } from '../api/chatbot.api';
 import styles from './ChatPage.module.css';
 
 export function ChatPage() {
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [selectedConversationId, setSelectedConversationId] = useState<
-    string | null
-  >(null);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [isLoadingConversations, setIsLoadingConversations] = useState(true);
-  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // Initialize chatbot store with event bus subscriptions
+  useChatbotStoreInitialization();
+
+  // Get state and actions from store
+  const {
+    conversations,
+    currentConversationId,
+    messages: storeMessages,
+    isLoading,
+    error,
+    setConversations,
+    addConversation,
+    updateConversation,
+    deleteConversation,
+    setCurrentConversation,
+    setMessages,
+    addMessage,
+    sendMessage,
+    setLoading,
+    setError,
+    clearError,
+  } = useChatbotStore();
 
   const { rateLimitInfo, trackMessage } = useRateLimit(10, 1);
+
+  // Get messages for current conversation
+  const messages = currentConversationId
+    ? storeMessages[currentConversationId] || []
+    : [];
 
   const {
     message: streamingMessage,
@@ -33,12 +52,12 @@ export function ChatPage() {
       // Add completed AI message to messages list
       const aiMessage: Message = {
         id: `temp-${Date.now()}`,
-        conversationId: selectedConversationId!,
+        conversationId: currentConversationId!,
         role: 'assistant',
         content: fullMessage,
-        createdAt: new Date().toISOString(),
+        timestamp: Date.now(),
       };
-      setMessages((prev) => [...prev, aiMessage]);
+      addMessage(aiMessage);
       resetMessage();
 
       // Refresh conversations to update message count
@@ -46,7 +65,7 @@ export function ChatPage() {
     },
     onError: (error) => {
       setError(error.message);
-      setTimeout(() => setError(null), 5000);
+      setTimeout(() => clearError(), 5000);
     },
   });
 
@@ -58,46 +77,51 @@ export function ChatPage() {
 
   // Load messages when conversation is selected
   useEffect(() => {
-    if (selectedConversationId) {
-      loadMessages(selectedConversationId);
+    if (currentConversationId) {
+      loadMessages(currentConversationId);
     }
-  }, [selectedConversationId]);
+  }, [currentConversationId]);
 
   const loadConversations = async () => {
     try {
-      setIsLoadingConversations(true);
+      setLoading(true);
       const data = await chatbotAPI.getConversations();
       setConversations(data);
 
       // Auto-select first conversation if none selected
-      if (!selectedConversationId && data.length > 0) {
+      if (!currentConversationId && data.length > 0) {
         const firstConversation = data[0];
         if (firstConversation) {
-          setSelectedConversationId(firstConversation.id);
+          setCurrentConversation(firstConversation.id);
         }
       }
     } catch (err: any) {
       console.error('Load conversations error:', err);
       setError(err.response?.data?.message || 'Failed to load conversations');
-      setTimeout(() => setError(null), 5000);
+      setTimeout(() => clearError(), 5000);
     } finally {
-      setIsLoadingConversations(false);
+      setLoading(false);
     }
   };
 
   const loadMessages = async (conversationId: string) => {
     try {
-      setIsLoadingMessages(true);
+      setLoading(true);
       const data = await chatbotAPI.getMessages(conversationId);
-      // Ensure data is always an array
-      setMessages(Array.isArray(data) ? data : []);
+      // Ensure data is always an array and convert to store format
+      const messagesArray = Array.isArray(data) ? data : [];
+      const formattedMessages = messagesArray.map((msg) => ({
+        ...msg,
+        timestamp: new Date(msg.createdAt).getTime(),
+      }));
+      setMessages(conversationId, formattedMessages);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to load messages');
-      setTimeout(() => setError(null), 5000);
+      setTimeout(() => clearError(), 5000);
       // Set empty array on error
-      setMessages([]);
+      setMessages(conversationId, []);
     } finally {
-      setIsLoadingMessages(false);
+      setLoading(false);
     }
   };
 
@@ -106,58 +130,61 @@ export function ChatPage() {
       const newConversation = await chatbotAPI.createConversation({
         title: `Chat ${conversations.length + 1}`,
       });
-      setConversations((prev) => [newConversation, ...prev]);
-      setSelectedConversationId(newConversation.id);
-      setMessages([]);
+      // Convert API response to store format
+      const storeConversation = {
+        ...newConversation,
+        createdAt: new Date(newConversation.createdAt).getTime(),
+        updatedAt: new Date(newConversation.updatedAt).getTime(),
+      };
+      addConversation(storeConversation);
+      setCurrentConversation(newConversation.id);
+      setMessages(newConversation.id, []);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to create conversation');
-      setTimeout(() => setError(null), 5000);
+      setTimeout(() => clearError(), 5000);
     }
   };
 
   const handleDeleteConversation = async (id: string) => {
     try {
       await chatbotAPI.deleteConversation(id);
-      setConversations((prev) => prev.filter((c) => c.id !== id));
+      deleteConversation(id);
 
       // Select another conversation if deleted one was selected
-      if (selectedConversationId === id) {
+      if (currentConversationId === id) {
         const remaining = conversations.filter((c) => c.id !== id);
-        setSelectedConversationId(remaining[0]?.id || null);
-        setMessages([]);
+        setCurrentConversation(remaining[0]?.id || null);
       }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to delete conversation');
-      setTimeout(() => setError(null), 5000);
+      setTimeout(() => clearError(), 5000);
     }
   };
 
   const handleRenameConversation = async (id: string, title: string) => {
     try {
       await chatbotAPI.updateConversationTitle(id, title);
-      setConversations((prev) =>
-        prev.map((c) => (c.id === id ? { ...c, title } : c))
-      );
+      updateConversation(id, { title });
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to rename conversation');
-      setTimeout(() => setError(null), 5000);
+      setTimeout(() => clearError(), 5000);
     }
   };
 
   const handleSendMessage = async (content: string) => {
-    if (!selectedConversationId || isStreaming || rateLimitInfo.isLimited) {
+    if (!currentConversationId || isStreaming || rateLimitInfo.isLimited) {
       return;
     }
 
     // Add user message immediately
     const userMessage: Message = {
       id: `temp-user-${Date.now()}`,
-      conversationId: selectedConversationId,
+      conversationId: currentConversationId,
       role: 'user',
       content,
-      createdAt: new Date().toISOString(),
+      timestamp: Date.now(),
     };
-    setMessages((prev) => [...prev, userMessage]);
+    addMessage(userMessage);
 
     // Track rate limit
     trackMessage();
@@ -165,22 +192,22 @@ export function ChatPage() {
     try {
       // Start streaming AI response
       const response = await chatbotAPI.sendMessageStream(
-        selectedConversationId,
+        currentConversationId,
         content
       );
       startStreaming(response);
     } catch (err: any) {
       setError(err.message || 'Failed to send message');
-      setTimeout(() => setError(null), 5000);
+      setTimeout(() => clearError(), 5000);
     }
   };
 
   const selectedConversation = conversations.find(
-    (c) => c.id === selectedConversationId
+    (c) => c.id === currentConversationId
   );
 
   // Add error boundary fallback
-  if (error && !conversations.length && !isLoadingConversations) {
+  if (error && !conversations.length && !isLoading) {
     return (
       <div style={{ padding: '20px', color: 'red' }}>
         <h2>Error Loading Chatbot</h2>
@@ -194,12 +221,12 @@ export function ChatPage() {
     <div className={styles.container}>
       <ConversationSidebar
         conversations={conversations}
-        selectedConversationId={selectedConversationId}
-        onSelectConversation={setSelectedConversationId}
+        selectedConversationId={currentConversationId}
+        onSelectConversation={setCurrentConversation}
         onCreateConversation={handleCreateConversation}
         onDeleteConversation={handleDeleteConversation}
         onRenameConversation={handleRenameConversation}
-        isLoading={isLoadingConversations}
+        isLoading={isLoading}
       />
 
       <div className={styles.chatArea}>
@@ -216,7 +243,7 @@ export function ChatPage() {
               <div className={styles.errorBanner}>
                 <span>{error}</span>
                 <button
-                  onClick={() => setError(null)}
+                  onClick={() => clearError()}
                   className={styles.closeError}
                 >
                   ✕
@@ -259,7 +286,7 @@ export function ChatPage() {
                   ? { role: 'assistant', content: streamingMessage.content }
                   : null
               }
-              isLoading={isLoadingMessages}
+              isLoading={isLoading}
             />
 
             <MessageInput
