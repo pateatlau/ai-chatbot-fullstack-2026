@@ -3,8 +3,9 @@ import { QueryProvider } from '../providers/QueryProvider';
 import { useToastStore } from '@myapp/frontend/stores';
 import { Toast } from '@myapp/frontend/ui-components';
 import { router } from '../routes';
-import { Component, ErrorInfo, ReactNode, useEffect } from 'react';
+import { Component, ErrorInfo, ReactNode } from 'react';
 import { useShellEventCoordination } from '../hooks/useEventDrivenStores';
+import { EventBusDevTools } from '../components/EventBusDevTools';
 
 // Error Boundary Component
 class ErrorBoundary extends Component<
@@ -80,11 +81,15 @@ export function App() {
   // Initialize shell-level event coordination
   useShellEventCoordination();
 
+  // Only show DevTools in development
+  const isDevelopment = process.env.NODE_ENV === 'development';
+
   return (
     <ErrorBoundary>
       <QueryProvider>
         <RouterProvider router={router} />
         <ToastContainer />
+        {isDevelopment && <EventBusDevTools />}
       </QueryProvider>
     </ErrorBoundary>
   );
