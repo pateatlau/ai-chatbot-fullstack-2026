@@ -1,10 +1,26 @@
 import { useState, useEffect } from 'react';
-import { useSettingsStore } from '@myapp/frontend/stores';
+import {
+  useProfileStore,
+  useProfileStoreInitialization,
+  useThemeBroadcaster,
+  useNotificationPreferences,
+} from '../store/profile.store';
 import { useToast } from '@myapp/frontend/hooks';
 import { Card, Button } from '@myapp/frontend/ui-components';
 
 export function SettingsPage() {
-  const { settings, updateSettings, resetSettings } = useSettingsStore();
+  // Initialize profile store with event bus subscriptions
+  useProfileStoreInitialization();
+
+  // Get settings from profile store
+  const { settings, updateSettings } = useProfileStore();
+
+  // Use notification preferences helper
+  const { resetToDefaults } = useNotificationPreferences();
+
+  // Use theme broadcaster to apply theme changes
+  useThemeBroadcaster();
+
   const toast = useToast();
 
   const [emailNotifications, setEmailNotifications] = useState(
@@ -39,11 +55,18 @@ export function SettingsPage() {
   };
 
   const handleReset = () => {
-    resetSettings();
-    setEmailNotifications(true);
-    setPushNotifications(false);
-    setWeeklyDigest(true);
-    setTheme('light');
+    resetToDefaults();
+    // Sync local state with reset values
+    const defaults = {
+      emailNotifications: true,
+      pushNotifications: false,
+      weeklyDigest: true,
+      theme: 'light' as const,
+    };
+    setEmailNotifications(defaults.emailNotifications);
+    setPushNotifications(defaults.pushNotifications);
+    setWeeklyDigest(defaults.weeklyDigest);
+    setTheme(defaults.theme);
     toast.info('Settings reset to defaults');
     setHasChanges(false);
   };

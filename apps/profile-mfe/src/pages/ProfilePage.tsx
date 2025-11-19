@@ -1,8 +1,15 @@
-import { useAuthStore } from '@myapp/frontend/stores';
+import {
+  useProfileStore,
+  useProfileStoreInitialization,
+} from '../store/profile.store';
 import { Card } from '@myapp/frontend/ui-components';
 
 export function ProfilePage() {
-  const { user } = useAuthStore();
+  // Initialize profile store with event bus subscriptions
+  useProfileStoreInitialization();
+
+  // Get user from profile store
+  const { user } = useProfileStore();
 
   return (
     <div className="max-w-4xl p-6 mx-auto">
