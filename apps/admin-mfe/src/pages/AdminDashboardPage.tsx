@@ -1,11 +1,22 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Card, Button } from '@myapp/frontend/ui-components';
 import { useToast } from '@myapp/frontend/hooks';
 import { adminAPI, DashboardStats } from '../api/admin.api';
+import {
+  useAdminStore,
+  useAdminStoreInitialization,
+  useAdminDashboardAutoRefresh,
+} from '../store/admin.store';
 
 export function AdminDashboardPage() {
-  const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [loading, setLoading] = useState(true);
+  // Initialize admin store with event bus subscriptions
+  useAdminStoreInitialization();
+
+  // Enable auto-refresh every 60 seconds
+  useAdminDashboardAutoRefresh(60000);
+
+  // Get state from store
+  const { metrics, isLoading, isRefreshing, error } = useAdminStore();
   const toast = useToast();
 
   useEffect(() => {
@@ -14,14 +25,30 @@ export function AdminDashboardPage() {
 
   const loadStats = async () => {
     try {
+      const { setMetrics, setLoading, setError } = useAdminStore.getState();
       setLoading(true);
       const data = await adminAPI.getStats();
-      setStats(data);
+
+      // Convert API stats to store metrics format
+      const metrics = {
+        totalUsers: data.totalUsers,
+        activeUsers: data.activeUsers,
+        totalConversations: data.totalConversations,
+        totalMessages:
+          data.totalConversations * data.averageMessagesPerConversation, // Approximate
+        avgMessagesPerUser: data.averageMessagesPerConversation,
+        lastUpdated: new Date().toISOString(),
+      };
+
+      setMetrics(metrics);
     } catch (error: any) {
+      const { setError } = useAdminStore.getState();
+      setError(error.response?.data?.error || 'Failed to load dashboard data');
       toast.error(
         error.response?.data?.error || 'Failed to load dashboard data'
       );
     } finally {
+      const { setLoading } = useAdminStore.getState();
       setLoading(false);
     }
   };
@@ -36,29 +63,29 @@ export function AdminDashboardPage() {
     return num.toString();
   };
 
-  const statCards = stats
+  const statCards = metrics
     ? [
         {
           label: 'Total Users',
-          value: formatNumber(stats.totalUsers),
+          value: formatNumber(metrics.totalUsers),
           icon: '👥',
           color: 'blue',
         },
         {
           label: 'Active Users',
-          value: formatNumber(stats.activeUsers),
+          value: formatNumber(metrics.activeUsers),
           icon: '✅',
           color: 'green',
         },
         {
           label: 'Total Conversations',
-          value: formatNumber(stats.totalConversations),
+          value: formatNumber(metrics.totalConversations),
           icon: '💬',
           color: 'purple',
         },
         {
-          label: 'Avg Messages/Conv',
-          value: stats.averageMessagesPerConversation.toFixed(1),
+          label: 'Avg Messages/User',
+          value: metrics.avgMessagesPerUser.toFixed(1),
           icon: '📊',
           color: 'orange',
         },
@@ -111,7 +138,7 @@ export function AdminDashboardPage() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {loading ? (
+        {isLoading ? (
           <>
             {[1, 2, 3, 4].map((i) => (
               <Card key={i}>

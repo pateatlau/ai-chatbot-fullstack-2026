@@ -2,10 +2,18 @@ import { useState, useEffect } from 'react';
 import { Card, Button } from '@myapp/frontend/ui-components';
 import { useToast } from '@myapp/frontend/hooks';
 import { adminAPI, User } from '../api/admin.api';
+import {
+  useAdminStore,
+  useAdminStoreInitialization,
+} from '../store/admin.store';
 
 export function UserManagementPage() {
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Initialize admin store with event bus subscriptions
+  useAdminStoreInitialization();
+
+  // Get state and actions from store
+  const { users, isLoading, setUsers, setLoading } = useAdminStore();
+
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [filters, setFilters] = useState<{
@@ -20,7 +28,16 @@ export function UserManagementPage() {
     try {
       setLoading(true);
       const data = await adminAPI.getUsers({ page, limit, ...filters });
-      setUsers(data.users);
+
+      // Convert API users to store format
+      const storeUsers = data.users.map((user) => ({
+        ...user,
+        isBanned: false, // API doesn't provide this, set default
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt || user.createdAt,
+      }));
+
+      setUsers(storeUsers);
       setTotal(data.total);
     } catch (error: any) {
       toast.error(error.response?.data?.error || 'Failed to load user list');
@@ -80,8 +97,8 @@ export function UserManagementPage() {
             Manage users, roles, and permissions
           </p>
         </div>
-        <Button onClick={loadUsers} disabled={loading}>
-          {loading ? 'Loading...' : 'Refresh'}
+        <Button onClick={loadUsers} disabled={isLoading}>
+          {isLoading ? 'Loading...' : 'Refresh'}
         </Button>
       </div>
 
@@ -169,7 +186,7 @@ export function UserManagementPage() {
               </tr>
             </thead>
             <tbody>
-              {loading ? (
+              {isLoading ? (
                 <>
                   {[1, 2, 3, 4, 5].map((i) => (
                     <tr key={i} className="border-b border-gray-100">
@@ -265,7 +282,7 @@ export function UserManagementPage() {
           <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200">
             <Button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page === 1 || loading}
+              disabled={page === 1 || isLoading}
               variant="outline"
             >
               Previous
@@ -275,7 +292,7 @@ export function UserManagementPage() {
             </div>
             <Button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page === totalPages || loading}
+              disabled={page === totalPages || isLoading}
               variant="outline"
             >
               Next
