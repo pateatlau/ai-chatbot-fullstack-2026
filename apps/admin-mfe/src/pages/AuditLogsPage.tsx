@@ -2,8 +2,18 @@ import { useState, useEffect } from 'react';
 import { Card, Button } from '@myapp/frontend/ui-components';
 import { useToast } from '@myapp/frontend/hooks';
 import { adminAPI, AuditLog } from '../api/admin.api';
+import {
+  useAdminStore,
+  useAdminStoreInitialization,
+} from '../store/admin.store';
 
 export function AuditLogsPage() {
+  // Initialize admin store with event bus subscriptions
+  useAdminStoreInitialization();
+
+  // Get loading state from store
+  const { isLoading: storeLoading } = useAdminStore();
+
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);

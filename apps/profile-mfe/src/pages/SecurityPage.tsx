@@ -3,8 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { useToast } from '@ai-chatbot/hooks';
 import { Card, FormField, Button } from '@myapp/frontend/ui-components';
 import { profileAPI } from '../api/profile.api';
+import { useProfileStoreInitialization } from '../store/profile.store';
 
 export function SecurityPage() {
+  // Initialize profile store with event bus subscriptions
+  useProfileStoreInitialization();
+
   const navigate = useNavigate();
   const toast = useToast();
 

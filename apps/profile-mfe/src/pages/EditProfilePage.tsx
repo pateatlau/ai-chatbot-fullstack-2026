@@ -1,12 +1,23 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '@myapp/frontend/stores';
 import { useToast } from '@myapp/frontend/hooks';
 import { Card, FormField, Button } from '@myapp/frontend/ui-components';
 import { profileAPI } from '../api/profile.api';
+import {
+  useProfileStore,
+  useProfileStoreInitialization,
+  useProfileAvatarUpload,
+} from '../store/profile.store';
+import { getEventBus, EVENT_NAMES } from '@myapp/shared/event-bus';
 
 export function EditProfilePage() {
-  const { user, setUser } = useAuthStore();
+  // Initialize profile store with event bus subscriptions
+  useProfileStoreInitialization();
+
+  // Use avatar upload helper
+  const { uploadAvatar: uploadAvatarToStore } = useProfileAvatarUpload();
+
+  const { user, setProfile } = useProfileStore();
   const navigate = useNavigate();
   const toast = useToast();
 
@@ -45,9 +56,9 @@ export function EditProfilePage() {
       };
       reader.readAsDataURL(file);
 
-      // Upload avatar
-      const result = await profileAPI.uploadAvatar(file);
-      setAvatar(result.url);
+      // Upload avatar using store helper (emits events)
+      const url = await uploadAvatarToStore(file);
+      setAvatar(url);
 
       toast.success('Avatar uploaded successfully');
     } catch (error: any) {
@@ -88,8 +99,15 @@ export function EditProfilePage() {
 
       const response = await profileAPI.updateProfile(updateData);
 
-      // Update user in auth store
-      setUser(response.user);
+      // Update profile in store
+      setProfile(response.user);
+
+      // Emit event for cross-MFE coordination
+      const eventBus = getEventBus();
+      eventBus.emit(EVENT_NAMES.USER_PROFILE_UPDATED, {
+        userId: user?.id,
+        updates: updateData,
+      });
 
       toast.success('Profile updated successfully');
       navigate('/profile');

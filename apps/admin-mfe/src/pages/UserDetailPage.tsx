@@ -3,8 +3,16 @@ import { useLocation } from 'react-router-dom';
 import { Card, Button, Input } from '@myapp/frontend/ui-components';
 import { useToast } from '@myapp/frontend/hooks';
 import { adminAPI, User } from '../api/admin.api';
+import {
+  useAdminStore,
+  useAdminStoreInitialization,
+} from '../store/admin.store';
+import { getEventBus, EVENT_NAMES } from '@myapp/shared/event-bus';
 
 export function UserDetailPage() {
+  // Initialize admin store with event bus subscriptions
+  useAdminStoreInitialization();
+
   const location = useLocation();
   const userId = location.pathname.split('/').pop() || '';
   const [user, setUser] = useState<User | null>(null);
@@ -49,6 +57,14 @@ export function UserDetailPage() {
     try {
       setSaving(true);
       await adminAPI.updateUser(userId, formData);
+
+      // Emit event for cross-MFE coordination
+      const eventBus = getEventBus();
+      eventBus.emit(EVENT_NAMES.USER_PROFILE_UPDATED, {
+        userId,
+        updates: formData,
+      });
+
       toast.success('User information has been updated successfully');
       loadUser();
     } catch (error: any) {
