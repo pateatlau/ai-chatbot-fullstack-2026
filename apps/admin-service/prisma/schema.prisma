@@ -1,0 +1,35 @@
+// Admin Service Prisma Schema
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  role      String   // SUPER_ADMIN, ADMIN, MODERATOR
+  permissions String[]
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([role])
+  @@map("admins")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String
+  action    String   // ASSIGN_ROLE, UPDATE_PERMISSIONS, etc
+  resource  String   // What was changed (e.g., User:123)
+  changes   String   @db.Text // JSON of changes
+  timestamp DateTime @default(now())
+
+  @@index([userId, timestamp])
+  @@index([action, timestamp])
+  @@map("audit_logs")
+}

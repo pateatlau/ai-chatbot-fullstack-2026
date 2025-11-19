@@ -6,6 +6,11 @@ import swaggerUi from 'swagger-ui-express';
 import adminRoutes from './routes/admin.routes';
 import { PrismaClient } from '@prisma/client';
 import { swaggerSpec } from './swagger';
+import jwt from 'jsonwebtoken';
+import { ApolloServer } from '@apollo/server';
+import { expressMiddleware } from '@apollo/server/express4';
+import { typeDefs } from './graphql/schema';
+import { resolvers } from './graphql/resolvers';
 
 // Load environment variables from the workspace root
 // In development: apps/admin-service/.env
@@ -54,6 +59,57 @@ app.use(
   })
 );
 app.use(express.json());
+
+// JWT context builder for GraphQL
+interface JWTContext {
+  userId?: string;
+  token?: string;
+}
+
+const buildContext = (req: express.Request): JWTContext => {
+  const authHeader = req.headers.authorization;
+  const token = authHeader?.replace('Bearer ', '');
+  let userId: string | undefined;
+
+  if (token) {
+    try {
+      const decoded: any = jwt.verify(
+        token,
+        process.env.JWT_SECRET || 'default-secret'
+      );
+      userId = decoded.userId;
+    } catch (err) {
+      // Token invalid or expired
+    }
+  }
+
+  return { userId, token };
+};
+
+// Initialize Apollo Server
+let apolloServer: ApolloServer;
+(async () => {
+  apolloServer = new ApolloServer({
+    typeDefs,
+    resolvers,
+  });
+  await apolloServer.start();
+
+  app.use(
+    '/graphql',
+    cors<express.Request>({
+      origin: [
+        'http://localhost:5173',
+        'http://localhost:5174',
+        'http://localhost:5175',
+      ],
+      credentials: true,
+    }),
+    expressMiddleware(apolloServer, {
+      context: async ({ req }) => buildContext(req),
+    })
+  );
+})();
 
 // Swagger API Documentation
 app.use(
