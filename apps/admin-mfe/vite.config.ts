@@ -12,6 +12,9 @@ export default defineConfig(() => ({
     port: 5176,
     host: 'localhost',
     hmr: {
+      host: 'localhost',
+      port: 5176,
+      protocol: 'http',
       overlay: true,
     },
   },
