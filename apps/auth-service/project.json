@@ -5,15 +5,9 @@
   "projectType": "application",
   "tags": ["type:backend", "scope:auth"],
   "targets": {
-    "prisma-generate": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "npx prisma generate --schema=./apps/auth-service/prisma/schema.prisma"
-      }
-    },
     "build": {
       "executor": "@nx/esbuild:esbuild",
-      "dependsOn": ["prisma-generate"],
+      "dependsOn": ["prisma-client:prisma-generate"],
       "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
       "options": {
