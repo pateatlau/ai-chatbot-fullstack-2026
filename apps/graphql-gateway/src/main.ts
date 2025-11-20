@@ -19,6 +19,10 @@ const CHATBOT_SUBGRAPH_URL =
 const ADMIN_SUBGRAPH_URL =
   process.env.ADMIN_SUBGRAPH_URL || 'http://localhost:3002/graphql';
 
+interface ContextValue {
+  token?: string;
+}
+
 async function startServer() {
   try {
     // Create Apollo Gateway
@@ -30,21 +34,12 @@ async function startServer() {
           { name: 'admin', url: ADMIN_SUBGRAPH_URL },
         ],
         pollIntervalInMs: 10000, // Poll every 10 seconds
-        pollErrorFormatter: (e) => {
-          console.error(`Failed to poll subgraph: ${e.message}`);
-          return e;
-        },
       }),
     });
 
     // Create Apollo Server
-    const server = new ApolloServer({
+    const server = new ApolloServer<ContextValue>({
       gateway,
-      context: async ({ req }) => {
-        // Extract JWT token from Authorization header
-        const token = req.headers.authorization?.replace('Bearer ', '');
-        return { token };
-      },
     });
 
     // Start Apollo Server
@@ -77,7 +72,7 @@ async function startServer() {
       cors<cors.CorsRequest>(),
       express.json({ limit: '50mb' }),
       expressMiddleware(server, {
-        context: async ({ req }) => ({
+        context: async ({ req }: any) => ({
           token: req.headers.authorization?.replace('Bearer ', ''),
         }),
       })
