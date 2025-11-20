@@ -11,6 +11,7 @@ import { swaggerSpec } from './swagger';
 import jwt from 'jsonwebtoken';
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
+import { buildSubgraphSchema } from '@apollo/subgraph';
 import { typeDefs } from './graphql/schema';
 import { resolvers } from './graphql/resolvers';
 
@@ -222,9 +223,10 @@ const buildContext = (req: any) => {
 let apolloServer: ApolloServer;
 
 const startApolloServer = async () => {
+  const schema = buildSubgraphSchema([{ typeDefs, resolvers }]);
+
   apolloServer = new ApolloServer({
-    typeDefs,
-    resolvers,
+    schema,
   });
 
   await apolloServer.start();
