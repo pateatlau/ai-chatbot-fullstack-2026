@@ -3,8 +3,10 @@ import gql from 'graphql-tag';
 export const typeDefs = gql`
   # Federation directive
   extend schema
-    @link(url: "https://specs.apollo.dev/federation/v2.0")
-    @link(url: "https://specs.apollo.dev/core/v0.1")
+    @link(
+      url: "https://specs.apollo.dev/federation/v2.0"
+      import: ["@key", "@external"]
+    )
 
   # Reference external User type from auth-service
   extend type User @key(fields: "id") {
