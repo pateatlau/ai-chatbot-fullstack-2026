@@ -1,7 +1,7 @@
 // Workspace-level Prisma Schema - Includes all models from all services
 generator client {
   provider = "prisma-client-js"
-  output   = "../node_modules/@prisma/client"
+  output   = "../node_modules/.prisma/client"
 }
 
 datasource db {
