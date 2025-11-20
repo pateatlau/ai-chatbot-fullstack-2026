@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions } from 'jsonwebtoken';
 import bcryptjs from 'bcryptjs';
 import { GraphQLError } from 'graphql';
 
@@ -110,24 +110,22 @@ export const resolvers = {
       }
 
       // Generate tokens
-      const jwtSecret = process.env.JWT_SECRET || 'default-secret';
-      const refreshSecret =
-        process.env.JWT_REFRESH_SECRET || 'default-refresh-secret';
+      const jwtSecret = (process.env.JWT_SECRET || 'default-secret') as string;
+      const refreshSecret = (process.env.JWT_REFRESH_SECRET ||
+        'default-refresh-secret') as string;
       const expiresIn = process.env.JWT_EXPIRES_IN || '15m';
       const refreshExpiresIn = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
 
       const token = jwt.sign(
         { userId: user.id, email: user.email },
         jwtSecret,
-        {
-          expiresIn,
-        }
+        { expiresIn } as any
       );
 
       const refreshToken = jwt.sign(
         { userId: user.id, email: user.email, type: 'refresh' },
         refreshSecret,
-        { expiresIn: refreshExpiresIn }
+        { expiresIn: refreshExpiresIn } as any
       );
 
       return {
@@ -170,7 +168,7 @@ export const resolvers = {
         data: {
           email,
           password: hashedPassword,
-          name: name || email.split('@')[0],
+          name: (name || email.split('@')[0]) as string,
           role: 'USER',
           isActive: true,
         },
@@ -188,13 +186,13 @@ export const resolvers = {
         jwtSecret,
         {
           expiresIn,
-        }
+        } as any
       );
 
       const refreshToken = jwt.sign(
         { userId: user.id, email: user.email, type: 'refresh' },
         refreshSecret,
-        { expiresIn: refreshExpiresIn }
+        { expiresIn: refreshExpiresIn } as any
       );
 
       return {
@@ -258,7 +256,7 @@ export const resolvers = {
         jwtSecret,
         {
           expiresIn,
-        }
+        } as any
       );
 
       return {
