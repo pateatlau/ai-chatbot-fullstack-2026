@@ -19,15 +19,11 @@ interface LoginInput {
 interface RegisterInput {
   email: string;
   password: string;
-  username?: string;
-  firstName?: string;
-  lastName?: string;
+  name?: string;
 }
 
 interface UpdateProfileInput {
-  username?: string;
-  firstName?: string;
-  lastName?: string;
+  name?: string;
 }
 
 export const resolvers = {
@@ -100,10 +96,7 @@ export const resolvers = {
       }
 
       // Verify password
-      const isPasswordValid = await bcryptjs.compare(
-        password,
-        user.passwordHash
-      );
+      const isPasswordValid = await bcryptjs.compare(password, user.password);
       if (!isPasswordValid) {
         throw new GraphQLError('Invalid credentials', {
           extensions: { code: 'INVALID_CREDENTIALS' },
@@ -143,9 +136,7 @@ export const resolvers = {
         user: {
           id: user.id,
           email: user.email,
-          username: user.username,
-          firstName: user.firstName,
-          lastName: user.lastName,
+          name: user.name,
           role: user.role,
           isActive: user.isActive,
           createdAt: user.createdAt,
@@ -158,7 +149,7 @@ export const resolvers = {
 
     // Register mutation
     register: async (_parent: any, args: { input: RegisterInput }) => {
-      const { email, password, username, firstName, lastName } = args.input;
+      const { email, password, name } = args.input;
 
       // Check if email already exists
       const existingUser = await prisma.user.findUnique({
@@ -172,16 +163,14 @@ export const resolvers = {
       }
 
       // Hash password
-      const passwordHash = await bcryptjs.hash(password, 10);
+      const hashedPassword = await bcryptjs.hash(password, 10);
 
       // Create user
       const user = await prisma.user.create({
         data: {
           email,
-          passwordHash,
-          username: username || email.split('@')[0],
-          firstName: firstName || '',
-          lastName: lastName || '',
+          password: hashedPassword,
+          name: name || email.split('@')[0],
           role: 'USER',
           isActive: true,
         },
@@ -214,9 +203,7 @@ export const resolvers = {
         user: {
           id: user.id,
           email: user.email,
-          username: user.username,
-          firstName: user.firstName,
-          lastName: user.lastName,
+          name: user.name,
           role: user.role,
           isActive: user.isActive,
           createdAt: user.createdAt,
@@ -280,9 +267,7 @@ export const resolvers = {
         user: {
           id: user.id,
           email: user.email,
-          username: user.username,
-          firstName: user.firstName,
-          lastName: user.lastName,
+          name: user.name,
           role: user.role,
           isActive: user.isActive,
           createdAt: user.createdAt,
@@ -305,23 +290,19 @@ export const resolvers = {
         });
       }
 
-      const { username, firstName, lastName } = args.input;
+      const { name } = args.input;
 
       const user = await prisma.user.update({
         where: { id: context.userId },
         data: {
-          ...(username && { username }),
-          ...(firstName && { firstName }),
-          ...(lastName && { lastName }),
+          ...(name && { name }),
         },
       });
 
       return {
         id: user.id,
         email: user.email,
-        username: user.username,
-        firstName: user.firstName,
-        lastName: user.lastName,
+        name: user.name,
         role: user.role,
         isActive: user.isActive,
         createdAt: user.createdAt,
@@ -354,7 +335,7 @@ export const resolvers = {
       // Verify old password
       const isOldPasswordValid = await bcryptjs.compare(
         args.oldPassword,
-        user.passwordHash
+        user.password
       );
       if (!isOldPasswordValid) {
         throw new GraphQLError('Invalid password', {
@@ -367,7 +348,7 @@ export const resolvers = {
 
       await prisma.user.update({
         where: { id: context.userId },
-        data: { passwordHash: newPasswordHash },
+        data: { password: newPasswordHash },
       });
 
       return {
@@ -410,9 +391,7 @@ export const resolvers = {
       return {
         id: user.id,
         email: user.email,
-        username: user.username,
-        firstName: user.firstName,
-        lastName: user.lastName,
+        name: user.name,
         role: user.role,
         isActive: user.isActive,
         createdAt: user.createdAt,
@@ -451,9 +430,7 @@ export const resolvers = {
       return {
         id: user.id,
         email: user.email,
-        username: user.username,
-        firstName: user.firstName,
-        lastName: user.lastName,
+        name: user.name,
         role: user.role,
         isActive: user.isActive,
         createdAt: user.createdAt,
@@ -492,9 +469,7 @@ export const resolvers = {
       return {
         id: user.id,
         email: user.email,
-        username: user.username,
-        firstName: user.firstName,
-        lastName: user.lastName,
+        name: user.name,
         role: user.role,
         isActive: user.isActive,
         createdAt: user.createdAt,
