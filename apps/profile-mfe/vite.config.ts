@@ -17,6 +17,9 @@ export default defineConfig(() => ({
       protocol: 'http',
       overlay: true,
     },
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+    },
   },
   preview: {
     port: 5177,

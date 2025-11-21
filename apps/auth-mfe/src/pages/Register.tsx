@@ -98,7 +98,7 @@ export function Register() {
             <div>
               <label
                 htmlFor="role"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block mb-2 text-sm font-medium text-gray-700"
               >
                 Role
               </label>

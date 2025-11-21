@@ -1,7 +1,31 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { init } from '@module-federation/runtime';
 import App from './app/app';
 import { startMocks } from './mocks/config';
+
+// Initialize Module Federation runtime
+init({
+  name: 'shell',
+  remotes: [
+    {
+      name: 'authMfe',
+      entry: 'http://localhost:5174/remoteEntry.js',
+    },
+    {
+      name: 'chatbotMfe',
+      entry: 'http://localhost:5175/remoteEntry.js',
+    },
+    {
+      name: 'adminMfe',
+      entry: 'http://localhost:5176/remoteEntry.js',
+    },
+    {
+      name: 'profileMfe',
+      entry: 'http://localhost:5177/remoteEntry.js',
+    },
+  ],
+});
 
 const rootElement = document.getElementById('root');
 
