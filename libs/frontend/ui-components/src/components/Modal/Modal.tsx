@@ -1,6 +1,7 @@
 import { FC, ReactNode, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { clsx } from 'clsx';
+import { designTokens, cn } from '../../lib/design-tokens';
+import { colorMap } from '../../lib/color-system';
 
 export interface ModalProps {
   isOpen: boolean;
@@ -66,7 +67,10 @@ export const Modal: FC<ModalProps> = ({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 animate-fade-in"
+      className={cn(
+        'fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50',
+        designTokens.transitions.normal
+      )}
       onClick={handleOverlayClick}
       role="dialog"
       aria-modal="true"
@@ -75,22 +79,34 @@ export const Modal: FC<ModalProps> = ({
       <div
         ref={modalRef}
         tabIndex={-1}
-        className={clsx(
-          'bg-white rounded-lg shadow-xl w-full animate-slide-up',
+        className={cn(
+          'bg-white rounded-lg shadow-xl w-full',
+          designTokens.transitions.normal,
           sizeStyles[size]
         )}
       >
         {title && (
-          <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+          <div
+            className={cn(
+              'px-6 py-4 border-b',
+              colorMap.border.default,
+              'flex items-center justify-between'
+            )}
+          >
             <h2
               id="modal-title"
-              className="text-xl font-semibold text-gray-900"
+              className={cn(designTokens.typography.h4, colorMap.text.primary)}
             >
               {title}
             </h2>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 rounded"
+              className={cn(
+                colorMap.text.light,
+                'hover:' + colorMap.text.secondary,
+                designTokens.transitions.normal,
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 rounded'
+              )}
               aria-label="Close modal"
             >
               <svg
@@ -113,7 +129,15 @@ export const Modal: FC<ModalProps> = ({
         </div>
 
         {footer && (
-          <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
+          <div
+            className={cn(
+              'px-6 py-4',
+              colorMap.bg.secondary,
+              'border-t',
+              colorMap.border.default,
+              'flex justify-end gap-3'
+            )}
+          >
             {footer}
           </div>
         )}
