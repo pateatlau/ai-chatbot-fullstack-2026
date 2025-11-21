@@ -46,7 +46,7 @@ export const Card: FC<CardProps> = ({
         </div>
       )}
 
-      <div className="px-6 py-4">{children}</div>
+      <div className={cn('px-6 py-4', 'text-gray-900')}>{children}</div>
 
       {footer && (
         <div

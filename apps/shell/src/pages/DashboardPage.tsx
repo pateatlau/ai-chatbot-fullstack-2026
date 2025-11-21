@@ -200,7 +200,7 @@ export function DashboardPage() {
       </div>
 
       {/* Call-to-Action Section */}
-      <Card className="bg-linear-to-r from-indigo-50 to-blue-50 border border-indigo-100">
+      <Card className="bg-linear-to-r from-indigo-50 to-blue-50 border border-indigo-100 text-gray-900!">
         <div className="flex items-center justify-between gap-6">
           <div>
             <h3 className="text-xl font-bold text-gray-900 mb-2">
