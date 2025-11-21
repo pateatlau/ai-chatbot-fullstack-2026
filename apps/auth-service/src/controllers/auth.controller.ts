@@ -22,10 +22,32 @@ export class AuthController {
         role: req.body.role || 'USER',
       };
 
-      // Register user
+      // Register user (now returns login response with tokens)
       const result = await authService.register(finalData);
 
-      res.status(201).json(result);
+      // Set HttpOnly cookies for tokens (same as login)
+      res.cookie('accessToken', result.accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 15 * 60 * 1000, // 15 minutes
+        path: '/',
+      });
+
+      res.cookie('refreshToken', result.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        path: '/',
+      });
+
+      // Return user data without tokens
+      res.status(201).json({
+        user: result.user,
+        expiresIn: result.expiresIn,
+        message: 'Registration successful',
+      });
     } catch (error) {
       if (error instanceof Error) {
         if (error.message === 'User with this email already exists') {

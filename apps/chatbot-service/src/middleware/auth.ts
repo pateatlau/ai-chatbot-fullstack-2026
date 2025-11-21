@@ -22,8 +22,15 @@ export const authenticateToken = (
   next: NextFunction
 ) => {
   const JWT_SECRET = getJwtSecret();
+
+  // Try to get token from Authorization header first (for API clients)
   const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
+  let token = authHeader && authHeader.split(' ')[1];
+
+  // If no Authorization header, try to get token from cookies (for browser requests)
+  if (!token && req.cookies) {
+    token = req.cookies.accessToken;
+  }
 
   if (!token) {
     return res.status(401).json({ error: 'Access token required' });

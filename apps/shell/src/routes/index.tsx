@@ -2,6 +2,7 @@ import { createBrowserRouter } from 'react-router-dom';
 import { ProtectedRoute } from '../components/ProtectedRoute';
 import { PublicRoute } from '../components/PublicRoute';
 import { AdminRoute } from '../components/AdminRoute';
+import { RootRedirect } from '../components/RootRedirect';
 import { DashboardLayout } from '../layouts/DashboardLayout';
 import { ChatbotMfe } from '../components/ChatbotMfe';
 import { AuthMfe } from '../components/AuthMfe';
@@ -9,16 +10,15 @@ import { AdminMfe } from '../components/AdminMfe';
 import { ProfileMfe } from '../components/ProfileMfe';
 
 // Core pages
-import { HomePage } from '../pages/HomePage';
 import { DashboardPage } from '../pages/DashboardPage';
 import { NotFoundPage } from '../pages/NotFoundPage';
 
 export const router = createBrowserRouter([
-  // Public home page
+  // Root route - redirect based on auth status
   {
     path: '/',
     index: true,
-    element: <HomePage />,
+    element: <RootRedirect />,
   },
   // Auth routes - delegated to Auth MFE
   {

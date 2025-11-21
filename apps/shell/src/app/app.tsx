@@ -82,7 +82,7 @@ export function App() {
   useShellEventCoordination();
 
   // Only show DevTools in development
-  const isDevelopment = process.env.NODE_ENV === 'development';
+  const isDevelopment = import.meta.env.MODE === 'development';
 
   return (
     <ErrorBoundary>

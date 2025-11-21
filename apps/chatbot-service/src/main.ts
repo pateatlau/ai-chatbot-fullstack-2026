@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import path from 'path';
 import swaggerUi from 'swagger-ui-express';
@@ -58,8 +59,22 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || 'mock-api-key',
 });
 
-// Middleware
-app.use(cors());
+// CORS Configuration - Allow credentials with specific origins
+app.use(
+  cors({
+    origin: [
+      'http://localhost:5173', // Shell
+      'http://localhost:5174', // Auth MFE
+      'http://localhost:5175', // Chatbot MFE
+      'http://localhost:5176', // Admin MFE
+      'http://localhost:5177', // Profile MFE
+    ],
+    credentials: true, // Allow cookies
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  })
+);
+app.use(cookieParser()); // Parse cookies from requests
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

@@ -239,10 +239,17 @@ let globalEventBus: EventBus | null = null;
  */
 export function getEventBus(): EventBus {
   if (!globalEventBus) {
+    // Check for development mode in both Node.js and browser environments
+    const isDevelopment =
+      (typeof process !== 'undefined' &&
+        process.env?.['NODE_ENV'] === 'development') ||
+      (typeof import.meta !== 'undefined' &&
+        import.meta.env?.MODE === 'development');
+
     globalEventBus = new EventBus({
       enableHistory: true,
       maxHistorySize: 1000,
-      enableLogging: process.env['NODE_ENV'] === 'development',
+      enableLogging: isDevelopment,
     });
   }
   return globalEventBus;

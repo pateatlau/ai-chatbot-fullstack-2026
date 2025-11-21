@@ -15,7 +15,7 @@ export function ConfigurationPanel() {
     logLevel: 'info',
     enablePerformanceTracking: true,
     environment:
-      process.env.NODE_ENV === 'production' ? 'production' : 'development',
+      import.meta.env.MODE === 'production' ? 'production' : 'development',
   });
 
   const [saved, setSaved] = useState(false);
@@ -34,7 +34,7 @@ export function ConfigurationPanel() {
       logLevel: 'info',
       enablePerformanceTracking: true,
       environment:
-        process.env.NODE_ENV === 'production' ? 'production' : 'development',
+        import.meta.env.MODE === 'production' ? 'production' : 'development',
     };
     setConfig(defaultConfig);
     localStorage.removeItem('eventBusConfig');
@@ -71,7 +71,7 @@ export function ConfigurationPanel() {
             </label>
           </div>
           <p className="text-xs text-gray-500 mt-2">
-            Current: <strong>{process.env.NODE_ENV}</strong>
+            Current: <strong>{import.meta.env.MODE}</strong>
           </p>
         </div>
 

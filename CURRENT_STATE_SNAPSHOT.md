@@ -1,14 +1,24 @@
 # AI Chatbot Fullstack - Current State Snapshot
 
-**Last Updated:** November 19, 2025  
-**Phase:** Week 2 (Post Week 1 Completion)  
-**Overall Status:** ✅ Backend Complete | 🚀 Frontend Partial | ⏳ GraphQL Gateway Ready
+**Last Updated:** November 21, 2025  
+**Phase:** Week 2 - Authentication Flow Complete  
+**Overall Status:** ✅ Backend Complete | ✅ Authentication Verified | 🚀 Frontend Partial | ⏳ GraphQL Gateway Ready
 
 ---
 
 ## 📋 Executive Summary
 
-This document provides a comprehensive snapshot of the AI Chatbot Fullstack application as of Week 2. The backend infrastructure is fully functional with Auth Service, Chatbot Service, and Admin Service all implemented. The frontend includes Auth MFE and Shell application. A GraphQL Gateway has been set up for federation across subgraphs.
+This document provides a comprehensive snapshot of the AI Chatbot Fullstack application as of November 21, 2025. The backend infrastructure is fully functional with Auth Service, Chatbot Service, and Admin Service all implemented. The frontend includes Auth MFE and Shell application with complete authentication flow. **Major milestone: Cookie-based authentication is now working end-to-end across all services, with all navigation routes verified working (/login, /register, /dashboard, /chat, /admin, /profile).** A GraphQL Gateway has been set up for federation across subgraphs.
+
+### Recent Fixes (November 21, 2025):
+
+- ✅ Fixed root route redirect (unauthenticated → /login, authenticated → /dashboard)
+- ✅ Fixed Module Federation bootstrap pattern (prevents RUNTIME-009 errors)
+- ✅ Fixed cookie-based authentication in chatbot service
+- ✅ Fixed database configuration (unified to myapp_dev)
+- ✅ Fixed CORS configuration for credentials
+- ✅ Fixed logout event logger timestamp handling
+- ✅ Complete authentication flow verified working
 
 ---
 
@@ -40,6 +50,74 @@ ai-chatbot-fullstack-2026/
 ---
 
 ## ✅ Completed Components
+
+### 0. Authentication Flow (End-to-End) - ✅ VERIFIED (November 21, 2025)
+
+**Status:** Complete and verified working
+
+#### Fixed Issues:
+
+1. **Root Route Redirect**
+   - Created `RootRedirect` component
+   - Smart redirect based on auth status
+   - Unauthenticated users → `/login`
+   - Authenticated users → `/dashboard`
+
+2. **Module Federation Bootstrap Pattern**
+   - Fixed RUNTIME-009 errors in all MFEs
+   - Created `bootstrap.tsx` files for: shell, auth-mfe, chatbot-mfe, admin-mfe, profile-mfe
+   - Updated all `main.tsx` to dynamically import bootstrap
+
+3. **Cookie-Based Authentication**
+   - Enhanced chatbot service auth middleware to check cookies
+   - Added `cookie-parser` middleware to chatbot service
+   - Updated CORS configuration to allow credentials
+   - HttpOnly cookies working across all services
+
+4. **Database Configuration**
+   - Fixed chatbot service DATABASE_URL (chatbot_dev → myapp_dev)
+   - All services now use shared `myapp_dev` database
+
+5. **Event Logger Fix**
+   - Fixed logout timestamp error (RangeError: Invalid time value)
+   - Added safe timestamp handling with validation
+
+#### Verified Working:
+
+- ✅ Register new user (sets HttpOnly cookies)
+- ✅ Login existing user (sets HttpOnly cookies)
+- ✅ Navigate to /chat (cookies sent, no 401 errors)
+- ✅ Navigate to /admin (cookies sent, authorized)
+- ✅ Navigate to /profile (cookies sent, authorized)
+- ✅ Navigate to /dashboard (cookies sent, authorized)
+- ✅ Logout (clears cookies, redirects to /login)
+- ✅ Root route redirect (smart redirect based on auth)
+- ✅ Module Federation loads all MFEs without errors
+
+#### Architecture:
+
+```typescript
+// Auth Service (sets cookies)
+res.cookie('accessToken', token, {
+  httpOnly: true,
+  secure: false, // true in production
+  sameSite: 'strict',
+  maxAge: 15 * 60 * 1000, // 15 minutes
+});
+
+// Chatbot Service (reads cookies)
+let token = authHeader?.split(' ')[1]; // Check Authorization header
+if (!token && req.cookies) {
+  token = req.cookies.accessToken; // Fallback to cookies
+}
+
+// Frontend (sends cookies automatically)
+axios.get('/api/chat/conversations', {
+  withCredentials: true, // Include cookies
+});
+```
+
+---
 
 ### 1. Auth Service (Backend) - 100% Complete
 
@@ -615,6 +693,8 @@ npm run prisma:studio
 
 ## 🔒 Security Features Implemented
 
+⚠️ **SECURITY AUDIT ALERT** (November 21, 2025): Critical vulnerabilities found. See `SECURITY_AUDIT_NOV_2025.md` for full details.
+
 ### Authentication & Authorization:
 
 - ✅ JWT-based authentication (HS256)
@@ -622,8 +702,8 @@ npm run prisma:studio
 - ✅ Token refresh mechanism
 - ✅ Token blacklisting on logout
 - ✅ Session management
-- ✅ CORS protection
-- ✅ Rate limiting ready
+- ⚠️ CORS protection - **CRITICAL FIX NEEDED** (wildcard → whitelist)
+- ✅ Rate limiting ready - **HIGH PRIORITY** (adjust limits for production)
 
 ### Data Protection:
 

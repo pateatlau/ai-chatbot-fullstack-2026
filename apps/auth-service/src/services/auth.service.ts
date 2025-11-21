@@ -18,9 +18,7 @@ import redis from '../lib/redis';
 import { EmailService } from './email.service';
 
 export class AuthService {
-  async register(
-    input: CreateUserInput
-  ): Promise<{ message: string; userId: string }> {
+  async register(input: CreateUserInput): Promise<LoginResponse> {
     // Check if user already exists
     const existingUserResult = await query(
       'SELECT id FROM users WHERE email = $1',
@@ -42,9 +40,57 @@ export class AuthService {
        VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())`,
       [userId, input.email, hashedPassword, input.name, userRole, true]
     );
+
+    // Auto-login user after registration
+    // Generate tokens
+    // @ts-ignore - TypeScript strict mode JWT secret type issue
+    const accessToken = jwt.sign(
+      {
+        userId: userId,
+        email: input.email,
+        role: userRole,
+        type: 'access',
+      },
+      JWT_SECRET,
+      { expiresIn: JWT_EXPIRES_IN }
+    );
+
+    const sessionId = uuidv4();
+    // @ts-ignore - TypeScript strict mode JWT secret type issue
+    const refreshToken = jwt.sign(
+      {
+        sessionId,
+        userId: userId,
+        type: 'refresh',
+      },
+      JWT_REFRESH_SECRET,
+      { expiresIn: JWT_REFRESH_EXPIRES_IN }
+    );
+
+    // Create session
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 7); // 7 days
+
+    await query(
+      `INSERT INTO sessions (id, "userId", "refreshToken", "expiresAt", "createdAt", "updatedAt") 
+       VALUES ($1, $2, $3, $4, NOW(), NOW())`,
+      [sessionId, userId, refreshToken, expiresAt]
+    );
+
+    // Return login response format
     return {
-      message: 'User registered successfully',
-      userId,
+      user: {
+        id: userId,
+        email: input.email,
+        name: input.name,
+        role: userRole,
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+      accessToken,
+      refreshToken,
+      expiresIn: 900, // 15 minutes in seconds
     };
   }
 
@@ -124,6 +170,9 @@ export class AuthService {
         email: user.email,
         name: user.name,
         role: user.role,
+        isActive: user.isActive,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
       },
     };
   }

@@ -18,11 +18,26 @@ export function useEventDrivenStores() {
     const eventBus = getEventBus();
 
     // Development mode: Log all events for debugging
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.MODE === 'development') {
       const eventLogger = (event: any) => {
+        // Safely format timestamp
+        let timestamp: string;
+        try {
+          if (event.timestamp) {
+            const date = new Date(event.timestamp);
+            timestamp = isNaN(date.getTime())
+              ? 'Invalid Date'
+              : date.toISOString();
+          } else {
+            timestamp = new Date().toISOString();
+          }
+        } catch {
+          timestamp = new Date().toISOString();
+        }
+
         console.log('[Shell Event Bus]', {
           name: event.name,
-          timestamp: new Date(event.timestamp).toISOString(),
+          timestamp,
           data: event.data,
           historySize: eventBus.getEventHistory().length,
         });
@@ -129,7 +144,7 @@ export function useShellEventCoordination() {
   useAuthenticationCoordination();
 
   // Conditionally use metrics in development
-  const isDevelopment = process.env.NODE_ENV === 'development';
+  const isDevelopment = import.meta.env.MODE === 'development';
 
   useEffect(() => {
     if (isDevelopment) {

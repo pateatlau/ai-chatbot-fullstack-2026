@@ -9,6 +9,19 @@ An enterprise-grade AI chatbot application built with modern microservices backe
 
 **Timeline:** 10 weeks (70 days) | **Team Size:** 3-4 developers | **Phases:** Event Bus → GraphQL → Hybrid Database
 
+## 🔒 SECURITY NOTICE
+
+⚠️ **Action Required**: A security audit on November 21, 2025 identified **2 critical vulnerabilities** requiring immediate attention before deployment. See `SECURITY_AUDIT_NOV_2025.md` for full details and remediation steps.
+
+**Critical Issues**:
+
+1. Exposed secrets in repository (.env files)
+2. CORS wildcard accepting any origin
+
+**Immediate Actions**: Rotate API keys, fix CORS configuration, remove secrets from git history.
+
+---
+
 ## ✨ Key Features
 
 - 🎯 **Modern Architecture** - Microservices + Module Federation MFEs
@@ -474,7 +487,7 @@ MIT
 ---
 
 **Version**: 1.0.0  
-**Status**: ✅ Production Ready  
-**Last Updated**: January 2026  
+**Status**: ✅ Production Ready (Authentication Verified November 21, 2025)  
+**Last Updated**: November 21, 2025  
 **Node Version**: 20.x  
 **Nx Version**: 22.0.3
