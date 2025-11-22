@@ -1,5 +1,6 @@
 import { useLocation } from 'react-router-dom';
 import { ErrorBoundary } from '@myapp/frontend/ui-components';
+import { RecoveryAction } from '@myapp/frontend/hooks';
 import {
   AdminDashboardPage,
   UserManagementPage,
@@ -33,8 +34,25 @@ function AppContent() {
 }
 
 export function App() {
+  const handleRecovery = (action: RecoveryAction) => {
+    console.log('[Admin MFE] Recovery action triggered:', action);
+    // Execute recovery action
+    void action.action();
+  };
+
+  const handleError = (error: Error, errorInfo: React.ErrorInfo) => {
+    console.error('[Admin MFE] Error caught:', { error, errorInfo });
+  };
+
   return (
-    <ErrorBoundary variant="full" context="admin-mfe-root">
+    <ErrorBoundary
+      variant="full"
+      context="admin-mfe-root"
+      enableRecovery={true}
+      onRecovery={handleRecovery}
+      onError={handleError}
+      showDetails={process.env.NODE_ENV === 'development'}
+    >
       <AppContent />
     </ErrorBoundary>
   );

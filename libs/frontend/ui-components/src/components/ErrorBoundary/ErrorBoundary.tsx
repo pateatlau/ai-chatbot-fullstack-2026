@@ -1,4 +1,5 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { ErrorCategory, RecoveryAction } from '@myapp/frontend/hooks';
 import styles from './ErrorBoundary.module.css';
 
 export type ErrorBoundaryVariant = 'full' | 'compact' | 'minimal';
@@ -24,6 +25,12 @@ export interface ErrorBoundaryProps {
 
   /** Show detailed error info (stack trace, component stack) */
   showDetails?: boolean;
+
+  /** Enable automatic error recovery */
+  enableRecovery?: boolean;
+
+  /** Recovery handler function */
+  onRecovery?: (action: RecoveryAction) => void;
 }
 
 interface State {
@@ -31,10 +38,15 @@ interface State {
   error: Error | null;
   errorInfo: ErrorInfo | null;
   errorId: string;
+  errorCategory: ErrorCategory | null;
+  recoveryActions: Array<{ label: string; description: string }>;
+  isRecovering: boolean;
+  recoveryAttempts: number;
 }
 
 export class ErrorBoundary extends Component<ErrorBoundaryProps, State> {
   private readonly DEFAULT_CONTEXT = 'ErrorBoundary';
+  private recoveryTimeoutId: NodeJS.Timeout | null = null;
 
   constructor(props: ErrorBoundaryProps) {
     super(props);
@@ -43,6 +55,10 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, State> {
       error: null,
       errorInfo: null,
       errorId: '',
+      errorCategory: null,
+      recoveryActions: [],
+      isRecovering: false,
+      recoveryAttempts: 0,
     };
   }
 
@@ -54,10 +70,110 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, State> {
     };
   }
 
+  private categorizeErrorAndGenerateRecovery(error: Error): {
+    category: ErrorCategory;
+    actions: Array<{ label: string; description: string }>;
+  } {
+    const errorMessage = error.message.toLowerCase();
+    let category: ErrorCategory = ErrorCategory.UNKNOWN;
+    const actions: Array<{ label: string; description: string }> = [];
+
+    // Categorize error based on message patterns
+    if (
+      errorMessage.includes('unauthorized') ||
+      errorMessage.includes('401') ||
+      errorMessage.includes('not authenticated')
+    ) {
+      category = ErrorCategory.AUTHENTICATION;
+      actions.push({
+        label: 'Refresh Session',
+        description: 'Attempt to refresh your authentication session',
+      });
+      actions.push({
+        label: 'Go to Login',
+        description: 'Return to login page',
+      });
+    } else if (
+      errorMessage.includes('forbidden') ||
+      errorMessage.includes('403') ||
+      errorMessage.includes('permission denied')
+    ) {
+      category = ErrorCategory.AUTHORIZATION;
+      actions.push({
+        label: 'Go to Home',
+        description: 'Return to home page',
+      });
+    } else if (
+      errorMessage.includes('network') ||
+      errorMessage.includes('fetch') ||
+      errorMessage.includes('503') ||
+      errorMessage.includes('connection')
+    ) {
+      category = ErrorCategory.NETWORK;
+      actions.push({
+        label: 'Retry Request',
+        description: 'Try the request again',
+      });
+      actions.push({
+        label: 'Use Cached Data',
+        description: 'Use previously cached data if available',
+      });
+    } else if (
+      errorMessage.includes('validation') ||
+      errorMessage.includes('invalid')
+    ) {
+      category = ErrorCategory.VALIDATION;
+      actions.push({
+        label: 'Reset Form',
+        description: 'Clear and reset the form',
+      });
+    } else if (
+      errorMessage.includes('module') ||
+      errorMessage.includes('loading') ||
+      errorMessage.includes('chunk')
+    ) {
+      category = ErrorCategory.MODULE_FEDERATION;
+      actions.push({
+        label: 'Reload Module',
+        description: 'Attempt to reload the module',
+      });
+      actions.push({
+        label: 'Use Fallback UI',
+        description: 'Display fallback interface',
+      });
+    } else if (
+      errorMessage.includes('state') ||
+      errorMessage.includes('redux')
+    ) {
+      category = ErrorCategory.STATE;
+      actions.push({
+        label: 'Restore State',
+        description: 'Restore application state from backup',
+      });
+      actions.push({
+        label: 'Reset State',
+        description: 'Reset state to initial values',
+      });
+    } else {
+      category = ErrorCategory.INTERNAL;
+      actions.push({
+        label: 'Try Again',
+        description: 'Attempt to recover from the error',
+      });
+    }
+
+    return { category, actions };
+  }
+
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    // Store component stack
+    const { category, actions } =
+      this.categorizeErrorAndGenerateRecovery(error);
+
+    // Store component stack and recovery info
     this.setState({
       errorInfo,
+      errorCategory: category,
+      recoveryActions: actions,
     });
 
     // Call user's error handler
@@ -69,16 +185,55 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, State> {
       error,
       errorInfo,
       errorId: this.state.errorId,
+      category,
+      availableRecoveryActions: actions,
       variant: this.props.variant,
       timestamp: new Date().toISOString(),
     });
+
+    // Attempt automatic recovery if enabled
+    if (this.props.enableRecovery) {
+      this.attemptAutoRecovery(error, category);
+    }
+  }
+
+  private attemptAutoRecovery(error: Error, category: ErrorCategory) {
+    const maxAttempts = 3;
+
+    if (this.state.recoveryAttempts >= maxAttempts) {
+      console.warn('[ErrorBoundary] Max recovery attempts reached');
+      return;
+    }
+
+    this.setState({
+      isRecovering: true,
+      recoveryAttempts: this.state.recoveryAttempts + 1,
+    });
+
+    // Auto-recovery strategy based on error category
+    this.recoveryTimeoutId = setTimeout(() => {
+      // For basic error boundary, we'll just reset and let the parent handle recovery
+      // The parent component can implement more sophisticated recovery via onRecovery prop
+      this.handleReset();
+      this.setState({ isRecovering: false });
+    }, 1000); // Wait 1 second before attempting recovery
   }
 
   handleReset = () => {
+    // Clear any pending recovery timeout
+    if (this.recoveryTimeoutId) {
+      clearTimeout(this.recoveryTimeoutId);
+      this.recoveryTimeoutId = null;
+    }
+
     this.setState({
       hasError: false,
       error: null,
       errorInfo: null,
+      errorCategory: null,
+      recoveryActions: [],
+      isRecovering: false,
+      recoveryAttempts: 0,
     });
   };
 
@@ -86,13 +241,37 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, State> {
     window.location.reload();
   };
 
+  componentWillUnmount() {
+    // Clean up any pending recovery timeout
+    if (this.recoveryTimeoutId) {
+      clearTimeout(this.recoveryTimeoutId);
+      this.recoveryTimeoutId = null;
+    }
+  }
+
   renderFallback() {
-    const { error, errorInfo, errorId } = this.state;
+    const { error, errorInfo, errorId, isRecovering, recoveryActions } =
+      this.state;
     const {
       variant = 'full',
       context = this.DEFAULT_CONTEXT,
       showDetails = true,
     } = this.props;
+
+    // Show recovery UI while recovering
+    if (isRecovering) {
+      return (
+        <div className={styles.errorContainer}>
+          <div className={styles.errorHeader}>
+            <span className={styles.errorIcon}>🔄</span>
+            <h1 className={styles.errorTitle}>Recovering...</h1>
+          </div>
+          <p className={styles.errorMessage}>
+            Attempting automatic recovery. Please stand by.
+          </p>
+        </div>
+      );
+    }
 
     if (this.props.fallback) {
       if (typeof this.props.fallback === 'function') {
@@ -108,10 +287,11 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, State> {
           errorInfo,
           errorId,
           context,
-          showDetails
+          showDetails,
+          recoveryActions
         );
       case 'compact':
-        return this.renderCompactUI(error, errorId, context);
+        return this.renderCompactUI(error, errorId, context, recoveryActions);
       case 'minimal':
         return this.renderMinimalUI(error);
       default:
@@ -120,7 +300,8 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, State> {
           errorInfo,
           errorId,
           context,
-          showDetails
+          showDetails,
+          recoveryActions
         );
     }
   }
@@ -130,7 +311,8 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, State> {
     errorInfo: ErrorInfo | null,
     errorId: string,
     context: string,
-    showDetails: boolean
+    showDetails: boolean,
+    recoveryActions?: Array<{ label: string; description: string }>
   ) {
     return (
       <div className={styles.errorContainer}>
@@ -143,6 +325,19 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, State> {
           <p className={styles.errorMessage}>
             {error?.message || 'Unknown error'}
           </p>
+
+          {recoveryActions && recoveryActions.length > 0 && (
+            <div className={styles.recoveryActions}>
+              <h3 className={styles.recoveryTitle}>Suggested Actions</h3>
+              <ul className={styles.recoveryList}>
+                {recoveryActions.map((action, idx) => (
+                  <li key={idx} className={styles.recoveryItem}>
+                    <strong>{action.label}:</strong> {action.description}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {showDetails && (
             <details className={styles.errorDetails}>
@@ -208,7 +403,8 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, State> {
   private renderCompactUI(
     error: Error | null,
     errorId: string,
-    context: string
+    context: string,
+    recoveryActions?: Array<{ label: string; description: string }>
   ) {
     return (
       <div className={styles.errorContainerCompact}>
@@ -219,12 +415,22 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, State> {
             <p className={styles.errorMessageCompact}>
               {error?.message || 'An error occurred'}
             </p>
+            {recoveryActions &&
+              recoveryActions.length > 0 &&
+              recoveryActions[0] && (
+                <p className={styles.recoveryHint}>
+                  Try: {recoveryActions[0].label}
+                </p>
+              )}
           </div>
         </div>
 
         <div className={styles.errorActionsCompact}>
           <button className={styles.buttonPrimary} onClick={this.handleReload}>
             Reload
+          </button>
+          <button className={styles.buttonSecondary} onClick={this.handleReset}>
+            Try Again
           </button>
         </div>
 

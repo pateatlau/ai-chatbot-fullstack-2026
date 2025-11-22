@@ -28,6 +28,19 @@ export type { MfeErrorBoundaryProps } from './components/ErrorBoundary/MfeErrorB
 
 export { ErrorLogDashboard } from './components/ErrorLogDashboard/ErrorLogDashboard';
 
+export { ErrorSuggestions } from './components/ErrorSuggestions/ErrorSuggestions';
+export type { ErrorSuggestionsProps } from './components/ErrorSuggestions/ErrorSuggestions';
+
+export {
+  OfflineFallback,
+  LoadingFallback,
+  NotAvailableFallback,
+  AccessDeniedFallback,
+  ErrorOccurredFallback,
+  SessionExpiredFallback,
+  NetworkErrorFallback,
+} from './components/FallbackPages/FallbackPages';
+
 // Design System Exports
 export { designTokens, componentPresets, cn } from './lib/design-tokens';
 

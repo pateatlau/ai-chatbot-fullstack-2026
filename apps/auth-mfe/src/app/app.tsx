@@ -1,5 +1,6 @@
 import { useLocation } from 'react-router-dom';
 import { ErrorBoundary } from '@myapp/frontend/ui-components';
+import { RecoveryAction } from '@myapp/frontend/hooks';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
 import ForgotPassword from '../pages/ForgotPassword';
@@ -27,8 +28,25 @@ function AppContent() {
 }
 
 export function App() {
+  const handleRecovery = (action: RecoveryAction) => {
+    console.log('[Auth MFE] Recovery action triggered:', action);
+    // Execute recovery action
+    void action.action();
+  };
+
+  const handleError = (error: Error, errorInfo: React.ErrorInfo) => {
+    console.error('[Auth MFE] Error caught:', { error, errorInfo });
+  };
+
   return (
-    <ErrorBoundary variant="full" context="auth-mfe-root">
+    <ErrorBoundary
+      variant="full"
+      context="auth-mfe-root"
+      enableRecovery={true}
+      onRecovery={handleRecovery}
+      onError={handleError}
+      showDetails={process.env.NODE_ENV === 'development'}
+    >
       <AppContent />
     </ErrorBoundary>
   );

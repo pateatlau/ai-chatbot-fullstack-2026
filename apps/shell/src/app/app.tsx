@@ -2,6 +2,7 @@ import { RouterProvider } from 'react-router-dom';
 import { QueryProvider } from '../providers/QueryProvider';
 import { useToastStore } from '@myapp/frontend/stores';
 import { Toast, ErrorBoundary } from '@myapp/frontend/ui-components';
+import { RecoveryAction } from '@myapp/frontend/hooks';
 import { router } from '../routes';
 import { useShellEventCoordination } from '../hooks/useEventDrivenStores';
 import { EventBusDevTools } from '../components/EventBusDevTools';
@@ -31,8 +32,25 @@ export function App() {
   // Only show DevTools in development
   const isDevelopment = import.meta.env.MODE === 'development';
 
+  const handleRecovery = (action: RecoveryAction) => {
+    console.log('[Shell] Recovery action triggered:', action);
+    // Execute recovery action
+    void action.action();
+  };
+
+  const handleError = (error: Error, errorInfo: React.ErrorInfo) => {
+    console.error('[Shell] Error caught:', { error, errorInfo });
+  };
+
   return (
-    <ErrorBoundary variant="full" context="shell-root">
+    <ErrorBoundary
+      variant="full"
+      context="shell-root"
+      enableRecovery={true}
+      onRecovery={handleRecovery}
+      onError={handleError}
+      showDetails={isDevelopment}
+    >
       <QueryProvider>
         <RouterProvider router={router} />
         <ToastContainer />
