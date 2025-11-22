@@ -42,9 +42,14 @@ export function RegisterPage() {
     register,
     handleSubmit,
     formState: { errors },
+    watch,
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
   });
+
+  // Watch the role field to debug
+  const watchedRole = watch('role');
+  console.log('[RegisterPage] Watched role value changed:', watchedRole);
 
   const onSubmit = async (data: RegisterFormData) => {
     setIsLoading(true);
