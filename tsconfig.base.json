@@ -37,6 +37,9 @@
       "@myapp/frontend/utils": ["libs/frontend/utils/src/index.ts"],
       "@myapp/frontend/mocks": ["libs/frontend/mocks/src/index.ts"],
       "@myapp/frontend/hooks": ["libs/frontend/hooks/src/index.ts"],
+      "@myapp/frontend/apollo-client": [
+        "libs/frontend/apollo-client/src/index.ts"
+      ],
       "@ai-chatbot/hooks": ["libs/frontend/hooks/src/index.ts"],
       "@ai-chatbot/chatbot-stores": ["libs/chatbot/stores/src/index.ts"],
       "@ai-chatbot/admin-stores": ["libs/admin/stores/src/index.ts"],

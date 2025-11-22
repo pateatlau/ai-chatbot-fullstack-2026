@@ -1,0 +1,46 @@
+{
+  "projectType": "library",
+  "sourceRoot": "libs/frontend/apollo-client/src",
+  "prefix": "myapp",
+  "targets": {
+    "build": {
+      "executor": "@nx/vite:build",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "outputPath": "dist/libs/frontend/apollo-client",
+        "main": "libs/frontend/apollo-client/src/index.ts",
+        "tsConfig": "libs/frontend/apollo-client/tsconfig.lib.json",
+        "inlineSourceMap": false,
+        "generatePackageJson": true,
+        "assets": [
+          {
+            "glob": "README.md",
+            "input": "libs/frontend/apollo-client",
+            "output": "/"
+          }
+        ]
+      },
+      "configurations": {
+        "development": {
+          "mode": "development"
+        },
+        "production": {
+          "mode": "production"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "test": {
+      "executor": "@nx/vite:test",
+      "outputs": ["{options.reportsDir}"],
+      "options": {
+        "reportsDir": "coverage/libs/frontend/apollo-client"
+      }
+    }
+  },
+  "tags": ["type:frontend", "scope:apollo-client"],
+  "importPath": "@myapp/frontend/apollo-client"
+}

@@ -1,6 +1,8 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { ApolloProvider } from '@apollo/client';
 import { init } from '@module-federation/runtime';
+import { apolloClient } from '@myapp/frontend/apollo-client';
 import App from './app/app';
 import { startMocks } from './mocks/config';
 import './styles.css';
@@ -73,7 +75,9 @@ if (!rootElement) {
 
       root.render(
         <StrictMode>
-          <App />
+          <ApolloProvider client={apolloClient}>
+            <App />
+          </ApolloProvider>
         </StrictMode>
       );
     } catch (error) {
