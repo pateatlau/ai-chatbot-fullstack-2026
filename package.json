@@ -53,7 +53,7 @@
     "kill:backend": "lsof -ti:3000 | xargs kill -9 2>/dev/null; lsof -ti:3001 | xargs kill -9 2>/dev/null; lsof -ti:3002 | xargs kill -9 2>/dev/null; pkill -f 'nx serve' 2>/dev/null; echo '✓ All backend ports killed'",
     "kill:frontend": "lsof -ti:5173,5174,5175,5176,5177,5178,5179 | xargs kill -9 2>/dev/null; echo '✓ All frontend ports killed'",
     "kill:all": "npm run kill:backend && npm run kill:frontend",
-    "docker:up": "docker-compose up -d",
+    "docker:up": "docker-compose up -d postgres redis",
     "docker:down": "docker-compose down",
     "docker:stop": "docker-compose stop",
     "docker:start": "docker-compose start",
