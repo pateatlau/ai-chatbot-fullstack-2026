@@ -56,7 +56,7 @@ export function DashboardPage() {
       description: 'Chat with AI assistant',
       icon: '💬',
       href: '/chatbot',
-      color: 'from-primary-500 to-primary-600',
+      color: 'from-gray-800 to-gray-900',
       textColor: 'text-white',
     },
     {
@@ -64,7 +64,7 @@ export function DashboardPage() {
       description: 'View account details',
       icon: '👤',
       href: '/profile',
-      color: 'from-blue-500 to-blue-600',
+      color: 'from-gray-800 to-gray-900',
       textColor: 'text-white',
     },
     {
@@ -72,7 +72,7 @@ export function DashboardPage() {
       description: 'Manage preferences',
       icon: '⚙️',
       href: '/profile/settings',
-      color: 'from-slate-500 to-slate-600',
+      color: 'from-gray-800 to-gray-900',
       textColor: 'text-white',
     },
   ];
@@ -98,16 +98,16 @@ export function DashboardPage() {
   return (
     <div className="space-y-6">
       {/* Hero Section */}
-      <div className="relative overflow-hidden rounded-xl bg-linear-to-br from-primary-600 via-primary-500 to-primary-700 px-6 py-12 md:px-8 md:py-16 shadow-lg">
+      <div className="relative overflow-hidden rounded-xl bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 px-6 py-12 md:px-8 md:py-16 shadow-lg">
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -right-40 -top-40 h-80 w-80 rounded-full bg-white opacity-10"></div>
-          <div className="absolute -left-40 -bottom-40 h-80 w-80 rounded-full bg-white opacity-10"></div>
+          <div className="absolute -right-40 -top-40 h-80 w-80 rounded-full bg-blue-500 opacity-10"></div>
+          <div className="absolute -left-40 -bottom-40 h-80 w-80 rounded-full bg-cyan-500 opacity-10"></div>
         </div>
         <div className="relative z-10">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
             Good {timeOfDay}, {user?.name?.split(' ')[0] || 'there'}!
           </h1>
-          <p className="text-white/90 text-lg md:text-xl max-w-2xl">
+          <p className="text-gray-100 text-lg md:text-xl max-w-2xl">
             Welcome back to your AI Chatbot dashboard. Let's explore what you
             can do today.
           </p>
@@ -134,7 +134,9 @@ export function DashboardPage() {
                     {stat.value}
                   </p>
                 </div>
-                <div className={cn('text-3xl', stat.iconColor)}>{stat.icon}</div>
+                <div className={cn('text-3xl', stat.iconColor)}>
+                  {stat.icon}
+                </div>
               </div>
               <div className="flex items-center justify-between">
                 <span
@@ -161,7 +163,9 @@ export function DashboardPage() {
       {/* Quick Actions Section */}
       <div>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-text-primary">Quick Actions</h2>
+          <h2 className="text-2xl font-bold text-text-primary">
+            Quick Actions
+          </h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {quickActions.map((action, index) => (
@@ -191,7 +195,9 @@ export function DashboardPage() {
 
       {/* Features Section */}
       <div>
-        <h2 className="text-2xl font-bold text-text-primary mb-6">Key Features</h2>
+        <h2 className="text-2xl font-bold text-text-primary mb-6">
+          Key Features
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {features.map((feature, index) => (
             <Card key={index} className="hover:shadow-md transition-shadow">
