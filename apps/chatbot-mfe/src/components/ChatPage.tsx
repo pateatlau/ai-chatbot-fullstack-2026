@@ -17,7 +17,7 @@ import {
   useDeleteConversation,
   useSendMessage,
 } from '@myapp/frontend/apollo-client';
-import { chatbotAPI, type Message } from '../api/chatbot.api';
+import type { Message } from '../api/chatbot.api';
 import styles from './ChatPage.module.css';
 
 function ChatPageContent() {
@@ -209,11 +209,34 @@ function ChatPageContent() {
       // Send message via Apollo mutation
       await sendMessageMutation(currentConversationId, content);
 
-      // Start streaming AI response (fallback to REST API for now)
-      const response = await chatbotAPI.sendMessageStream(
-        currentConversationId,
-        content
+      // Start streaming AI response via REST API (SSE endpoint - cannot migrate to GraphQL)
+      // The sendMessageStream endpoint returns Server-Sent Events for real-time streaming
+      const response = await fetch(
+        `${import.meta.env.VITE_CHATBOT_API_URL || 'http://localhost:3001/api'}/chat/conversations/${currentConversationId}/messages`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({ content }),
+        }
       );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        try {
+          const errorJson = JSON.parse(errorText);
+          throw new Error(
+            errorJson.error || errorJson.message || 'Failed to send message'
+          );
+        } catch {
+          throw new Error(
+            errorText || `Request failed with status ${response.status}`
+          );
+        }
+      }
+
       startStreaming(response);
     } catch (err: any) {
       setError(err.message || 'Failed to send message');
