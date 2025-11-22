@@ -4,7 +4,8 @@
   "license": "MIT",
   "scripts": {
     "dev": "nx run-many --target=serve --all --parallel=10",
-    "dev:backend": "nx run-many --target=serve --projects=auth-service,chatbot-service,admin-service --parallel=3",
+    "dev:backend": "bash scripts/start-backend.sh",
+    "dev:gateway": "nx serve graphql-gateway",
     "dev:auth": "nx serve auth-service --inspect=false",
     "dev:chatbot": "cd apps/chatbot-service && npx prisma generate && cd ../.. && nx serve chatbot-service --inspect=false",
     "dev:admin": "nx serve admin-service --inspect=false",

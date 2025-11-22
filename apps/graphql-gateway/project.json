@@ -72,7 +72,7 @@
       "options": {
         "buildTarget": "graphql-gateway:build",
         "runBuildTargetDependencies": false,
-        "inspect": "localhost:9222",
+        "inspect": false,
         "port": 4000
       },
       "configurations": {
