@@ -1,22 +1,22 @@
 .container {
   padding: 16px;
-  background: white;
-  border-top: 1px solid #e5e7eb;
+  background: var(--bg-primary);
+  border-top: 1px solid var(--border-default);
 }
 
 .inputWrapper {
   display: flex;
   align-items: flex-end;
   gap: 12px;
-  background: #f9fafb;
-  border: 2px solid #e5e7eb;
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-default);
   border-radius: 12px;
   padding: 12px;
   transition: border-color 0.2s;
 }
 
 .inputWrapper:focus-within {
-  border-color: #667eea;
+  border-color: var(--border-focus);
 }
 
 .textarea {
@@ -27,18 +27,18 @@
   font-family: inherit;
   font-size: 15px;
   line-height: 1.5;
-  color: #1f2937;
+  color: var(--text-primary);
   outline: none;
   max-height: 200px;
   overflow-y: auto;
 }
 
 .textarea::placeholder {
-  color: #9ca3af;
+  color: var(--text-tertiary);
 }
 
 .textarea:disabled {
-  color: #9ca3af;
+  color: var(--text-disabled);
   cursor: not-allowed;
 }
 
@@ -50,14 +50,15 @@
   height: 40px;
   border: none;
   border-radius: 8px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: var(--interactive-primary);
+  color: var(--text-inverse);
   cursor: pointer;
   transition: all 0.2s;
   flex-shrink: 0;
 }
 
 .sendButton:hover:not(:disabled) {
+  background: var(--interactive-primaryHover);
   transform: scale(1.05);
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
@@ -79,44 +80,19 @@
 
 .characterCount {
   font-size: 12px;
-  color: #f59e0b;
+  color: var(--status-warning);
   text-align: right;
   margin-top: 4px;
   font-weight: 500;
 }
 
 .overLimit {
-  color: #ef4444;
+  color: var(--status-error);
 }
 
 .hint {
   font-size: 11px;
-  color: #9ca3af;
+  color: var(--text-tertiary);
   text-align: center;
   margin-top: 4px;
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .container {
-    background: #1f2937;
-    border-top-color: #374151;
-  }
-
-  .inputWrapper {
-    background: #111827;
-    border-color: #374151;
-  }
-
-  .inputWrapper:focus-within {
-    border-color: #667eea;
-  }
-
-  .textarea {
-    color: #f3f4f6;
-  }
-
-  .textarea::placeholder {
-    color: #6b7280;
-  }
 }

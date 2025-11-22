@@ -8,6 +8,7 @@ import {
   Button,
   ErrorBoundary,
   ThemeToggle,
+  cn,
 } from '@myapp/frontend/ui-components';
 import { useAuthStore, useToastStore } from '@myapp/frontend/stores';
 import { registerSchema, RegisterFormData } from '../schemas/auth.schema';
@@ -51,17 +52,26 @@ function RegisterContent() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen px-4 py-12 bg-bg-secondary sm:px-6 lg:px-8">
+    <div
+      className={cn(
+        'flex items-center justify-center min-h-screen',
+        'px-4 py-12 sm:px-6 lg:px-8',
+        'bg-[var(--bg-secondary)]',
+        'transition-colors duration-200'
+      )}
+    >
       <div className="fixed top-4 right-4 z-50">
         <ThemeToggle />
       </div>
       <div className="w-full max-w-md">
         <Card>
           <div className="mb-8 text-center">
-            <h2 className="text-3xl font-bold text-text-primary">
+            <h2
+              className={cn('text-3xl font-bold', 'text-[var(--text-primary)]')}
+            >
               Create account
             </h2>
-            <p className="mt-2 text-sm text-text-secondary">
+            <p className={cn('mt-2 text-sm', 'text-[var(--text-secondary)]')}>
               Sign up to get started with your account.
             </p>
           </div>
@@ -107,7 +117,10 @@ function RegisterContent() {
             <div>
               <label
                 htmlFor="role"
-                className="block mb-2 text-sm font-medium text-text-secondary"
+                className={cn(
+                  'block mb-2 text-sm font-medium',
+                  'text-[var(--text-secondary)]'
+                )}
               >
                 Role
               </label>
@@ -115,44 +128,65 @@ function RegisterContent() {
                 id="role"
                 {...register('role')}
                 defaultValue="USER"
-                className="w-full px-3 py-2 border border-border-default rounded-lg bg-bg-primary text-text-primary focus:outline-none focus:ring-2 focus:ring-border-focus focus:border-transparent dark:border-border-hover dark:bg-bg-secondary"
+                className={cn(
+                  'w-full px-3 py-2',
+                  'border rounded-lg',
+                  'border-[var(--border-default)]',
+                  'bg-[var(--bg-primary)] text-[var(--text-primary)]',
+                  'focus:outline-none focus:ring-2',
+                  'focus:ring-[var(--border-focus)] focus:border-transparent',
+                  'transition-all duration-200'
+                )}
               >
                 <option value="USER">User</option>
                 <option value="ADMIN">Admin</option>
               </select>
               {errors.role?.message && (
-                <p className="mt-1 text-sm text-feedback-error">
+                <p className="mt-1 text-sm text-[var(--status-error)]">
                   {errors.role.message}
                 </p>
               )}
-              <p className="mt-1 text-xs text-text-tertiary">
+              <p className="mt-1 text-xs text-[var(--text-tertiary)]">
                 Select ADMIN to create an admin account
               </p>
             </div>
 
-            <div className="flex items-start">
+            <div className="flex items-start gap-3">
               <div className="flex items-center h-5">
                 <input
                   id="terms"
                   name="terms"
                   type="checkbox"
                   required
-                  className="w-4 h-4 border-border-default rounded text-interactive-primary focus:ring-interactive-primaryHover dark:border-border-hover"
+                  className={cn(
+                    'w-4 h-4 rounded',
+                    'border-[var(--border-default)]',
+                    'text-[var(--interactive-primary)]',
+                    'focus:ring-[var(--interactive-primaryHover)]'
+                  )}
                 />
               </div>
-              <div className="ml-3 text-sm">
-                <label htmlFor="terms" className="text-text-primary">
+              <div className="text-sm">
+                <label htmlFor="terms" className="text-[var(--text-primary)]">
                   I agree to the{' '}
                   <a
                     href="#"
-                    className="font-medium text-text-link hover:text-text-linkHover"
+                    className={cn(
+                      'font-medium',
+                      'text-[var(--text-link)] hover:text-[var(--text-linkHover)]',
+                      'transition-colors'
+                    )}
                   >
                     Terms of Service
                   </a>{' '}
                   and{' '}
                   <a
                     href="#"
-                    className="font-medium text-text-link hover:text-text-linkHover"
+                    className={cn(
+                      'font-medium',
+                      'text-[var(--text-link)] hover:text-[var(--text-linkHover)]',
+                      'transition-colors'
+                    )}
                   >
                     Privacy Policy
                   </a>
@@ -165,12 +199,16 @@ function RegisterContent() {
             </Button>
 
             <div className="text-sm text-center">
-              <span className="text-text-secondary">
+              <span className="text-[var(--text-secondary)]">
                 Already have an account?{' '}
               </span>
               <Link
                 to="/login"
-                className="font-medium text-text-link hover:text-text-linkHover"
+                className={cn(
+                  'font-medium',
+                  'text-[var(--text-link)] hover:text-[var(--text-linkHover)]',
+                  'transition-colors'
+                )}
               >
                 Sign in
               </Link>

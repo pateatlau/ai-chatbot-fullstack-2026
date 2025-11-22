@@ -9,6 +9,7 @@ import {
   Button,
   ErrorBoundary,
   ThemeToggle,
+  cn,
 } from '@myapp/frontend/ui-components';
 import { useToastStore } from '@myapp/frontend/stores';
 import { authService } from '../services/auth.service';
@@ -80,16 +81,29 @@ function ResetPasswordContent() {
 
   if (!token) {
     return (
-      <div className="flex items-center justify-center min-h-screen px-4 py-12 bg-bg-secondary sm:px-6 lg:px-8">
+      <div
+        className={cn(
+          'flex items-center justify-center min-h-screen',
+          'px-4 py-12 sm:px-6 lg:px-8',
+          'bg-[var(--bg-secondary)]',
+          'transition-colors duration-200'
+        )}
+      >
         <div className="fixed top-4 right-4 z-50">
           <ThemeToggle />
         </div>
         <div className="w-full max-w-md">
           <Card>
             <div className="text-center">
-              <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-[var(--status-error)]/10 rounded-full">
+              <div
+                className={cn(
+                  'flex items-center justify-center',
+                  'w-16 h-16 mx-auto mb-4 rounded-full',
+                  'bg-[var(--status-error)]/10'
+                )}
+              >
                 <svg
-                  className="w-8 h-8 text-feedback-error"
+                  className={cn('w-8 h-8', 'text-[var(--status-error)]')}
                   fill="none"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -100,10 +114,15 @@ function ResetPasswordContent() {
                   <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
               </div>
-              <h2 className="mb-2 text-2xl font-bold text-text-primary">
+              <h2
+                className={cn(
+                  'mb-2 text-2xl font-bold',
+                  'text-[var(--text-primary)]'
+                )}
+              >
                 Invalid Reset Link
               </h2>
-              <p className="mb-6 text-text-secondary">
+              <p className={cn('mb-6', 'text-[var(--text-secondary)]')}>
                 This password reset link is invalid or has expired.
               </p>
               <Link to="/forgot-password">
@@ -117,17 +136,26 @@ function ResetPasswordContent() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen px-4 py-12 bg-bg-secondary sm:px-6 lg:px-8">
+    <div
+      className={cn(
+        'flex items-center justify-center min-h-screen',
+        'px-4 py-12 sm:px-6 lg:px-8',
+        'bg-[var(--bg-secondary)]',
+        'transition-colors duration-200'
+      )}
+    >
       <div className="fixed top-4 right-4 z-50">
         <ThemeToggle />
       </div>
       <div className="w-full max-w-md">
         <Card>
           <div className="mb-8 text-center">
-            <h2 className="text-3xl font-bold text-text-primary">
+            <h2
+              className={cn('text-3xl font-bold', 'text-[var(--text-primary)]')}
+            >
               Reset your password
             </h2>
-            <p className="mt-2 text-sm text-text-secondary">
+            <p className={cn('mt-2 text-sm', 'text-[var(--text-secondary)]')}>
               Enter your new password below.
             </p>
           </div>
@@ -160,7 +188,11 @@ function ResetPasswordContent() {
             <div className="text-sm text-center">
               <Link
                 to="/login"
-                className="font-medium text-text-link hover:text-text-linkHover"
+                className={cn(
+                  'font-medium',
+                  'text-[var(--text-link)] hover:text-[var(--text-linkHover)]',
+                  'transition-colors'
+                )}
               >
                 ← Back to login
               </Link>

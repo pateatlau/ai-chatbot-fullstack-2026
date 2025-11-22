@@ -6,6 +6,7 @@ import {
   FormField,
   Button,
   ErrorBoundary,
+  cn,
 } from '@myapp/frontend/ui-components';
 import { profileAPI } from '../api/profile.api';
 import { useProfileStoreInitialization } from '../store/profile.store';
@@ -117,10 +118,12 @@ function SecurityPageContent() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-6">
+    <div className={cn('max-w-3xl mx-auto', 'px-4 py-6 sm:px-6 lg:px-8')}>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Security</h1>
-        <p className="mt-2 text-gray-600">
+        <h1 className={cn('text-3xl font-bold', 'text-text-primary')}>
+          Security
+        </h1>
+        <p className={cn('mt-2', 'text-text-secondary')}>
           Manage your password and security settings
         </p>
       </div>
@@ -128,7 +131,7 @@ function SecurityPageContent() {
       <div className="space-y-6">
         {/* Change Password */}
         <Card>
-          <h3 className="text-lg font-medium text-gray-900 mb-4">
+          <h3 className={cn('text-lg font-medium mb-4', 'text-text-primary')}>
             Change Password
           </h3>
           <form onSubmit={handlePasswordChange} className="space-y-4">
@@ -170,10 +173,10 @@ function SecurityPageContent() {
 
         {/* Two-Factor Authentication */}
         <Card>
-          <h3 className="text-lg font-medium text-gray-900 mb-4">
+          <h3 className={cn('text-lg font-medium mb-4', 'text-text-primary')}>
             Two-Factor Authentication
           </h3>
-          <p className="text-sm text-gray-600 mb-4">
+          <p className={cn('text-sm mb-4', 'text-text-secondary')}>
             Add an extra layer of security to your account by enabling
             two-factor authentication.
           </p>
@@ -184,21 +187,39 @@ function SecurityPageContent() {
 
         {/* Active Sessions */}
         <Card>
-          <h3 className="text-lg font-medium text-gray-900 mb-4">
+          <h3
+            className={cn(
+              'text-lg font-medium mb-4',
+              'text-[var(--text-primary)]'
+            )}
+          >
             Active Sessions
           </h3>
-          <p className="text-sm text-gray-600 mb-4">
+          <p className={cn('text-sm mb-4', 'text-text-secondary')}>
             View and manage your active sessions across different devices.
           </p>
           <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+            <div
+              className={cn(
+                'flex items-center justify-between p-3 rounded-lg',
+                'border border-border-default'
+              )}
+            >
               <div>
-                <p className="text-sm font-medium text-gray-900">
+                <p className={cn('text-sm font-medium', 'text-text-primary')}>
                   Current Session
                 </p>
-                <p className="text-xs text-gray-500">Active now</p>
+                <p className={cn('text-xs', 'text-text-tertiary')}>
+                  Active now
+                </p>
               </div>
-              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+              <span
+                className={cn(
+                  'inline-flex items-center px-2 py-0.5 rounded',
+                  'text-xs font-medium',
+                  'bg-feedback-successBg text-feedback-success'
+                )}
+              >
                 Active
               </span>
             </div>

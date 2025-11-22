@@ -6,6 +6,7 @@ import {
   FormField,
   Button,
   ErrorBoundary,
+  cn,
 } from '@myapp/frontend/ui-components';
 import { profileAPI } from '../api/profile.api';
 import {
@@ -129,21 +130,42 @@ function EditProfilePageContent() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-6">
+    <div className={cn('max-w-3xl mx-auto', 'px-4 py-6 sm:px-6 lg:px-8')}>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Edit Profile</h1>
-        <p className="mt-2 text-gray-600">Update your profile information</p>
+        <h1 className={cn('text-3xl font-bold', 'text-text-primary')}>
+          Edit Profile
+        </h1>
+        <p className={cn('mt-2', 'text-text-secondary')}>
+          Update your profile information
+        </p>
       </div>
 
       <Card>
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Avatar Upload */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              className={cn(
+                'block text-sm font-medium mb-2',
+                'text-text-primary'
+              )}
+            >
               Profile Picture
             </label>
-            <div className="flex items-center space-x-6">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white text-2xl font-bold overflow-hidden">
+            <div
+              className={cn(
+                'flex flex-col sm:flex-row sm:items-center',
+                'gap-4 sm:gap-6'
+              )}
+            >
+              <div
+                className={cn(
+                  'w-20 h-20 rounded-full flex-shrink-0',
+                  'flex items-center justify-center',
+                  'text-white text-2xl font-bold overflow-hidden',
+                  'bg-gradient-to-br from-purple-500 to-purple-700'
+                )}
+              >
                 {avatarPreview ? (
                   <img
                     src={avatarPreview}
@@ -171,7 +193,9 @@ function EditProfilePageContent() {
                 >
                   {isUploadingAvatar ? 'Uploading...' : 'Change Avatar'}
                 </Button>
-                <p className="mt-1 text-xs text-gray-500">PNG, JPG up to 5MB</p>
+                <p className={cn('mt-1 text-xs', 'text-text-tertiary')}>
+                  PNG, JPG up to 5MB
+                </p>
               </div>
             </div>
           </div>
@@ -192,7 +216,10 @@ function EditProfilePageContent() {
             hint="Email cannot be changed"
           />
 
-          <div className="flex justify-end space-x-3">
+          <div className="flex flex-col sm:flex-row-reverse gap-3 sm:justify-start">
+            <Button type="submit" disabled={isLoading} loading={isLoading}>
+              Save Changes
+            </Button>
             <Button
               type="button"
               variant="outline"
@@ -200,9 +227,6 @@ function EditProfilePageContent() {
               disabled={isLoading}
             >
               Cancel
-            </Button>
-            <Button type="submit" disabled={isLoading} loading={isLoading}>
-              Save Changes
             </Button>
           </div>
         </form>

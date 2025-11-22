@@ -28,6 +28,9 @@ export default {
   ],
   theme: {
     extend: {
+      zIndex: {
+        9999: '9999',
+      },
       colors: {
         primary: {
           50: '#eef2ff',

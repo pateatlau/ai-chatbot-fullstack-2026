@@ -8,6 +8,7 @@ import {
   Button,
   ErrorBoundary,
   ThemeToggle,
+  cn,
 } from '@myapp/frontend/ui-components';
 import { useAuthStore, useToastStore } from '@myapp/frontend/stores';
 import { loginSchema, LoginFormData } from '../schemas/auth.schema';
@@ -57,17 +58,26 @@ function LoginContent() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen px-4 py-12 bg-[var(--bg-secondary)] sm:px-6 lg:px-8">
+    <div
+      className={cn(
+        'flex items-center justify-center min-h-screen',
+        'px-4 py-12 sm:px-6 lg:px-8',
+        'bg-[var(--bg-secondary)]',
+        'transition-colors duration-200'
+      )}
+    >
       <div className="fixed top-4 right-4 z-50">
         <ThemeToggle />
       </div>
       <div className="w-full max-w-md">
         <Card>
           <div className="mb-8 text-center">
-            <h2 className="text-3xl font-bold text-[var(--text-primary)]">
+            <h2
+              className={cn('text-3xl font-bold', 'text-[var(--text-primary)]')}
+            >
               Sign in
             </h2>
-            <p className="mt-2 text-sm text-[var(--text-secondary)]">
+            <p className={cn('mt-2 text-sm', 'text-[var(--text-secondary)]')}>
               Welcome back! Please sign in to your account.
             </p>
           </div>
@@ -91,7 +101,7 @@ function LoginContent() {
               {...register('password')}
             />
 
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-4">
               <div className="flex items-center">
                 <input
                   id="remember-me"
@@ -99,11 +109,16 @@ function LoginContent() {
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-4 h-4 border-[var(--border-default)] rounded text-[var(--interactive-primary)] focus:ring-[var(--interactive-primaryHover)]"
+                  className={cn(
+                    'w-4 h-4 rounded',
+                    'border-[var(--border-default)]',
+                    'text-[var(--interactive-primary)]',
+                    'focus:ring-[var(--interactive-primaryHover)]'
+                  )}
                 />
                 <label
                   htmlFor="remember-me"
-                  className="block ml-2 text-sm text-[var(--text-primary)]"
+                  className={cn('ml-2 text-sm', 'text-[var(--text-primary)]')}
                 >
                   Remember me
                 </label>
@@ -112,7 +127,11 @@ function LoginContent() {
               <div className="text-sm">
                 <Link
                   to="/forgot-password"
-                  className="font-medium text-[var(--text-link)] hover:text-[var(--text-linkHover)]"
+                  className={cn(
+                    'font-medium',
+                    'text-[var(--text-link)] hover:text-[var(--text-linkHover)]',
+                    'transition-colors'
+                  )}
                 >
                   Forgot password?
                 </Link>
@@ -129,7 +148,11 @@ function LoginContent() {
               </span>
               <Link
                 to="/register"
-                className="font-medium text-[var(--text-link)] hover:text-[var(--text-linkHover)]"
+                className={cn(
+                  'font-medium',
+                  'text-[var(--text-link)] hover:text-[var(--text-linkHover)]',
+                  'transition-colors'
+                )}
               >
                 Sign up
               </Link>

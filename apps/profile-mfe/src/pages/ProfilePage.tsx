@@ -2,7 +2,7 @@ import {
   useProfileStore,
   useProfileStoreInitialization,
 } from '../store/profile.store';
-import { Card, ErrorBoundary } from '@myapp/frontend/ui-components';
+import { Card, ErrorBoundary, cn } from '@myapp/frontend/ui-components';
 
 function ProfilePageContent() {
   // Initialize profile store with event bus subscriptions
@@ -12,10 +12,12 @@ function ProfilePageContent() {
   const { user } = useProfileStore();
 
   return (
-    <div className="max-w-4xl p-6 mx-auto">
+    <div className={cn('max-w-4xl mx-auto', 'px-4 py-6 sm:px-6 lg:px-8')}>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Profile</h1>
-        <p className="mt-2 text-gray-600">
+        <h1 className={cn('text-3xl font-bold', 'text-text-primary')}>
+          Profile
+        </h1>
+        <p className={cn('mt-2', 'text-text-secondary')}>
           View and manage your profile information
         </p>
       </div>
@@ -23,25 +25,64 @@ function ProfilePageContent() {
       <div className="space-y-6">
         {/* Profile Header */}
         <Card>
-          <div className="flex items-center space-x-6">
+          <div
+            className={cn(
+              'flex flex-col sm:flex-row sm:items-center',
+              'gap-4 sm:gap-6'
+            )}
+          >
             <div className="flex-shrink-0">
-              <div className="flex items-center justify-center w-24 h-24 rounded-full bg-primary-100">
-                <span className="text-3xl font-bold text-primary-600">
-                  {user?.name?.charAt(0).toUpperCase()}
+              <div
+                className={cn(
+                  'flex items-center justify-center',
+                  'w-20 h-20 sm:w-24 sm:h-24 rounded-full',
+                  'bg-interactive-primary/10'
+                )}
+              >
+                <span
+                  className={cn(
+                    'text-2xl sm:text-3xl font-bold',
+                    'text-interactive-primary'
+                  )}
+                >
+                  {user?.name?.charAt(0).toUpperCase() || 'U'}
                 </span>
               </div>
             </div>
-            <div className="flex-1">
-              <h2 className="text-2xl font-bold text-gray-900">{user?.name}</h2>
-              <p className="text-gray-600">{user?.email}</p>
-              <span className="inline-flex items-center px-3 py-1 mt-2 text-xs font-medium rounded-full bg-primary-100 text-primary-800">
-                {user?.role}
+            <div className="flex-1 min-w-0">
+              <h2
+                className={cn(
+                  'text-2xl font-bold truncate',
+                  'text-text-primary'
+                )}
+              >
+                {user?.name || 'User'}
+              </h2>
+              <p className={cn('truncate', 'text-text-secondary')}>
+                {user?.email || 'Loading...'}
+              </p>
+              <span
+                className={cn(
+                  'inline-flex items-center px-3 py-1 mt-2',
+                  'text-xs font-medium rounded-full',
+                  'bg-interactive-primary/10 text-interactive-primary'
+                )}
+              >
+                {user?.role || 'User'}
               </span>
             </div>
-            <div>
+            <div className="flex-shrink-0">
               <a
                 href="/profile/edit"
-                className="inline-flex items-center px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                className={cn(
+                  'inline-flex items-center px-4 py-2',
+                  'text-sm font-medium rounded-md',
+                  'text-text-inverse bg-interactive-primary',
+                  'hover:bg-interactive-primaryHover',
+                  'focus:outline-none focus:ring-2 focus:ring-offset-2',
+                  'focus:ring-border-focus',
+                  'transition-colors'
+                )}
               >
                 Edit Profile
               </a>
@@ -51,30 +92,46 @@ function ProfilePageContent() {
 
         {/* Profile Information */}
         <Card>
-          <h3 className="mb-4 text-lg font-medium text-gray-900">
+          <h3 className={cn('mb-4 text-lg font-medium', 'text-text-primary')}>
             Profile Information
           </h3>
           <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
             <div>
-              <dt className="text-sm font-medium text-gray-500">Full name</dt>
-              <dd className="mt-1 text-sm text-gray-900">{user?.name}</dd>
+              <dt className={cn('text-sm font-medium', 'text-text-secondary')}>
+                Full name
+              </dt>
+              <dd className={cn('mt-1 text-sm', 'text-text-primary')}>
+                {user?.name}
+              </dd>
             </div>
             <div>
-              <dt className="text-sm font-medium text-gray-500">
+              <dt className={cn('text-sm font-medium', 'text-text-secondary')}>
                 Email address
               </dt>
-              <dd className="mt-1 text-sm text-gray-900">{user?.email}</dd>
+              <dd className={cn('mt-1 text-sm', 'text-text-primary')}>
+                {user?.email}
+              </dd>
             </div>
             <div>
-              <dt className="text-sm font-medium text-gray-500">Role</dt>
-              <dd className="mt-1 text-sm text-gray-900">{user?.role}</dd>
+              <dt className={cn('text-sm font-medium', 'text-text-secondary')}>
+                Role
+              </dt>
+              <dd className={cn('mt-1 text-sm', 'text-text-primary')}>
+                {user?.role}
+              </dd>
             </div>
             <div>
-              <dt className="text-sm font-medium text-gray-500">
+              <dt className={cn('text-sm font-medium', 'text-text-secondary')}>
                 Account Status
               </dt>
-              <dd className="mt-1 text-sm text-gray-900">
-                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+              <dd className={cn('mt-1 text-sm', 'text-text-primary')}>
+                <span
+                  className={cn(
+                    'inline-flex items-center px-2 py-0.5 rounded',
+                    'text-xs font-medium',
+                    'bg-feedback-successBg text-feedback-success'
+                  )}
+                >
                   Active
                 </span>
               </dd>
@@ -84,36 +141,62 @@ function ProfilePageContent() {
 
         {/* Quick Actions */}
         <Card>
-          <h3 className="mb-4 text-lg font-medium text-gray-900">
+          <h3 className={cn('mb-4 text-lg font-medium', 'text-text-primary')}>
             Quick Actions
           </h3>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <a
               href="/profile/settings"
-              className="flex items-center p-4 transition-all border border-gray-200 rounded-lg hover:border-primary-500 hover:shadow-md"
+              className={cn(
+                'flex items-center p-4 rounded-lg',
+                'border border-border-default',
+                'hover:border-border-hover hover:bg-bg-secondary',
+                'transition-colors'
+              )}
             >
               <div className="flex-shrink-0">
-                <div className="flex items-center justify-center w-12 h-12 text-white rounded-md bg-primary-500">
+                <div
+                  className={cn(
+                    'flex items-center justify-center w-12 h-12 rounded-md',
+                    'text-white bg-interactive-primary'
+                  )}
+                >
                   ⚙️
                 </div>
               </div>
               <div className="ml-4">
-                <h4 className="text-sm font-medium text-gray-900">Settings</h4>
-                <p className="text-sm text-gray-500">Manage your preferences</p>
+                <h4 className={cn('text-sm font-medium', 'text-text-primary')}>
+                  Settings
+                </h4>
+                <p className={cn('text-sm', 'text-text-secondary')}>
+                  Manage your preferences
+                </p>
               </div>
             </a>
             <a
               href="/profile/security"
-              className="flex items-center p-4 transition-all border border-gray-200 rounded-lg hover:border-primary-500 hover:shadow-md"
+              className={cn(
+                'flex items-center p-4 rounded-lg',
+                'border border-border-default',
+                'hover:border-border-hover hover:bg-bg-secondary',
+                'transition-colors'
+              )}
             >
               <div className="flex-shrink-0">
-                <div className="flex items-center justify-center w-12 h-12 text-white rounded-md bg-primary-500">
+                <div
+                  className={cn(
+                    'flex items-center justify-center w-12 h-12 rounded-md',
+                    'text-white bg-interactive-primary'
+                  )}
+                >
                   🔒
                 </div>
               </div>
               <div className="ml-4">
-                <h4 className="text-sm font-medium text-gray-900">Security</h4>
-                <p className="text-sm text-gray-500">
+                <h4 className={cn('text-sm font-medium', 'text-text-primary')}>
+                  Security
+                </h4>
+                <p className={cn('text-sm', 'text-text-secondary')}>
                   Password and security settings
                 </p>
               </div>

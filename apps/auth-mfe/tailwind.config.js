@@ -50,6 +50,9 @@ export default {
   ],
   theme: {
     extend: {
+      zIndex: {
+        9999: '9999',
+      },
       colors: {
         // Design System Tokens - Flattened for Tailwind JIT
         'bg-primary': 'var(--bg-primary)',
