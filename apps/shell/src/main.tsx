@@ -1,4 +1,3 @@
-// Import bootstrap dynamically to ensure Module Federation runtime is initialized first
 import('./bootstrap').catch((error) => {
   console.error('Failed to load bootstrap:', error);
   const rootElement = document.getElementById('root');
@@ -7,7 +6,14 @@ import('./bootstrap').catch((error) => {
       <div style="padding: 20px; background: #fee; border: 2px solid red; font-family: monospace;">
         <h1 style="color: red;">Failed to Initialize Application</h1>
         <p><strong>Error:</strong> ${error.message}</p>
-        <pre style="background: white; padding: 10px; border: 1px solid #ccc; overflow: auto;">${error.stack}</pre>
+        <p style="font-size: 12px; color: #666; margin-top: 10px;">
+          Make sure all backend services are running:
+          <br>• auth-service on port 3000
+          <br>• chatbot-service on port 3001
+          <br>• admin-service on port 3002
+          <br>• graphql-gateway on port 4000
+        </p>
+        <pre style="background: white; padding: 10px; border: 1px solid #ccc; overflow: auto; font-size: 11px;">${error.stack}</pre>
         <button onclick="location.reload()" style="padding: 10px 20px; background: #4f46e5; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px;">
           Reload
         </button>
