@@ -1,13 +1,99 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: 'class',
   content: [
     './index.html',
     './src/**/*.{js,ts,jsx,tsx}',
     '../../libs/frontend/ui-components/src/**/*.{js,ts,jsx,tsx}',
   ],
+  safelist: [
+    // Layout utilities used by ui-components
+    'px-6',
+    'py-4',
+    'px-4',
+    'py-2',
+    'gap-2',
+    'flex-col',
+    'mb-1',
+    'mt-1',
+    'rounded-lg',
+    'overflow-hidden',
+    'flex',
+    'items-center',
+    'justify-between',
+
+    // Safelist all theme-aware color classes to ensure they're generated
+    {
+      pattern: /^bg-bg-(primary|secondary|tertiary|elevated|overlay|inverse)$/,
+    },
+    {
+      pattern:
+        /^text-text-(primary|secondary|tertiary|disabled|inverse|link|linkHover)$/,
+    },
+    { pattern: /^border-border-(default|focus|hover|error|success|warning)$/ },
+    {
+      pattern:
+        /^bg-interactive-(primary|primaryHover|primaryActive|secondary|secondaryHover|disabled|danger|dangerHover|success|warning)$/,
+    },
+    {
+      pattern:
+        /^text-interactive-(primary|primaryHover|primaryActive|secondary|secondaryHover|disabled|danger|dangerHover|success|warning)$/,
+    },
+    {
+      pattern:
+        /^border-interactive-(primary|primaryHover|primaryActive|secondary|secondaryHover|disabled|danger|dangerHover|success|warning)$/,
+    },
+    {
+      pattern:
+        /^bg-feedback-(info|success|warning|error|infoBg|successBg|warningBg|errorBg)$/,
+    },
+  ],
   theme: {
     extend: {
       colors: {
+        // Design System Tokens - Flattened for Tailwind JIT
+        'bg-primary': 'var(--bg-primary)',
+        'bg-secondary': 'var(--bg-secondary)',
+        'bg-tertiary': 'var(--bg-tertiary)',
+        'bg-elevated': 'var(--bg-elevated)',
+        'bg-overlay': 'var(--bg-overlay)',
+        'bg-inverse': 'var(--bg-inverse)',
+
+        'text-primary': 'var(--text-primary)',
+        'text-secondary': 'var(--text-secondary)',
+        'text-tertiary': 'var(--text-tertiary)',
+        'text-disabled': 'var(--text-disabled)',
+        'text-inverse': 'var(--text-inverse)',
+        'text-link': 'var(--text-link)',
+        'text-linkHover': 'var(--text-linkHover)',
+
+        'border-default': 'var(--border-default)',
+        'border-focus': 'var(--border-focus)',
+        'border-hover': 'var(--border-hover)',
+        'border-error': 'var(--border-error)',
+        'border-success': 'var(--border-success)',
+        'border-warning': 'var(--border-warning)',
+
+        'interactive-primary': 'var(--interactive-primary)',
+        'interactive-primaryHover': 'var(--interactive-primaryHover)',
+        'interactive-primaryActive': 'var(--interactive-primaryActive)',
+        'interactive-secondary': 'var(--interactive-secondary)',
+        'interactive-secondaryHover': 'var(--interactive-secondaryHover)',
+        'interactive-disabled': 'var(--interactive-disabled)',
+        'interactive-danger': 'var(--interactive-danger)',
+        'interactive-dangerHover': 'var(--interactive-dangerHover)',
+        'interactive-success': 'var(--interactive-success)',
+        'interactive-warning': 'var(--interactive-warning)',
+
+        'feedback-info': 'var(--status-info)',
+        'feedback-success': 'var(--status-success)',
+        'feedback-warning': 'var(--status-warning)',
+        'feedback-error': 'var(--status-error)',
+        'feedback-infoBg': 'var(--status-infoBg)',
+        'feedback-successBg': 'var(--status-successBg)',
+        'feedback-warningBg': 'var(--status-warningBg)',
+        'feedback-errorBg': 'var(--status-errorBg)',
+
         primary: {
           50: '#eef2ff',
           100: '#e0e7ff',

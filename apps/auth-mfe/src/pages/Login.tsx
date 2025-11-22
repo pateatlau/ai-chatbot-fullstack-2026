@@ -2,7 +2,13 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link } from 'react-router-dom';
-import { FormField, Card, ErrorBoundary } from '@myapp/frontend/ui-components';
+import {
+  FormField,
+  Card,
+  Button,
+  ErrorBoundary,
+  ThemeToggle,
+} from '@myapp/frontend/ui-components';
 import { useAuthStore, useToastStore } from '@myapp/frontend/stores';
 import { loginSchema, LoginFormData } from '../schemas/auth.schema';
 import { authService } from '../services/auth.service';
@@ -27,11 +33,8 @@ function LoginContent() {
     try {
       const response = await authService.login(data);
 
-      // Store auth data - tokens are now in HttpOnly cookies, not in the response
-      setAuth(response.user);
-
-      // NOTE: setAuth() already emits USER_LOGGED_IN event via auth.store.ts
-      // No need to emit duplicate event here
+      // Store auth data - tokens are in HttpOnly cookies AND returned for API calls
+      setAuth(response.user, response.accessToken, null);
 
       // Store remember me preference
       if (rememberMe) {
@@ -43,7 +46,6 @@ function LoginContent() {
       addToast('Login successful!', 'success');
 
       // Use window.location.replace for reliable cross-MFE navigation
-      // React Router navigate doesn't work reliably across federated modules
       window.location.replace('/dashboard');
     } catch (err: any) {
       const errorMessage =
@@ -55,12 +57,17 @@ function LoginContent() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen px-4 py-12 bg-gray-50 sm:px-6 lg:px-8">
+    <div className="flex items-center justify-center min-h-screen px-4 py-12 bg-[var(--bg-secondary)] sm:px-6 lg:px-8">
+      <div className="fixed top-4 right-4 z-50">
+        <ThemeToggle />
+      </div>
       <div className="w-full max-w-md">
         <Card>
           <div className="mb-8 text-center">
-            <h2 className="text-3xl font-bold text-gray-900">Sign in</h2>
-            <p className="mt-2 text-sm text-gray-600">
+            <h2 className="text-3xl font-bold text-[var(--text-primary)]">
+              Sign in
+            </h2>
+            <p className="mt-2 text-sm text-[var(--text-secondary)]">
               Welcome back! Please sign in to your account.
             </p>
           </div>
@@ -92,11 +99,11 @@ function LoginContent() {
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-4 h-4 border-gray-300 rounded text-primary-600 focus:ring-primary-500"
+                  className="w-4 h-4 border-[var(--border-default)] rounded text-[var(--interactive-primary)] focus:ring-[var(--interactive-primaryHover)]"
                 />
                 <label
                   htmlFor="remember-me"
-                  className="block ml-2 text-sm text-gray-900"
+                  className="block ml-2 text-sm text-[var(--text-primary)]"
                 >
                   Remember me
                 </label>
@@ -105,37 +112,24 @@ function LoginContent() {
               <div className="text-sm">
                 <Link
                   to="/forgot-password"
-                  className="font-medium text-primary-600 hover:text-primary-500"
+                  className="font-medium text-[var(--text-link)] hover:text-[var(--text-linkHover)]"
                 >
                   Forgot password?
                 </Link>
               </div>
             </div>
 
-            <button
-              type="submit"
-              disabled={isLoading}
-              style={{
-                width: '100%',
-                padding: '0.5rem 1rem',
-                backgroundColor: '#4f46e5',
-                color: 'white',
-                border: 'none',
-                borderRadius: '0.5rem',
-                fontSize: '1rem',
-                fontWeight: '500',
-                cursor: isLoading ? 'not-allowed' : 'pointer',
-                opacity: isLoading ? 0.5 : 1,
-              }}
-            >
+            <Button type="submit" fullWidth disabled={isLoading}>
               {isLoading ? 'Signing in...' : 'Sign in'}
-            </button>
+            </Button>
 
             <div className="text-sm text-center">
-              <span className="text-gray-600">Don't have an account? </span>
+              <span className="text-[var(--text-secondary)]">
+                Don't have an account?{' '}
+              </span>
               <Link
                 to="/register"
-                className="font-medium text-primary-600 hover:text-primary-500"
+                className="font-medium text-[var(--text-link)] hover:text-[var(--text-linkHover)]"
               >
                 Sign up
               </Link>

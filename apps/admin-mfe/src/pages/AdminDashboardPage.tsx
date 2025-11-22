@@ -1,5 +1,13 @@
 import { useEffect } from 'react';
-import { Card, Button, ErrorBoundary } from '@myapp/frontend/ui-components';
+import {
+  Card,
+  Button,
+  ErrorBoundary,
+  designTokens,
+  colorMap,
+  layouts,
+  cn,
+} from '@myapp/frontend/ui-components';
 import { useToast, useRequireRole } from '@myapp/frontend/hooks';
 import { adminAPI, DashboardStats } from '../api/admin.api';
 import {

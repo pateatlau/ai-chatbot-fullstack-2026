@@ -58,3 +58,14 @@ export {
   interactionStates,
   statePatterns,
 } from './lib/animations-states';
+
+// Theme System Exports
+export { ThemeProvider, useTheme } from './lib/ThemeProvider';
+export type { ThemeMode, ThemeColors } from './lib/theme-config';
+export { themes, lightTheme, darkTheme } from './lib/theme-config';
+export { ThemeToggle } from './lib/ThemeToggle';
+export { Navigation } from './lib/Navigation';
+export type { NavLink } from './lib/Navigation';
+
+// Import global theme styles
+import './lib/theme.css';

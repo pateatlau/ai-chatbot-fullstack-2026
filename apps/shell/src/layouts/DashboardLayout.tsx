@@ -1,14 +1,83 @@
-import { Outlet, Link, useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth, useToast } from '@ai-chatbot/hooks';
-import { Button } from '@myapp/frontend/ui-components';
-import { designTokens, layouts, cn } from '@myapp/frontend/ui-components';
-import { colorMap, gradients } from '@myapp/frontend/ui-components';
+import {
+  Navigation,
+  NavLink,
+  cn,
+  designTokens,
+} from '@myapp/frontend/ui-components';
 import { getEventBus, EVENT_NAMES } from '@myapp/shared/event-bus';
+
+// Inline SVG icons for navigation
+const HomeIcon = ({ className = '' }: { className?: string }) => (
+  <svg
+    className={className}
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+    />
+  </svg>
+);
+
+const ChatIcon = ({ className = '' }: { className?: string }) => (
+  <svg
+    className={className}
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+    />
+  </svg>
+);
+
+const UserIcon = ({ className = '' }: { className?: string }) => (
+  <svg
+    className={className}
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+    />
+  </svg>
+);
+
+const ShieldIcon = ({ className = '' }: { className?: string }) => (
+  <svg
+    className={className}
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+    />
+  </svg>
+);
 
 export function DashboardLayout() {
   const { user, logout, hasRole } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = async () => {
     await logout();
@@ -21,151 +90,51 @@ export function DashboardLayout() {
     navigate('/login');
   };
 
+  // Define navigation links
+  const navLinks: NavLink[] = [
+    {
+      label: 'Dashboard',
+      to: '/dashboard',
+      icon: HomeIcon,
+      requiresAuth: true,
+    },
+    {
+      label: 'Chat',
+      to: '/chat',
+      icon: ChatIcon,
+      requiresAuth: true,
+    },
+    {
+      label: 'Profile',
+      to: '/profile',
+      icon: UserIcon,
+      requiresAuth: true,
+    },
+    {
+      label: 'Admin',
+      to: '/admin',
+      icon: ShieldIcon,
+      requiresAuth: true,
+      requiresAdmin: true,
+    },
+  ];
+
   return (
-    <div className={cn('min-h-screen', colorMap.bg.secondary)}>
-      {/* Header */}
-      <header className={cn('bg-white', designTokens.shadows.sm)}>
-        <div className={cn(layouts.container, 'py-4')}>
-          <div className={cn(layouts.centerBetween)}>
-            <div className={cn(layouts.hStack, designTokens.spacing.xl)}>
-              <Link
-                to="/dashboard"
-                className={cn(designTokens.typography.h5, 'text-primary-600')}
-              >
-                AI Chatbot
-              </Link>
-              <nav className={cn(layouts.hStack, designTokens.spacing.lg)}>
-                <Link
-                  to="/dashboard"
-                  className={cn(
-                    colorMap.text.secondary,
-                    'hover:text-gray-900 transition-colors font-medium'
-                  )}
-                >
-                  Dashboard
-                </Link>
-                <Link
-                  to="/chatbot"
-                  className={cn(
-                    colorMap.text.secondary,
-                    'hover:text-gray-900 transition-colors font-medium'
-                  )}
-                >
-                  Chat
-                </Link>
-                {hasRole('ADMIN') && (
-                  <Link
-                    to="/admin"
-                    className={cn(
-                      colorMap.text.secondary,
-                      'hover:text-gray-900 transition-colors font-medium'
-                    )}
-                  >
-                    Admin
-                  </Link>
-                )}
-              </nav>
-            </div>
-
-            <div className={cn(layouts.hStack, designTokens.spacing.lg)}>
-              {/* User Dropdown */}
-              <div className="relative group">
-                <button
-                  className={cn(
-                    layouts.hStack,
-                    designTokens.spacing.md,
-                    'text-sm',
-                    colorMap.text.secondary,
-                    'hover:text-gray-900 transition-colors'
-                  )}
-                >
-                  <div
-                    className={cn(
-                      cn(
-                        gradients.primary,
-                        'rounded-full flex items-center justify-center'
-                      ),
-                      'w-8 h-8 text-white font-medium'
-                    )}
-                  >
-                    {user?.name?.[0]?.toUpperCase() ||
-                      user?.email?.[0]?.toUpperCase() ||
-                      'U'}
-                  </div>
-                  <span className="font-medium">
-                    {user?.name || user?.email}
-                  </span>
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
-                </button>
-
-                {/* Dropdown Menu */}
-                <div
-                  className={cn(
-                    'absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200'
-                  )}
-                >
-                  <Link
-                    to="/profile"
-                    className={cn(
-                      'block px-4 py-2 text-sm',
-                      colorMap.text.secondary,
-                      'hover:bg-gray-100'
-                    )}
-                  >
-                    👤 Profile
-                  </Link>
-                  <Link
-                    to="/profile/settings"
-                    className={cn(
-                      'block px-4 py-2 text-sm',
-                      colorMap.text.secondary,
-                      'hover:bg-gray-100'
-                    )}
-                  >
-                    ⚙️ Settings
-                  </Link>
-                  <Link
-                    to="/profile/security"
-                    className={cn(
-                      'block px-4 py-2 text-sm',
-                      colorMap.text.secondary,
-                      'hover:bg-gray-100'
-                    )}
-                  >
-                    🔒 Security
-                  </Link>
-                  <hr className="my-1" />
-                  <button
-                    onClick={handleLogout}
-                    className={cn(
-                      'w-full text-left px-4 py-2 text-sm',
-                      colorMap.text.danger,
-                      'hover:bg-gray-100'
-                    )}
-                  >
-                    🚪 Logout
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-bg-secondary">
+      {/* Navigation Header */}
+      <Navigation
+        links={navLinks}
+        currentPath={location.pathname}
+        isAuthenticated={!!user}
+        isAdmin={hasRole('ADMIN')}
+        userEmail={user?.email}
+        onLogout={handleLogout}
+      />
 
       {/* Main Content */}
-      <main className={cn(layouts.container, designTokens.padding.lg)}>
+      <main
+        className={cn('container mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8')}
+      >
         <Outlet />
       </main>
     </div>

@@ -30,13 +30,14 @@ export const FormField = forwardRef<HTMLInputElement, FormFieldProps>(
     const inputId = id || `field-${label?.replace(/\s+/g, '-').toLowerCase()}`;
 
     return (
-      <div className={cn(designTokens.spacing.md, 'flex flex-col', className)}>
+      <div className={cn('flex flex-col gap-2', className)}>
         {label && (
           <label
             htmlFor={inputId}
             className={cn(
               designTokens.typography.label,
-              colorMap.text.secondary
+              colorMap.text.secondary,
+              'mb-1'
             )}
           >
             {label}
@@ -63,7 +64,11 @@ export const FormField = forwardRef<HTMLInputElement, FormFieldProps>(
         {hint && !error && (
           <p
             id={`${inputId}-hint`}
-            className={cn(designTokens.typography.caption, colorMap.text.muted)}
+            className={cn(
+              designTokens.typography.caption,
+              colorMap.text.muted,
+              'mt-1'
+            )}
           >
             {hint}
           </p>
@@ -75,7 +80,8 @@ export const FormField = forwardRef<HTMLInputElement, FormFieldProps>(
             className={cn(
               designTokens.typography.caption,
               colorMap.text.danger,
-              designTokens.transitions.normal
+              designTokens.transitions.normal,
+              'mt-1'
             )}
             role="alert"
           >

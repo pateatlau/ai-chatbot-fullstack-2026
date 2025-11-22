@@ -205,7 +205,7 @@ export const designTokens = {
 
   // Button Styles
   buttonBase:
-    'inline-flex items-center justify-center font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+    'inline-flex items-center justify-center font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 cursor-pointer disabled:cursor-not-allowed rounded-md',
   buttonSizes: {
     xs: 'px-2 py-1 text-xs',
     sm: 'px-3 py-2 text-sm',
@@ -214,25 +214,29 @@ export const designTokens = {
   },
   buttonVariants: {
     primary:
-      'bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800 disabled:bg-primary-300',
+      'bg-interactive-primary text-text-inverse border border-interactive-primaryActive shadow-sm hover:bg-interactive-primaryHover hover:shadow-md hover:scale-[1.02] active:bg-interactive-primaryActive active:scale-100 disabled:bg-interactive-disabled disabled:text-text-tertiary disabled:border-interactive-disabled disabled:shadow-none disabled:hover:scale-100',
     secondary:
-      'bg-gray-200 text-gray-900 hover:bg-gray-300 active:bg-gray-400 disabled:bg-gray-100',
+      'bg-bg-tertiary text-text-primary border border-border-default shadow-sm hover:bg-bg-elevated hover:border-border-hover hover:shadow-md hover:scale-[1.02] active:bg-border-default active:scale-100 disabled:bg-bg-secondary disabled:border-border-default disabled:shadow-none disabled:hover:scale-100 dark:bg-bg-elevated dark:hover:bg-bg-tertiary dark:border-border-hover',
     outline:
-      'border border-gray-300 text-gray-900 hover:bg-gray-50 active:bg-gray-100',
-    ghost: 'text-gray-900 hover:bg-gray-100 active:bg-gray-200',
-    danger: 'bg-red-600 text-white hover:bg-red-700 active:bg-red-800',
-    success: 'bg-green-600 text-white hover:bg-green-700 active:bg-green-800',
+      'border border-border-default text-text-primary shadow-sm hover:bg-bg-secondary hover:border-border-hover hover:shadow-md hover:scale-[1.02] active:bg-bg-tertiary active:scale-100 disabled:border-border-default disabled:shadow-none disabled:hover:scale-100 dark:border-border-hover dark:hover:bg-bg-elevated',
+    ghost:
+      'text-text-primary hover:bg-bg-secondary hover:scale-[1.02] active:bg-bg-tertiary active:scale-100 disabled:hover:scale-100 dark:hover:bg-bg-elevated',
+    danger:
+      'bg-feedback-error text-text-inverse border border-red-800 shadow-sm hover:bg-red-700 hover:border-red-900 hover:shadow-md hover:scale-[1.02] active:bg-red-800 active:scale-100 disabled:bg-red-300 disabled:border-red-400 disabled:shadow-none disabled:hover:scale-100 dark:hover:bg-red-600 dark:border-red-700',
+    success:
+      'bg-feedback-success text-text-inverse border border-green-800 shadow-sm hover:bg-green-700 hover:border-green-900 hover:shadow-md hover:scale-[1.02] active:bg-green-800 active:scale-100 disabled:bg-green-300 disabled:border-green-400 disabled:shadow-none disabled:hover:scale-100 dark:hover:bg-green-600 dark:border-green-700',
   },
 
   // Card Styles
-  cardBase: 'rounded-lg border border-gray-200 bg-white shadow-sm',
+  cardBase:
+    'rounded-lg border border-border-default bg-bg-elevated shadow-sm dark:border-border-hover',
   cardHover: 'hover:shadow-md transition-shadow',
 
   // Input Styles
   inputBase:
-    'w-full px-3 py-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent',
-  inputError: 'border-red-500 focus:ring-red-500',
-  inputSuccess: 'border-green-500 focus:ring-green-500',
+    'w-full px-3 py-2 text-base border border-border-default rounded-md bg-bg-primary text-text-primary focus:outline-none focus:ring-2 focus:ring-border-focus focus:border-transparent dark:border-border-hover dark:bg-bg-secondary',
+  inputError: 'border-feedback-error focus:ring-feedback-error',
+  inputSuccess: 'border-feedback-success focus:ring-feedback-success',
 
   // Container
   container: 'mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl',

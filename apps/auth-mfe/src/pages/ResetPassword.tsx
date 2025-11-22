@@ -3,7 +3,13 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
-import { FormField, Card, ErrorBoundary } from '@myapp/frontend/ui-components';
+import {
+  FormField,
+  Card,
+  Button,
+  ErrorBoundary,
+  ThemeToggle,
+} from '@myapp/frontend/ui-components';
 import { useToastStore } from '@myapp/frontend/stores';
 import { authService } from '../services/auth.service';
 
@@ -74,13 +80,16 @@ function ResetPasswordContent() {
 
   if (!token) {
     return (
-      <div className="flex items-center justify-center min-h-screen px-4 py-12 bg-gray-50 sm:px-6 lg:px-8">
+      <div className="flex items-center justify-center min-h-screen px-4 py-12 bg-bg-secondary sm:px-6 lg:px-8">
+        <div className="fixed top-4 right-4 z-50">
+          <ThemeToggle />
+        </div>
         <div className="w-full max-w-md">
           <Card>
             <div className="text-center">
-              <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full">
+              <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-feedback-errorBg dark:bg-red-900/20 rounded-full">
                 <svg
-                  className="w-8 h-8 text-red-600"
+                  className="w-8 h-8 text-feedback-error"
                   fill="none"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -91,17 +100,14 @@ function ResetPasswordContent() {
                   <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
               </div>
-              <h2 className="mb-2 text-2xl font-bold text-gray-900">
+              <h2 className="mb-2 text-2xl font-bold text-text-primary">
                 Invalid Reset Link
               </h2>
-              <p className="mb-6 text-gray-600">
+              <p className="mb-6 text-text-secondary">
                 This password reset link is invalid or has expired.
               </p>
-              <Link
-                to="/forgot-password"
-                className="inline-block px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700"
-              >
-                Request new reset link
+              <Link to="/forgot-password">
+                <Button>Request new reset link</Button>
               </Link>
             </div>
           </Card>
@@ -111,14 +117,17 @@ function ResetPasswordContent() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen px-4 py-12 bg-gray-50 sm:px-6 lg:px-8">
+    <div className="flex items-center justify-center min-h-screen px-4 py-12 bg-bg-secondary sm:px-6 lg:px-8">
+      <div className="fixed top-4 right-4 z-50">
+        <ThemeToggle />
+      </div>
       <div className="w-full max-w-md">
         <Card>
           <div className="mb-8 text-center">
-            <h2 className="text-3xl font-bold text-gray-900">
+            <h2 className="text-3xl font-bold text-text-primary">
               Reset your password
             </h2>
-            <p className="mt-2 text-sm text-gray-600">
+            <p className="mt-2 text-sm text-text-secondary">
               Enter your new password below.
             </p>
           </div>
@@ -144,29 +153,14 @@ function ResetPasswordContent() {
               {...register('confirmPassword')}
             />
 
-            <button
-              type="submit"
-              disabled={isLoading}
-              style={{
-                width: '100%',
-                padding: '0.5rem 1rem',
-                backgroundColor: '#4f46e5',
-                color: 'white',
-                border: 'none',
-                borderRadius: '0.5rem',
-                fontSize: '1rem',
-                fontWeight: '500',
-                cursor: isLoading ? 'not-allowed' : 'pointer',
-                opacity: isLoading ? 0.5 : 1,
-              }}
-            >
+            <Button type="submit" fullWidth disabled={isLoading}>
               {isLoading ? 'Resetting password...' : 'Reset password'}
-            </button>
+            </Button>
 
             <div className="text-sm text-center">
               <Link
                 to="/login"
-                className="font-medium text-primary-600 hover:text-primary-500"
+                className="font-medium text-text-link hover:text-text-linkHover"
               >
                 ← Back to login
               </Link>

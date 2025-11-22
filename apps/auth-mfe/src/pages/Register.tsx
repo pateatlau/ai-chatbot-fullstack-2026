@@ -2,12 +2,18 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link } from 'react-router-dom';
-import { FormField, Card } from '@myapp/frontend/ui-components';
+import {
+  FormField,
+  Card,
+  Button,
+  ErrorBoundary,
+  ThemeToggle,
+} from '@myapp/frontend/ui-components';
 import { useAuthStore, useToastStore } from '@myapp/frontend/stores';
 import { registerSchema, RegisterFormData } from '../schemas/auth.schema';
 import { authService } from '../services/auth.service';
 
-export function Register() {
+function RegisterContent() {
   const [isLoading, setIsLoading] = useState(false);
   const { setAuth } = useAuthStore();
   const { addToast } = useToastStore();
@@ -26,11 +32,9 @@ export function Register() {
     try {
       const { confirmPassword, ...registerData } = data;
       const response = await authService.register(registerData);
-      // Tokens are now in HttpOnly cookies, not in the response
-      setAuth(response.user);
 
-      // NOTE: setAuth() already emits USER_LOGGED_IN event via auth.store.ts
-      // No need to emit duplicate event here
+      // Store auth data - tokens are in HttpOnly cookies AND returned for API calls
+      setAuth(response.user, response.accessToken, null);
 
       addToast('Account created successfully!', 'success');
 
@@ -47,12 +51,17 @@ export function Register() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen px-4 py-12 bg-gray-50 sm:px-6 lg:px-8">
+    <div className="flex items-center justify-center min-h-screen px-4 py-12 bg-bg-secondary sm:px-6 lg:px-8">
+      <div className="fixed top-4 right-4 z-50">
+        <ThemeToggle />
+      </div>
       <div className="w-full max-w-md">
         <Card>
           <div className="mb-8 text-center">
-            <h2 className="text-3xl font-bold text-gray-900">Create account</h2>
-            <p className="mt-2 text-sm text-gray-600">
+            <h2 className="text-3xl font-bold text-text-primary">
+              Create account
+            </h2>
+            <p className="mt-2 text-sm text-text-secondary">
               Sign up to get started with your account.
             </p>
           </div>
@@ -98,7 +107,7 @@ export function Register() {
             <div>
               <label
                 htmlFor="role"
-                className="block mb-2 text-sm font-medium text-gray-700"
+                className="block mb-2 text-sm font-medium text-text-secondary"
               >
                 Role
               </label>
@@ -106,17 +115,17 @@ export function Register() {
                 id="role"
                 {...register('role')}
                 defaultValue="USER"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-border-default rounded-lg bg-bg-primary text-text-primary focus:outline-none focus:ring-2 focus:ring-border-focus focus:border-transparent dark:border-border-hover dark:bg-bg-secondary"
               >
                 <option value="USER">User</option>
                 <option value="ADMIN">Admin</option>
               </select>
               {errors.role?.message && (
-                <p className="mt-1 text-sm text-red-600">
+                <p className="mt-1 text-sm text-feedback-error">
                   {errors.role.message}
                 </p>
               )}
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-xs text-text-tertiary">
                 Select ADMIN to create an admin account
               </p>
             </div>
@@ -128,22 +137,22 @@ export function Register() {
                   name="terms"
                   type="checkbox"
                   required
-                  className="w-4 h-4 border-gray-300 rounded text-primary-600 focus:ring-primary-500"
+                  className="w-4 h-4 border-border-default rounded text-interactive-primary focus:ring-interactive-primaryHover dark:border-border-hover"
                 />
               </div>
               <div className="ml-3 text-sm">
-                <label htmlFor="terms" className="text-gray-700">
+                <label htmlFor="terms" className="text-text-primary">
                   I agree to the{' '}
                   <a
                     href="#"
-                    className="font-medium text-primary-600 hover:text-primary-500"
+                    className="font-medium text-text-link hover:text-text-linkHover"
                   >
                     Terms of Service
                   </a>{' '}
                   and{' '}
                   <a
                     href="#"
-                    className="font-medium text-primary-600 hover:text-primary-500"
+                    className="font-medium text-text-link hover:text-text-linkHover"
                   >
                     Privacy Policy
                   </a>
@@ -151,30 +160,17 @@ export function Register() {
               </div>
             </div>
 
-            <button
-              type="submit"
-              disabled={isLoading}
-              style={{
-                width: '100%',
-                padding: '0.5rem 1rem',
-                backgroundColor: '#4f46e5',
-                color: 'white',
-                border: 'none',
-                borderRadius: '0.5rem',
-                fontSize: '1rem',
-                fontWeight: '500',
-                cursor: isLoading ? 'not-allowed' : 'pointer',
-                opacity: isLoading ? 0.5 : 1,
-              }}
-            >
+            <Button type="submit" fullWidth disabled={isLoading}>
               {isLoading ? 'Creating account...' : 'Create account'}
-            </button>
+            </Button>
 
             <div className="text-sm text-center">
-              <span className="text-gray-600">Already have an account? </span>
+              <span className="text-text-secondary">
+                Already have an account?{' '}
+              </span>
               <Link
                 to="/login"
-                className="font-medium text-primary-600 hover:text-primary-500"
+                className="font-medium text-text-link hover:text-text-linkHover"
               >
                 Sign in
               </Link>
@@ -183,6 +179,14 @@ export function Register() {
         </Card>
       </div>
     </div>
+  );
+}
+
+export function Register() {
+  return (
+    <ErrorBoundary variant="full" context="page-register">
+      <RegisterContent />
+    </ErrorBoundary>
   );
 }
 

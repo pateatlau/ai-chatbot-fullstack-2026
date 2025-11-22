@@ -3,7 +3,13 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link } from 'react-router-dom';
 import { z } from 'zod';
-import { FormField, Card, ErrorBoundary } from '@myapp/frontend/ui-components';
+import {
+  FormField,
+  Card,
+  Button,
+  ErrorBoundary,
+  ThemeToggle,
+} from '@myapp/frontend/ui-components';
 import { useToastStore } from '@myapp/frontend/stores';
 import { authService } from '../services/auth.service';
 
@@ -48,13 +54,16 @@ function ForgotPasswordContent() {
 
   if (isSuccess) {
     return (
-      <div className="flex items-center justify-center min-h-screen px-4 py-12 bg-gray-50 sm:px-6 lg:px-8">
+      <div className="flex items-center justify-center min-h-screen px-4 py-12 bg-bg-secondary sm:px-6 lg:px-8">
+        <div className="fixed top-4 right-4 z-50">
+          <ThemeToggle />
+        </div>
         <div className="w-full max-w-md">
           <Card>
             <div className="text-center">
-              <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full">
+              <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-feedback-successBg dark:bg-green-900/20 rounded-full">
                 <svg
-                  className="w-8 h-8 text-green-600"
+                  className="w-8 h-8 text-feedback-success"
                   fill="none"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -65,19 +74,19 @@ function ForgotPasswordContent() {
                   <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
               </div>
-              <h2 className="mb-2 text-2xl font-bold text-gray-900">
+              <h2 className="mb-2 text-2xl font-bold text-text-primary">
                 Check your email
               </h2>
-              <p className="mb-6 text-gray-600">
+              <p className="mb-6 text-text-secondary">
                 If an account exists with that email, you will receive password
                 reset instructions shortly.
               </p>
-              <p className="mb-4 text-sm text-gray-500">
+              <p className="mb-4 text-sm text-text-tertiary">
                 Didn't receive an email? Check your spam folder or try again.
               </p>
               <Link
                 to="/login"
-                className="inline-block px-4 py-2 text-sm font-medium text-primary-600 hover:text-primary-700"
+                className="inline-block px-4 py-2 text-sm font-medium text-text-link hover:text-text-linkHover"
               >
                 ← Back to login
               </Link>
@@ -89,14 +98,17 @@ function ForgotPasswordContent() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen px-4 py-12 bg-gray-50 sm:px-6 lg:px-8">
+    <div className="flex items-center justify-center min-h-screen px-4 py-12 bg-bg-secondary sm:px-6 lg:px-8">
+      <div className="fixed top-4 right-4 z-50">
+        <ThemeToggle />
+      </div>
       <div className="w-full max-w-md">
         <Card>
           <div className="mb-8 text-center">
-            <h2 className="text-3xl font-bold text-gray-900">
+            <h2 className="text-3xl font-bold text-text-primary">
               Forgot password?
             </h2>
-            <p className="mt-2 text-sm text-gray-600">
+            <p className="mt-2 text-sm text-text-secondary">
               Enter your email address and we'll send you instructions to reset
               your password.
             </p>
@@ -113,29 +125,14 @@ function ForgotPasswordContent() {
               {...register('email')}
             />
 
-            <button
-              type="submit"
-              disabled={isLoading}
-              style={{
-                width: '100%',
-                padding: '0.5rem 1rem',
-                backgroundColor: '#4f46e5',
-                color: 'white',
-                border: 'none',
-                borderRadius: '0.5rem',
-                fontSize: '1rem',
-                fontWeight: '500',
-                cursor: isLoading ? 'not-allowed' : 'pointer',
-                opacity: isLoading ? 0.5 : 1,
-              }}
-            >
+            <Button type="submit" fullWidth disabled={isLoading}>
               {isLoading ? 'Sending...' : 'Send reset instructions'}
-            </button>
+            </Button>
 
             <div className="text-sm text-center">
               <Link
                 to="/login"
-                className="font-medium text-primary-600 hover:text-primary-500"
+                className="font-medium text-text-link hover:text-text-linkHover"
               >
                 ← Back to login
               </Link>

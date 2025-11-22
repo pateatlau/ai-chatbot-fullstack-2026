@@ -1,5 +1,5 @@
 import { useLocation } from 'react-router-dom';
-import { ErrorBoundary } from '@myapp/frontend/ui-components';
+import { ErrorBoundary, ThemeProvider } from '@myapp/frontend/ui-components';
 import { RecoveryAction } from '@myapp/frontend/hooks';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
@@ -28,6 +28,10 @@ function AppContent() {
 }
 
 export function App() {
+  // Detect if running in shell (port 5173) vs standalone (port 5174)
+  const isInShell =
+    typeof window !== 'undefined' && window.location.port === '5173';
+
   const handleRecovery = (action: RecoveryAction) => {
     console.log('[Auth MFE] Recovery action triggered:', action);
     // Execute recovery action
@@ -38,17 +42,25 @@ export function App() {
     console.error('[Auth MFE] Error caught:', { error, errorInfo });
   };
 
+  // Use passive mode when in shell so we don't fight with shell's ThemeProvider
+  // In passive mode, we provide theme context but don't manipulate the DOM
   return (
-    <ErrorBoundary
-      variant="full"
-      context="auth-mfe-root"
-      enableRecovery={true}
-      onRecovery={handleRecovery}
-      onError={handleError}
-      showDetails={process.env.NODE_ENV === 'development'}
+    <ThemeProvider
+      defaultTheme="light"
+      storageKey="app-theme"
+      passive={isInShell}
     >
-      <AppContent />
-    </ErrorBoundary>
+      <ErrorBoundary
+        variant="full"
+        context="auth-mfe-root"
+        enableRecovery={true}
+        onRecovery={handleRecovery}
+        onError={handleError}
+        showDetails={process.env.NODE_ENV === 'development'}
+      >
+        <AppContent />
+      </ErrorBoundary>
+    </ThemeProvider>
   );
 }
 

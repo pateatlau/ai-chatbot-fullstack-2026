@@ -3,6 +3,7 @@ import * as ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { init } from '@module-federation/runtime';
 import App from './app/app';
+import { StandaloneWrapper } from './app/standalone-wrapper';
 import './styles.css';
 
 // Initialize Module Federation runtime for standalone mode
@@ -17,8 +18,10 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <StandaloneWrapper>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </StandaloneWrapper>
   </StrictMode>
 );

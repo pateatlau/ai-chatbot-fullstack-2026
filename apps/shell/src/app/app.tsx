@@ -1,7 +1,11 @@
 import { RouterProvider } from 'react-router-dom';
 import { QueryProvider } from '../providers/QueryProvider';
 import { useToastStore } from '@myapp/frontend/stores';
-import { Toast, ErrorBoundary } from '@myapp/frontend/ui-components';
+import {
+  Toast,
+  ErrorBoundary,
+  ThemeProvider,
+} from '@myapp/frontend/ui-components';
 import { RecoveryAction } from '@myapp/frontend/hooks';
 import { router } from '../routes';
 import { useShellEventCoordination } from '../hooks/useEventDrivenStores';
@@ -43,20 +47,22 @@ export function App() {
   };
 
   return (
-    <ErrorBoundary
-      variant="full"
-      context="shell-root"
-      enableRecovery={true}
-      onRecovery={handleRecovery}
-      onError={handleError}
-      showDetails={isDevelopment}
-    >
-      <QueryProvider>
-        <RouterProvider router={router} />
-        <ToastContainer />
-        {isDevelopment && <EventBusDevTools />}
-      </QueryProvider>
-    </ErrorBoundary>
+    <ThemeProvider defaultTheme="light" storageKey="app-theme">
+      <ErrorBoundary
+        variant="full"
+        context="shell-root"
+        enableRecovery={true}
+        onRecovery={handleRecovery}
+        onError={handleError}
+        showDetails={isDevelopment}
+      >
+        <QueryProvider>
+          <RouterProvider router={router} />
+          <ToastContainer />
+          {isDevelopment && <EventBusDevTools />}
+        </QueryProvider>
+      </ErrorBoundary>
+    </ThemeProvider>
   );
 }
 

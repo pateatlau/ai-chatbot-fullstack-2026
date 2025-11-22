@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dark Mode Debug Tool</title>
+    <style>
+      body {
+        font-family: monospace;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .debug-panel {
+        background: white;
+        border: 2px solid #333;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+      .debug-panel h2 {
+        margin-top: 0;
+        color: #333;
+      }
+      .check-item {
+        padding: 10px;
+        margin: 5px 0;
+        border-left: 4px solid #ccc;
+        background: #f9f9f9;
+      }
+      .check-item.success {
+        border-left-color: #22c55e;
+        background: #f0fdf4;
+      }
+      .check-item.error {
+        border-left-color: #ef4444;
+        background: #fef2f2;
+      }
+      .check-item.warning {
+        border-left-color: #f59e0b;
+        background: #fffbeb;
+      }
+      button {
+        padding: 10px 20px;
+        background: #3b82f6;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        margin: 5px;
+      }
+      button:hover {
+        background: #2563eb;
+      }
+      code {
+        background: #e5e7eb;
+        padding: 2px 6px;
+        border-radius: 3px;
+        color: #dc2626;
+      }
+      .value {
+        color: #059669;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🔍 Dark Mode Debug Tool</h1>
+    <p>Open this file alongside your app to debug dark mode issues.</p>
+
+    <div class="debug-panel">
+      <h2>Instructions</h2>
+      <ol>
+        <li>Open your app in Shell mode (localhost:5173)</li>
+        <li>Navigate to a page with dark mode toggle (e.g., login page)</li>
+        <li>Toggle dark mode ON</li>
+        <li>Open browser DevTools Console (F12)</li>
+        <li>Copy and paste the script below into the console</li>
+        <li>Review the output to find what's wrong</li>
+      </ol>
+    </div>
+
+    <div class="debug-panel">
+      <h2>Debug Script</h2>
+      <p>Copy this entire script and paste it into your browser console:</p>
+      <textarea
+        id="debugScript"
+        readonly
+        style="
+          width: 100%;
+          height: 400px;
+          font-family: monospace;
+          font-size: 12px;
+          padding: 10px;
+        "
+      >
+// === DARK MODE DEBUG SCRIPT ===
+console.log('🔍 Starting Dark Mode Debug...\n');
+
+// 1. Check if dark class is applied
+const rootClasses = document.documentElement.classList;
+const hasDarkClass = rootClasses.contains('dark');
+console.log(`✓ Dark class on <html>: ${hasDarkClass ? '✅ YES' : '❌ NO'}`);
+console.log(`  Classes: ${Array.from(rootClasses).join(', ') || 'none'}\n`);
+
+// 2. Check CSS variables
+const computedStyle = getComputedStyle(document.documentElement);
+const cssVars = [
+    '--bg-primary',
+    '--bg-secondary',
+    '--text-primary',
+    '--text-secondary',
+    '--border-default',
+    '--interactive-primary'
+];
+
+console.log('CSS Variables:');
+cssVars.forEach(varName => {
+    const value = computedStyle.getPropertyValue(varName).trim();
+    console.log(`  ${varName}: ${value || '❌ NOT SET'}`);
+});
+console.log('');
+
+// 3. Check inline styles on html element
+const inlineStyles = document.documentElement.getAttribute('style');
+console.log(`Inline styles on <html>: ${inlineStyles ? '✅ YES' : '❌ NO'}`);
+if (inlineStyles) {
+    console.log(`  ${inlineStyles.substring(0, 200)}...`);
+}
+console.log('');
+
+// 4. Check if theme.css is loaded
+const stylesheets = Array.from(document.styleSheets);
+const themeSheet = stylesheets.find(sheet => {
+    try {
+        return sheet.href && sheet.href.includes('theme');
+    } catch (e) {
+        return false;
+    }
+});
+console.log(`Theme stylesheet loaded: ${themeSheet ? '✅ YES' : '⚠️ NOT FOUND'}\n`);
+
+// 5. Check localStorage
+const storedTheme = localStorage.getItem('app-theme');
+console.log(`localStorage['app-theme']: ${storedTheme || '❌ NOT SET'}\n`);
+
+// 6. Test if CSS variables work by creating test element
+const testDiv = document.createElement('div');
+testDiv.style.cssText = `
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    padding: 20px;
+    background: var(--bg-primary, red);
+    color: var(--text-primary, blue);
+    border: 2px solid var(--border-default, yellow);
+    border-radius: 8px;
+    z-index: 99999;
+    font-family: monospace;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+`;
+testDiv.innerHTML = `
+    <strong>Test Element</strong><br>
+    If CSS vars work, this should be dark.<br>
+    <button onclick="this.parentElement.remove()" style="margin-top: 10px; padding: 5px 10px; cursor: pointer;">Close</button>
+`;
+document.body.appendChild(testDiv);
+console.log('✓ Test element added to page (top-right corner)\n');
+
+// 7. Check for Tailwind classes
+const loginForm = document.querySelector('form');
+if (loginForm) {
+    const bgClasses = Array.from(loginForm.classList).filter(c => c.startsWith('bg-'));
+    const textClasses = Array.from(loginForm.classList).filter(c => c.startsWith('text-'));
+    console.log('Form element classes:');
+    console.log(`  Background: ${bgClasses.join(', ') || 'none'}`);
+    console.log(`  Text: ${textClasses.join(', ') || 'none'}`);
+    
+    const formStyle = getComputedStyle(loginForm);
+    console.log(`  Computed background: ${formStyle.backgroundColor}`);
+    console.log(`  Computed color: ${formStyle.color}`);
+} else {
+    console.log('⚠️ No form element found on page');
+}
+console.log('');
+
+// 8. Summary
+console.log('=== SUMMARY ===');
+if (!hasDarkClass) {
+    console.log('❌ PROBLEM: Dark class not applied to <html>');
+    console.log('   → ThemeProvider may not be setting the class');
+}
+if (!cssVars.some(v => computedStyle.getPropertyValue(v).trim())) {
+    console.log('❌ PROBLEM: CSS variables not set');
+    console.log('   → ThemeProvider may not be setting inline styles');
+}
+if (hasDarkClass && cssVars.every(v => computedStyle.getPropertyValue(v).trim())) {
+    console.log('✅ Dark class AND CSS variables are set correctly');
+    console.log('   → Problem may be in Tailwind config or CSS specificity');
+}
+
+console.log('\n🔍 Debug complete. Check the test element in the top-right corner.');
+        </textarea
+      >
+      <button onclick="copyScript()">📋 Copy Script to Clipboard</button>
+    </div>
+
+    <div class="debug-panel">
+      <h2>Common Issues & Solutions</h2>
+      <div class="check-item warning">
+        <strong>Issue:</strong> Dark class not on &lt;html&gt;<br />
+        <strong>Solution:</strong> ThemeProvider not rendering or not applying
+        class. Check if ThemeProvider is mounted.
+      </div>
+      <div class="check-item warning">
+        <strong>Issue:</strong> CSS variables not set<br />
+        <strong>Solution:</strong> ThemeProvider not setting inline styles.
+        Check ThemeProvider useEffect.
+      </div>
+      <div class="check-item warning">
+        <strong>Issue:</strong> Variables set but colors still wrong<br />
+        <strong>Solution:</strong> Tailwind not using CSS variables. Check
+        tailwind.config.js colors section.
+      </div>
+      <div class="check-item warning">
+        <strong>Issue:</strong> Works standalone but not in shell<br />
+        <strong>Solution:</strong> Possible CSS scope/loading issue. Check if
+        ui-components CSS loads in shell.
+      </div>
+    </div>
+
+    <script>
+      function copyScript() {
+        const textarea = document.getElementById('debugScript');
+        textarea.select();
+        document.execCommand('copy');
+        alert('Script copied! Paste it into your browser console (F12).');
+      }
+    </script>
+  </body>
+</html>

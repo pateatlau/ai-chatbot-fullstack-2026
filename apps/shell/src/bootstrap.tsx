@@ -6,7 +6,7 @@ import { startMocks } from './mocks/config';
 import './styles.css';
 
 // Initialize Module Federation runtime
-init({
+const mfRuntime = init({
   name: 'shell',
   remotes: [
     {
@@ -26,6 +26,33 @@ init({
       entry: 'http://localhost:5177/remoteEntry.js',
     },
   ],
+  shared: {
+    react: {
+      version: '19.0.0',
+      scope: 'default',
+      lib: () => import('react'),
+      shareConfig: {
+        singleton: true,
+        requiredVersion: '^19.0.0',
+      },
+    },
+    'react-dom': {
+      version: '19.0.0',
+      scope: 'default',
+      lib: () => import('react-dom'),
+      shareConfig: {
+        singleton: true,
+        requiredVersion: '^19.0.0',
+      },
+    },
+    'react-router-dom': {
+      scope: 'default',
+      lib: () => import('react-router-dom'),
+      shareConfig: {
+        singleton: true,
+      },
+    },
+  },
 });
 
 const rootElement = document.getElementById('root');
@@ -36,6 +63,9 @@ if (!rootElement) {
 } else {
   (async () => {
     try {
+      // Wait for Module Federation runtime to be fully initialized
+      await mfRuntime;
+
       // Start MSW mocks if needed
       await startMocks();
 

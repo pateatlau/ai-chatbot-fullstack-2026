@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '@ai-chatbot/hooks';
-import { Card } from '@myapp/frontend/ui-components';
+import { Card, cn } from '@myapp/frontend/ui-components';
 
 export function DashboardPage() {
   const { user } = useAuth();
@@ -17,8 +17,8 @@ export function DashboardPage() {
       value: '0',
       change: '+0%',
       icon: '💬',
-      bgColor: 'bg-blue-50',
-      iconColor: 'text-blue-600',
+      bgColor: 'bg-blue-50 dark:bg-blue-900/20',
+      iconColor: 'text-blue-600 dark:text-blue-400',
       trend: 'neutral',
     },
     {
@@ -26,8 +26,8 @@ export function DashboardPage() {
       value: '0',
       change: '+0%',
       icon: '✉️',
-      bgColor: 'bg-green-50',
-      iconColor: 'text-green-600',
+      bgColor: 'bg-green-50 dark:bg-green-900/20',
+      iconColor: 'text-green-600 dark:text-green-400',
       trend: 'neutral',
     },
     {
@@ -35,8 +35,8 @@ export function DashboardPage() {
       value: '0',
       change: '+0%',
       icon: '🎯',
-      bgColor: 'bg-purple-50',
-      iconColor: 'text-purple-600',
+      bgColor: 'bg-purple-50 dark:bg-purple-900/20',
+      iconColor: 'text-purple-600 dark:text-purple-400',
       trend: 'neutral',
     },
     {
@@ -44,8 +44,8 @@ export function DashboardPage() {
       value: '1',
       change: 'Active',
       icon: '⚡',
-      bgColor: 'bg-orange-50',
-      iconColor: 'text-orange-600',
+      bgColor: 'bg-orange-50 dark:bg-orange-900/20',
+      iconColor: 'text-orange-600 dark:text-orange-400',
       trend: 'positive',
     },
   ];
@@ -104,10 +104,10 @@ export function DashboardPage() {
           <div className="absolute -left-40 -bottom-40 h-80 w-80 rounded-full bg-white opacity-10"></div>
         </div>
         <div className="relative z-10">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-2">
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
             Good {timeOfDay}, {user?.name?.split(' ')[0] || 'there'}!
           </h1>
-          <p className="text-gray-700 text-lg md:text-xl max-w-2xl">
+          <p className="text-white/90 text-lg md:text-xl max-w-2xl">
             Welcome back to your AI Chatbot dashboard. Let's explore what you
             can do today.
           </p>
@@ -122,28 +122,33 @@ export function DashboardPage() {
             className="relative overflow-hidden group hover:shadow-md transition-shadow"
           >
             <div
-              className={`absolute inset-0 ${stat.bgColor} opacity-40`}
+              className={cn('absolute inset-0 opacity-40', stat.bgColor)}
             ></div>
             <div className="relative">
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">
+                  <p className="text-sm font-medium text-text-secondary">
                     {stat.label}
                   </p>
-                  <p className="text-3xl font-bold text-gray-900 mt-2">
+                  <p className="text-3xl font-bold text-text-primary mt-2">
                     {stat.value}
                   </p>
                 </div>
-                <div className={`text-3xl ${stat.iconColor}`}>{stat.icon}</div>
+                <div className={cn('text-3xl', stat.iconColor)}>{stat.icon}</div>
               </div>
               <div className="flex items-center justify-between">
                 <span
-                  className={`text-xs font-semibold ${stat.trend === 'positive' ? 'text-green-600' : 'text-gray-600'}`}
+                  className={cn(
+                    'text-xs font-semibold',
+                    stat.trend === 'positive'
+                      ? 'text-green-600 dark:text-green-400'
+                      : 'text-text-secondary'
+                  )}
                 >
                   {stat.change}
                 </span>
                 {stat.trend === 'positive' && (
-                  <span className="inline-flex items-center px-2 py-1 rounded-full bg-green-100 text-green-700 text-xs font-medium">
+                  <span className="inline-flex items-center px-2 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-medium">
                     Active
                   </span>
                 )}
@@ -156,18 +161,21 @@ export function DashboardPage() {
       {/* Quick Actions Section */}
       <div>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Quick Actions</h2>
+          <h2 className="text-2xl font-bold text-text-primary">Quick Actions</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {quickActions.map((action, index) => (
             <Link
               key={index}
               to={action.href}
-              className={`group relative overflow-hidden rounded-xl bg-linear-to-br ${action.color} p-6 ${action.textColor} shadow-md hover:shadow-lg transition-all transform hover:scale-105`}
+              className={cn(
+                'group relative overflow-hidden rounded-xl p-6 shadow-md hover:shadow-lg transition-all transform hover:scale-105',
+                `bg-linear-to-br ${action.color} ${action.textColor}`
+              )}
             >
               <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
               <div className="relative z-10">
-                <div className="text-4xl mb-3 group-group-hover:scale-110 transition-transform">
+                <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">
                   {action.icon}
                 </div>
                 <h3 className="text-lg font-bold mb-2">{action.title}</h3>
@@ -183,15 +191,15 @@ export function DashboardPage() {
 
       {/* Features Section */}
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">Key Features</h2>
+        <h2 className="text-2xl font-bold text-text-primary mb-6">Key Features</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {features.map((feature, index) => (
             <Card key={index} className="hover:shadow-md transition-shadow">
               <div className="text-5xl mb-4">{feature.icon}</div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">
+              <h3 className="text-lg font-bold text-text-primary mb-2">
                 {feature.title}
               </h3>
-              <p className="text-gray-600 text-sm leading-relaxed">
+              <p className="text-text-secondary text-sm leading-relaxed">
                 {feature.description}
               </p>
             </Card>
@@ -200,13 +208,13 @@ export function DashboardPage() {
       </div>
 
       {/* Call-to-Action Section */}
-      <Card className="bg-linear-to-r from-indigo-50 to-blue-50 border border-indigo-100 text-gray-900!">
-        <div className="flex items-center justify-between gap-6">
+      <Card className="bg-linear-to-r from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 border border-indigo-100 dark:border-indigo-800">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">
+            <h3 className="text-xl font-bold text-text-primary mb-2">
               Ready to start?
             </h3>
-            <p className="text-gray-600">
+            <p className="text-text-secondary">
               Begin your first conversation with our AI assistant and explore
               the capabilities of intelligent chatting.
             </p>
@@ -214,7 +222,7 @@ export function DashboardPage() {
           <div className="shrink-0">
             <Link
               to="/chatbot"
-              className="inline-flex items-center px-6 py-3 rounded-lg bg-primary-600 text-white font-semibold hover:bg-primary-700 transition-colors shadow-md hover:shadow-lg"
+              className="inline-flex items-center px-6 py-3 rounded-lg bg-interactive-primary hover:bg-interactive-primaryHover text-text-inverse font-semibold transition-colors shadow-md hover:shadow-lg"
             >
               Start Now <span className="ml-2">→</span>
             </Link>
@@ -224,18 +232,18 @@ export function DashboardPage() {
 
       {/* Admin Access Notice */}
       {user?.role === 'ADMIN' && (
-        <Card className="border-l-4 border-amber-500 bg-amber-50">
+        <Card className="border-l-4 border-amber-500 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-600">
           <div className="flex items-start gap-4">
             <div className="text-3xl">👨‍💼</div>
             <div className="flex-1">
-              <h3 className="font-bold text-gray-900 mb-1">Admin Access</h3>
-              <p className="text-gray-600 text-sm mb-3">
+              <h3 className="font-bold text-text-primary mb-1">Admin Access</h3>
+              <p className="text-text-secondary text-sm mb-3">
                 You have access to the admin panel to manage users and system
                 settings.
               </p>
               <Link
                 to="/admin"
-                className="inline-flex items-center text-sm font-semibold text-amber-700 hover:text-amber-900 transition-colors"
+                className="inline-flex items-center text-sm font-semibold text-amber-700 dark:text-amber-400 hover:text-amber-900 dark:hover:text-amber-300 transition-colors"
               >
                 Go to Admin Panel <span className="ml-2">→</span>
               </Link>
