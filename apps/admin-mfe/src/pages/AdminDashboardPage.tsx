@@ -15,6 +15,7 @@ import {
   useAdminStoreInitialization,
   useAdminDashboardAutoRefresh,
 } from '../store/admin.store';
+import { useSystemStats } from '@myapp/frontend/apollo-client';
 
 function AdminDashboardPageContent() {
   // Ensure only ADMIN users can access this page
@@ -30,23 +31,51 @@ function AdminDashboardPageContent() {
   const { metrics, isLoading, isRefreshing, error } = useAdminStore();
   const toast = useToast();
 
+  // Apollo Client query for system stats
+  const {
+    data: statsData,
+    loading: statsLoading,
+    error: statsError,
+  } = useSystemStats();
+
+  // Load stats from Apollo on mount or when data updates
   useEffect(() => {
-    loadStats();
-  }, []);
+    if (statsData?.systemStats) {
+      const { setMetrics } = useAdminStore.getState();
+      const stats = statsData.systemStats;
+
+      const metrics = {
+        totalUsers: stats.totalUsers || 0,
+        activeUsers: stats.activeUsers || 0,
+        totalConversations: stats.totalConversations || 0,
+        totalMessages: stats.totalMessages || 0,
+        avgMessagesPerUser: stats.averageMessagesPerConversation || 0,
+        lastUpdated: new Date().toISOString(),
+      };
+
+      setMetrics(metrics);
+    }
+  }, [statsData]);
+
+  // Fallback to REST API if GraphQL not available
+  useEffect(() => {
+    if (!statsData && !statsLoading && !isLoading) {
+      loadStats();
+    }
+  }, [statsLoading, isLoading, statsData]);
 
   const loadStats = async () => {
     try {
-      const { setMetrics, setLoading, setError } = useAdminStore.getState();
+      const { setMetrics, setLoading } = useAdminStore.getState();
       setLoading(true);
       const data = await adminAPI.getStats();
 
-      // Convert API stats to store metrics format
       const metrics = {
         totalUsers: data.totalUsers,
         activeUsers: data.activeUsers,
         totalConversations: data.totalConversations,
         totalMessages:
-          data.totalConversations * data.averageMessagesPerConversation, // Approximate
+          data.totalConversations * (data.averageMessagesPerConversation || 1),
         avgMessagesPerUser: data.averageMessagesPerConversation,
         lastUpdated: new Date().toISOString(),
       };
@@ -54,10 +83,10 @@ function AdminDashboardPageContent() {
       setMetrics(metrics);
     } catch (error: any) {
       const { setError } = useAdminStore.getState();
-      setError(error.response?.data?.error || 'Failed to load dashboard data');
-      toast.error(
-        error.response?.data?.error || 'Failed to load dashboard data'
-      );
+      const errorMsg =
+        error.response?.data?.error || 'Failed to load dashboard data';
+      setError(errorMsg);
+      toast.error(errorMsg);
     } finally {
       const { setLoading } = useAdminStore.getState();
       setLoading(false);

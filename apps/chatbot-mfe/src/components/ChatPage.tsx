@@ -9,6 +9,14 @@ import {
   useChatbotStore,
   useChatbotStoreInitialization,
 } from '../store/chatbot.store';
+import {
+  useConversations,
+  useConversation,
+  useCreateConversation,
+  useUpdateConversation,
+  useDeleteConversation,
+  useSendMessage,
+} from '@myapp/frontend/apollo-client';
 import { chatbotAPI, type Message } from '../api/chatbot.api';
 import styles from './ChatPage.module.css';
 
@@ -30,13 +38,25 @@ function ChatPageContent() {
     setCurrentConversation,
     setMessages,
     addMessage,
-    sendMessage,
     setLoading,
     setError,
     clearError,
   } = useChatbotStore();
 
   const { rateLimitInfo, trackMessage } = useRateLimit(10, 1);
+
+  // Apollo Client hooks for GraphQL operations
+  const {
+    data: conversationsData,
+    loading: conversationsLoading,
+    error: conversationsError,
+  } = useConversations(1, 50);
+  const { data: conversationData, loading: conversationLoading } =
+    useConversation(currentConversationId);
+  const createConversationMutation = useCreateConversation();
+  const updateConversationMutation = useUpdateConversation();
+  const deleteConversationMutation = useDeleteConversation();
+  const sendMessageMutation = useSendMessage();
 
   // Get messages for current conversation
   const messages = currentConversationId
@@ -70,85 +90,80 @@ function ChatPageContent() {
     },
   });
 
-  // Load conversations on mount
+  // Load conversations on mount and when data updates
   useEffect(() => {
-    loadConversations();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (conversationsData?.conversations) {
+      const conversations = conversationsData.conversations.map(
+        (conv: any) => ({
+          id: conv.id,
+          title: conv.title,
+          createdAt: new Date(conv.createdAt).getTime(),
+          updatedAt: new Date(conv.updatedAt).getTime(),
+          _count: { messages: conv.messageCount },
+        })
+      );
+      setConversations(conversations);
+
+      // Auto-select first conversation if none selected
+      if (!currentConversationId && conversations.length > 0) {
+        setCurrentConversation(conversations[0].id);
+      }
+    }
+  }, [conversationsData]);
 
   // Load messages when conversation is selected
   useEffect(() => {
-    if (currentConversationId) {
-      loadMessages(currentConversationId);
+    if (conversationData?.conversation && currentConversationId) {
+      const messages = conversationData.conversation.messages.map(
+        (msg: any) => ({
+          ...msg,
+          timestamp: new Date(msg.createdAt).getTime(),
+        })
+      );
+      setMessages(currentConversationId, messages);
     }
-  }, [currentConversationId]);
+  }, [conversationData, currentConversationId]);
 
   const loadConversations = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      const data = await chatbotAPI.getConversations();
-      setConversations(data);
-
-      // Auto-select first conversation if none selected
-      if (!currentConversationId && data.length > 0) {
-        const firstConversation = data[0];
-        if (firstConversation) {
-          setCurrentConversation(firstConversation.id);
-        }
-      }
+      // Data will be fetched by Apollo and handled in useEffect above
+      setLoading(false);
     } catch (err: any) {
       console.error('Load conversations error:', err);
-      setError(err.response?.data?.message || 'Failed to load conversations');
+      setError(err.message || 'Failed to load conversations');
       setTimeout(() => clearError(), 5000);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const loadMessages = async (conversationId: string) => {
-    try {
-      setLoading(true);
-      const data = await chatbotAPI.getMessages(conversationId);
-      // Ensure data is always an array and convert to store format
-      const messagesArray = Array.isArray(data) ? data : [];
-      const formattedMessages = messagesArray.map((msg) => ({
-        ...msg,
-        timestamp: new Date(msg.createdAt).getTime(),
-      }));
-      setMessages(conversationId, formattedMessages);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to load messages');
-      setTimeout(() => clearError(), 5000);
-      // Set empty array on error
-      setMessages(conversationId, []);
-    } finally {
       setLoading(false);
     }
   };
 
   const handleCreateConversation = async () => {
     try {
-      const newConversation = await chatbotAPI.createConversation({
-        title: `Chat ${conversations.length + 1}`,
-      });
-      // Convert API response to store format
-      const storeConversation = {
-        ...newConversation,
-        createdAt: new Date(newConversation.createdAt).getTime(),
-        updatedAt: new Date(newConversation.updatedAt).getTime(),
-      };
-      addConversation(storeConversation);
-      setCurrentConversation(newConversation.id);
-      setMessages(newConversation.id, []);
+      const result = await createConversationMutation(
+        'Chat ' + (conversations.length + 1)
+      );
+      if (result.data?.createConversation) {
+        const newConversation = result.data.createConversation;
+        const storeConversation = {
+          id: newConversation.id,
+          title: newConversation.title,
+          createdAt: new Date(newConversation.createdAt).getTime(),
+          updatedAt: new Date(newConversation.updatedAt).getTime(),
+          _count: { messages: 0 },
+        };
+        addConversation(storeConversation);
+        setCurrentConversation(newConversation.id);
+        setMessages(newConversation.id, []);
+      }
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to create conversation');
+      setError(err.message || 'Failed to create conversation');
       setTimeout(() => clearError(), 5000);
     }
   };
 
   const handleDeleteConversation = async (id: string) => {
     try {
-      await chatbotAPI.deleteConversation(id);
+      await deleteConversationMutation(id);
       deleteConversation(id);
 
       // Select another conversation if deleted one was selected
@@ -157,17 +172,17 @@ function ChatPageContent() {
         setCurrentConversation(remaining[0]?.id || null);
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to delete conversation');
+      setError(err.message || 'Failed to delete conversation');
       setTimeout(() => clearError(), 5000);
     }
   };
 
   const handleRenameConversation = async (id: string, title: string) => {
     try {
-      await chatbotAPI.updateConversationTitle(id, title);
+      await updateConversationMutation(id, title);
       updateConversation(id, { title });
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to rename conversation');
+      setError(err.message || 'Failed to rename conversation');
       setTimeout(() => clearError(), 5000);
     }
   };
@@ -191,7 +206,10 @@ function ChatPageContent() {
     trackMessage();
 
     try {
-      // Start streaming AI response
+      // Send message via Apollo mutation
+      await sendMessageMutation(currentConversationId, content);
+
+      // Start streaming AI response (fallback to REST API for now)
       const response = await chatbotAPI.sendMessageStream(
         currentConversationId,
         content
@@ -208,7 +226,7 @@ function ChatPageContent() {
   );
 
   // Add error boundary fallback
-  if (error && !conversations.length && !isLoading) {
+  if (error && !conversations.length && !isLoading && !conversationsLoading) {
     return (
       <div style={{ padding: '20px', color: 'red' }}>
         <h2>Error Loading Chatbot</h2>

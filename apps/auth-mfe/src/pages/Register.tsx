@@ -12,15 +12,17 @@ import {
 } from '@myapp/frontend/ui-components';
 import { useAuthStore, useToastStore } from '@myapp/frontend/stores';
 import { registerSchema, RegisterFormData } from '../schemas/auth.schema';
-import { authService } from '../services/auth.service';
+import { useRegister } from '@myapp/frontend/apollo-client';
+import { eventBus, Events } from '@myapp/frontend/event-bus';
 
 function RegisterContent() {
   const [isLoading, setIsLoading] = useState(false);
   const { setAuth } = useAuthStore();
   const { addToast } = useToastStore();
+  const register = useRegister();
 
   const {
-    register,
+    register: formRegister,
     handleSubmit,
     formState: { errors },
   } = useForm<RegisterFormData>({
@@ -32,19 +34,36 @@ function RegisterContent() {
 
     try {
       const { confirmPassword, ...registerData } = data;
-      const response = await authService.register(registerData);
+      const result = await register(
+        registerData.email,
+        registerData.password,
+        registerData.name
+      );
 
-      // Store auth data - tokens are in HttpOnly cookies AND returned for API calls
-      setAuth(response.user, response.accessToken, null);
+      if (result.data?.register) {
+        const userData = result.data.register.user;
 
-      addToast('Account created successfully!', 'success');
+        // Store auth data - tokens are in HttpOnly cookies AND returned for API calls
+        setAuth(userData, result.data.register.token, null);
 
-      // Use window.location.replace for reliable cross-MFE navigation
-      // React Router navigate doesn't work reliably across federated modules
-      window.location.replace('/dashboard');
+        // Emit login event for other MFEs
+        eventBus.publish(Events.USER_LOGIN, {
+          userId: userData.id,
+          email: userData.email,
+          name: userData.name,
+          role: userData.role,
+          accessToken: result.data.register.token,
+        });
+
+        addToast('Account created successfully!', 'success');
+
+        // Use window.location.replace for reliable cross-MFE navigation
+        // React Router navigate doesn't work reliably across federated modules
+        window.location.replace('/dashboard');
+      }
     } catch (err: any) {
       const errorMessage =
-        err.response?.data?.message || 'Registration failed. Please try again.';
+        err.message || 'Registration failed. Please try again.';
       addToast(errorMessage, 'error');
     } finally {
       setIsLoading(false);
@@ -83,7 +102,7 @@ function RegisterContent() {
               placeholder="John Doe"
               error={errors.name?.message}
               required
-              {...register('name')}
+              {...formRegister('name')}
             />
 
             <FormField
@@ -92,7 +111,7 @@ function RegisterContent() {
               placeholder="you@example.com"
               error={errors.email?.message}
               required
-              {...register('email')}
+              {...formRegister('email')}
             />
 
             <FormField
@@ -102,7 +121,7 @@ function RegisterContent() {
               error={errors.password?.message}
               hint="Must be at least 8 characters with uppercase, lowercase, number, and special character"
               required
-              {...register('password')}
+              {...formRegister('password')}
             />
 
             <FormField
@@ -111,7 +130,7 @@ function RegisterContent() {
               placeholder="••••••••"
               error={errors.confirmPassword?.message}
               required
-              {...register('confirmPassword')}
+              {...formRegister('confirmPassword')}
             />
 
             <div>
@@ -126,7 +145,7 @@ function RegisterContent() {
               </label>
               <select
                 id="role"
-                {...register('role')}
+                {...formRegister('role')}
                 defaultValue="USER"
                 className={cn(
                   'w-full px-3 py-2',

@@ -12,13 +12,15 @@ import {
 } from '@myapp/frontend/ui-components';
 import { useAuthStore, useToastStore } from '@myapp/frontend/stores';
 import { loginSchema, LoginFormData } from '../schemas/auth.schema';
-import { authService } from '../services/auth.service';
+import { useLogin } from '@myapp/frontend/apollo-client';
+import { eventBus, Events } from '@myapp/frontend/event-bus';
 
 function LoginContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const { setAuth } = useAuthStore();
   const { addToast } = useToastStore();
+  const login = useLogin();
 
   const {
     register,
@@ -32,25 +34,37 @@ function LoginContent() {
     setIsLoading(true);
 
     try {
-      const response = await authService.login(data);
+      const result = await login(data.email, data.password);
 
-      // Store auth data - tokens are in HttpOnly cookies AND returned for API calls
-      setAuth(response.user, response.accessToken, null);
+      if (result.data?.login) {
+        const userData = result.data.login.user;
 
-      // Store remember me preference
-      if (rememberMe) {
-        localStorage.setItem('rememberMe', 'true');
-      } else {
-        localStorage.removeItem('rememberMe');
+        // Store auth data - tokens are in HttpOnly cookies AND returned for API calls
+        setAuth(userData, result.data.login.token, null);
+
+        // Store remember me preference
+        if (rememberMe) {
+          localStorage.setItem('rememberMe', 'true');
+        } else {
+          localStorage.removeItem('rememberMe');
+        }
+
+        // Emit login event for other MFEs
+        eventBus.publish(Events.USER_LOGIN, {
+          userId: userData.id,
+          email: userData.email,
+          name: userData.name,
+          role: userData.role,
+          accessToken: result.data.login.token,
+        });
+
+        addToast('Login successful!', 'success');
+
+        // Use window.location.replace for reliable cross-MFE navigation
+        window.location.replace('/dashboard');
       }
-
-      addToast('Login successful!', 'success');
-
-      // Use window.location.replace for reliable cross-MFE navigation
-      window.location.replace('/dashboard');
     } catch (err: any) {
-      const errorMessage =
-        err.response?.data?.message || 'Login failed. Please try again.';
+      const errorMessage = err.message || 'Login failed. Please try again.';
       addToast(errorMessage, 'error');
     } finally {
       setIsLoading(false);

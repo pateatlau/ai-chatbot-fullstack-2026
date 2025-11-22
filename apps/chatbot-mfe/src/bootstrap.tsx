@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import * as ReactDOM from 'react-dom/client';
 import { init } from '@module-federation/runtime';
+import { ApolloProvider, apolloClient } from '@myapp/frontend/apollo-client';
 import App from './app/app';
 import './styles.css';
 
@@ -16,6 +17,8 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <StrictMode>
-    <App />
+    <ApolloProvider client={apolloClient}>
+      <App />
+    </ApolloProvider>
   </StrictMode>
 );
