@@ -18,15 +18,23 @@ export const typeDefs = gql`
     updatedAt: DateTime!
   }
 
-  # User role enum
+  # User role enum - shared across all services
   enum UserRole {
+    SUPER_ADMIN
     ADMIN
+    MODERATOR
     USER
     GUEST
   }
 
   # Scalar for DateTime
   scalar DateTime
+
+  # Pagination input
+  input PaginationInput {
+    page: Int
+    limit: Int
+  }
 
   # Authentication response
   type AuthResponse {
@@ -74,7 +82,7 @@ export const typeDefs = gql`
     emailExists(email: String!): Boolean!
 
     # Health check for subgraph
-    health: String!
+    health: String! @shareable
   }
 
   # Mutation type

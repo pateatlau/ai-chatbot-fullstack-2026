@@ -10,16 +10,17 @@ export const typeDefs = gql`
   # Extend User from Auth Service
   extend type User @key(fields: "id") {
     id: ID! @external
-    role: UserRole!
+    role: UserRole! @external
     permissions: [String!]!
   }
 
-  # Admin-specific user role
+  # Admin-specific user role - comprehensive enum
   enum UserRole {
     SUPER_ADMIN
     ADMIN
     MODERATOR
     USER
+    GUEST
   }
 
   # Service admin type
@@ -80,7 +81,7 @@ export const typeDefs = gql`
     auditLogs(input: PaginationInput): [AuditLog!]!
 
     # Health and metrics
-    health: String!
+    health: String! @shareable
   }
 
   # Mutation

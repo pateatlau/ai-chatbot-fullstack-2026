@@ -47,8 +47,23 @@ export const typeDefs = gql`
     ASSISTANT
   }
 
+  # User role enum - shared across all services
+  enum UserRole {
+    SUPER_ADMIN
+    ADMIN
+    MODERATOR
+    USER
+    GUEST
+  }
+
   # Scalar for DateTime
   scalar DateTime
+
+  # Pagination input
+  input PaginationInput {
+    page: Int
+    limit: Int
+  }
 
   # Chat statistics
   type ChatStats {
@@ -105,7 +120,7 @@ export const typeDefs = gql`
     searchConversations(query: String!): [Conversation!]!
 
     # Health check for subgraph
-    health: String!
+    health: String! @shareable
   }
 
   # Mutation type
