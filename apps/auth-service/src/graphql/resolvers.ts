@@ -196,12 +196,6 @@ export const resolvers = {
     register: async (_parent: any, args: { input: RegisterInput }) => {
       const { email, password, name, role } = args.input;
 
-      console.log('[GraphQL] Register mutation called with:', {
-        email,
-        name,
-        role: role || 'USER (default)',
-      });
-
       // Check if email already exists
       const existingUser = await prisma.user.findUnique({
         where: { email },
@@ -219,7 +213,6 @@ export const resolvers = {
       // Determine role - use provided role or default to USER
       const userRole =
         role && (role === 'ADMIN' || role === 'USER') ? role : 'USER';
-      console.log('[GraphQL] Creating user with role:', userRole);
 
       // Create user
       const user = await prisma.user.create({
@@ -231,8 +224,6 @@ export const resolvers = {
           isActive: true,
         },
       });
-
-      console.log('[GraphQL] User created with role:', user.role);
 
       // Generate tokens
       const jwtSecret = process.env.JWT_SECRET || 'default-secret';

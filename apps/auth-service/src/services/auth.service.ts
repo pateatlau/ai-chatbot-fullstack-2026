@@ -19,12 +19,6 @@ import { EmailService } from './email.service';
 
 export class AuthService {
   async register(input: CreateUserInput): Promise<LoginResponse> {
-    console.log(
-      '[AUTH_SERVICE] Register called with input:',
-      JSON.stringify(input, null, 2)
-    );
-    console.log('[AUTH_SERVICE] Input role value:', input.role);
-
     // Check if user already exists
     const existingUserResult = await query(
       'SELECT id FROM users WHERE email = $1',
@@ -41,13 +35,11 @@ export class AuthService {
     // Create user with specified role
     const userId = uuidv4();
     const userRole = input.role;
-    console.log('[AUTH_SERVICE] About to insert user with role:', userRole);
     await query(
       `INSERT INTO users (id, email, password, name, role, "isActive", "createdAt", "updatedAt") 
        VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())`,
       [userId, input.email, hashedPassword, input.name, userRole, true]
     );
-    console.log('[AUTH_SERVICE] User inserted with role:', userRole);
 
     // Auto-login user after registration
     // Generate tokens

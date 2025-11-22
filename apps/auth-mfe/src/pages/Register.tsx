@@ -34,9 +34,6 @@ function RegisterContent() {
 
     try {
       const { confirmPassword, ...registerData } = data;
-      console.log('[Register] Form data:', registerData);
-      console.log('[Register] Role:', registerData.role);
-
       const result = await register(registerData);
 
       if (result.data?.register) {

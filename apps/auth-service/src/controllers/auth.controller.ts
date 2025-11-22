@@ -13,21 +13,11 @@ const authService = new AuthService();
 export class AuthController {
   async register(req: Request, res: Response) {
     try {
-      // DEBUG: Log the raw request body and role field
-      console.log(
-        '[REGISTER] Raw req.body:',
-        JSON.stringify(req.body, null, 2)
-      );
-      console.log('[REGISTER] req.body.role value:', req.body.role);
-      console.log('[REGISTER] req.body.role type:', typeof req.body.role);
-
       // Validate input (role is included in schema with transform to default 'USER' if empty)
       const validatedData = CreateUserSchema.parse(req.body);
-      console.log('[REGISTER] After Zod validation, role:', validatedData.role);
 
       // Register user (now returns login response with tokens)
       const result = await authService.register(validatedData);
-      console.log('[REGISTER] User created with role:', result.user.role);
 
       // Set HttpOnly cookies for tokens (same as login)
       res.cookie('accessToken', result.accessToken, {

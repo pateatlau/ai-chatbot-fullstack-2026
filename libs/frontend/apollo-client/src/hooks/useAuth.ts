@@ -58,9 +58,6 @@ export function useRegister() {
               role: data.role, // Include role from registerData
             };
 
-      console.log('[useRegister] Called with data:', data);
-      console.log('[useRegister] Sending to GraphQL with input:', input);
-
       const result = await register({
         variables: { input },
       });
@@ -75,10 +72,6 @@ export function useRegister() {
         }
       }
 
-      console.log(
-        '[useRegister] Response received, role:',
-        result.data?.register?.user?.role
-      );
       return result;
     } catch (error) {
       console.error('Registration failed:', error);
