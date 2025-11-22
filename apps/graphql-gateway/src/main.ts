@@ -106,9 +106,24 @@ async function startServer() {
       }),
       express.json({ limit: '50mb' }),
       expressMiddleware(server, {
-        context: async ({ req }: any) => ({
-          token: req.headers.authorization?.replace('Bearer ', ''),
-        }),
+        context: async ({ req }: any) => {
+          const authHeader = req.headers.authorization;
+          const token = authHeader?.replace('Bearer ', '');
+
+          console.log(
+            `[Gateway Context] Auth header: ${authHeader ? 'YES' : 'NO'}`
+          );
+          if (authHeader) {
+            console.log(
+              `[Gateway Context] Full header: ${authHeader.substring(0, 20)}...`
+            );
+            console.log(`[Gateway Context] Token length: ${token?.length}`);
+          }
+
+          return {
+            token,
+          };
+        },
       })
     );
 
