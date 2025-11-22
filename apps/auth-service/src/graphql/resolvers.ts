@@ -20,6 +20,7 @@ interface RegisterInput {
   email: string;
   password: string;
   name?: string;
+  role?: string; // Support role parameter in GraphQL registration
 }
 
 interface UpdateProfileInput {
@@ -193,7 +194,13 @@ export const resolvers = {
 
     // Register mutation
     register: async (_parent: any, args: { input: RegisterInput }) => {
-      const { email, password, name } = args.input;
+      const { email, password, name, role } = args.input;
+
+      console.log('[GraphQL] Register mutation called with:', {
+        email,
+        name,
+        role: role || 'USER (default)',
+      });
 
       // Check if email already exists
       const existingUser = await prisma.user.findUnique({
@@ -209,16 +216,23 @@ export const resolvers = {
       // Hash password
       const hashedPassword = await bcryptjs.hash(password, 10);
 
+      // Determine role - use provided role or default to USER
+      const userRole =
+        role && (role === 'ADMIN' || role === 'USER') ? role : 'USER';
+      console.log('[GraphQL] Creating user with role:', userRole);
+
       // Create user
       const user = await prisma.user.create({
         data: {
           email,
           password: hashedPassword,
           name: (name || email.split('@')[0]) as string,
-          role: 'USER',
+          role: userRole,
           isActive: true,
         },
       });
+
+      console.log('[GraphQL] User created with role:', user.role);
 
       // Generate tokens
       const jwtSecret = process.env.JWT_SECRET || 'default-secret';

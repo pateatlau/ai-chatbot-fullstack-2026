@@ -69,6 +69,7 @@ export const typeDefs = gql`
     username: String
     firstName: String
     lastName: String
+    role: String # Optional role during registration (defaults to USER)
   }
 
   # Update profile input
