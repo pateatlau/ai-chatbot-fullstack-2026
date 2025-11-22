@@ -1,7 +1,11 @@
 import express from 'express';
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
-import { ApolloGateway, IntrospectAndCompose } from '@apollo/gateway';
+import {
+  ApolloGateway,
+  IntrospectAndCompose,
+  RemoteGraphQLDataSource,
+} from '@apollo/gateway';
 import cors from 'cors';
 import * as dotenv from 'dotenv';
 
@@ -25,7 +29,7 @@ interface ContextValue {
 
 async function startServer() {
   try {
-    // Create Apollo Gateway
+    // Create Apollo Gateway with header forwarding
     const gateway = new ApolloGateway({
       supergraphSdl: new IntrospectAndCompose({
         subgraphs: [
@@ -35,6 +39,20 @@ async function startServer() {
         ],
         pollIntervalInMs: 10000, // Poll every 10 seconds
       }),
+      buildService({ url }) {
+        return new RemoteGraphQLDataSource({
+          url,
+          willSendRequest({ request, context }: any) {
+            // Forward the authorization header to subgraphs
+            if (context.token) {
+              request.http.headers.set(
+                'authorization',
+                `Bearer ${context.token}`
+              );
+            }
+          },
+        });
+      },
     });
 
     // Create Apollo Server
