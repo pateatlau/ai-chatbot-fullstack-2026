@@ -1,5 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 import { clsx } from 'clsx';
+import styles from './Toast.module.css';
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
 
@@ -31,11 +32,11 @@ export const Toast: FC<ToastProps> = ({
     }
   }, [duration, onClose]);
 
-  const typeStyles = {
-    success: 'bg-success-50 text-success-800 border-success-500',
-    error: 'bg-error-50 text-error-800 border-error-500',
-    warning: 'bg-warning-50 text-warning-800 border-warning-500',
-    info: 'bg-primary-50 text-primary-800 border-primary-500',
+  const typeStylesMap = {
+    success: styles.toastSuccess,
+    error: styles.toastError,
+    warning: styles.toastWarning,
+    info: styles.toastInfo,
   };
 
   const icons = {
@@ -87,23 +88,23 @@ export const Toast: FC<ToastProps> = ({
   return (
     <div
       className={clsx(
-        'flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg border-l-4 min-w-[320px] max-w-md transition-all duration-300',
-        typeStyles[type],
-        isVisible ? 'animate-slide-up opacity-100' : 'opacity-0 translate-y-2'
+        styles.toastBase,
+        typeStylesMap[type],
+        isVisible ? styles.toastVisible : styles.toastHidden
       )}
       role="alert"
       aria-live="polite"
     >
-      <div className="flex-shrink-0">{icons[type]}</div>
+      <div className={styles.toastIcon}>{icons[type]}</div>
 
-      <p className="flex-1 text-sm font-medium">{message}</p>
+      <p className={styles.toastMessage}>{message}</p>
 
       <button
         onClick={handleClose}
-        className="flex-shrink-0 text-current hover:opacity-70 transition-opacity focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-current rounded"
+        className={styles.toastButton}
         aria-label="Close notification"
       >
-        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+        <svg fill="currentColor" viewBox="0 0 20 20">
           <path
             fillRule="evenodd"
             d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"

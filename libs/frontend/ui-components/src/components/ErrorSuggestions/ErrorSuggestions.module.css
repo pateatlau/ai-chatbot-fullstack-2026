@@ -4,7 +4,11 @@
   justify-content: center;
   min-height: 300px;
   padding: 24px;
-  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+  background: linear-gradient(
+    135deg,
+    var(--bg-primary) 0%,
+    var(--bg-secondary) 100%
+  );
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
@@ -23,13 +27,13 @@
 .title {
   font-size: 24px;
   font-weight: 700;
-  color: #111827;
+  color: var(--text-primary);
   margin: 0 0 12px 0;
 }
 
 .description {
   font-size: 16px;
-  color: #6b7280;
+  color: var(--text-tertiary);
   margin: 0 0 24px 0;
   line-height: 1.5;
 }
@@ -37,8 +41,8 @@
 .details {
   margin: 16px 0;
   text-align: left;
-  background: white;
-  border: 1px solid #e5e7eb;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
   border-radius: 8px;
   padding: 12px;
 }
@@ -46,20 +50,20 @@
 .details summary {
   cursor: pointer;
   font-weight: 500;
-  color: #374151;
+  color: var(--text-secondary);
   padding: 8px;
   user-select: none;
 }
 
 .details summary:hover {
-  color: #111827;
+  color: var(--text-primary);
 }
 
 .errorStack {
   margin-top: 12px;
   padding: 12px;
-  background: #1f2937;
-  color: #10b981;
+  background: var(--text-primary);
+  color: var(--status-success);
   border-radius: 6px;
   font-size: 12px;
   overflow-x: auto;
@@ -78,8 +82,8 @@
 
 .actionButton {
   padding: 10px 20px;
-  background: #e5e7eb;
-  color: #111827;
+  background: var(--border-default);
+  color: var(--text-primary);
   border: none;
   border-radius: 6px;
   font-size: 14px;
@@ -89,7 +93,7 @@
 }
 
 .actionButton:hover {
-  background: #d1d5db;
+  background: var(--border-hover);
   transform: translateY(-1px);
 }
 
@@ -98,18 +102,18 @@
 }
 
 .actionButton.primary {
-  background: #3b82f6;
+  background: var(--interactive-primary);
   color: white;
 }
 
 .actionButton.primary:hover {
-  background: #2563eb;
+  background: var(--interactive-primaryHover);
 }
 
 .dismissButton {
   background: none;
   border: none;
-  color: #9ca3af;
+  color: var(--text-quaternary);
   font-size: 20px;
   cursor: pointer;
   padding: 4px;
@@ -117,7 +121,7 @@
 }
 
 .dismissButton:hover {
-  color: #6b7280;
+  color: var(--text-tertiary);
 }
 
 /* Responsive */

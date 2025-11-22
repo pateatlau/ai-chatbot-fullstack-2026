@@ -185,14 +185,6 @@
     }
       const usedRemotes = [
                 {
-                  entryGlobalName: "adminMfe",
-                  name: "adminMfe",
-                  type: "module",
-                  entry: "http://localhost:5176/remoteEntry.js",
-                  shareScope: "default",
-                }
-          ,
-                {
                   entryGlobalName: "authMfe",
                   name: "authMfe",
                   type: "module",
@@ -205,6 +197,14 @@
                   name: "chatbotMfe",
                   type: "module",
                   entry: "http://localhost:5175/remoteEntry.js",
+                  shareScope: "default",
+                }
+          ,
+                {
+                  entryGlobalName: "adminMfe",
+                  name: "adminMfe",
+                  type: "module",
+                  entry: "http://localhost:5176/remoteEntry.js",
                   shareScope: "default",
                 }
           ,
