@@ -64,9 +64,21 @@ const authLink = setContext((_, { headers }) => {
     if (authStorage) {
       const authState = JSON.parse(authStorage);
       token = authState.state?.accessToken;
+
+      // Debug logging (remove in production)
+      if (!token) {
+        console.warn(
+          '[Apollo Auth] No token found in auth-storage:',
+          authState
+        );
+      } else {
+        console.log('[Apollo Auth] Token found, length:', token.length);
+      }
+    } else {
+      console.warn('[Apollo Auth] No auth-storage in localStorage');
     }
   } catch (error) {
-    console.error('Failed to parse auth storage:', error);
+    console.error('[Apollo Auth] Failed to parse auth storage:', error);
   }
 
   return {

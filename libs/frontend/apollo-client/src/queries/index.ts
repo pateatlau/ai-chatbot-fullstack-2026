@@ -247,12 +247,12 @@ export const GET_SYSTEM_STATS = gql`
   query GetSystemStats {
     systemStats {
       totalUsers
-      activeUsers
       totalConversations
       totalMessages
-      dbSize
-      cacheHitRate
-      avgResponseTime
+      activeUsers24h
+      totalTokensUsed
+      averageResponseTime
+      systemUptime
     }
   }
 `;
