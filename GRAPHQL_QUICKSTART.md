@@ -140,9 +140,11 @@ http://localhost:4000/graphql
 | ECONNREFUSED :3000         | Auth service not running - check Terminal 3                             |
 | ECONNREFUSED :4000         | Gateway not running - check Terminal 6                                  |
 | "Not authenticated"        | Missing or invalid token - check Authorization header                   |
+| "Invalid signature"        | JWT_SECRET mismatch - see docs/JWT_AUTHENTICATION_FIX_NOV22.md          |
 | "Email already registered" | User exists - login instead or use different email                      |
 | Slow responses             | Check database is running (Terminal 1) and migrations done (Terminal 2) |
 | GraphQL schema incomplete  | Wait 10 seconds for introspection polling - check logs                  |
+| Admin dashboard logout     | Clear localStorage, login again with updated JWT_SECRET                 |
 
 ---
 
@@ -164,9 +166,10 @@ http://localhost:4000/graphql
 
 **For detailed reference:**
 
+- `docs/JWT_AUTHENTICATION_FIX_NOV22.md` - **Critical JWT fix (Nov 22, 2025)**
+- `docs/APOLLO_CLIENT_INTEGRATION_GUIDE.md` - Apollo Client integration
 - `docs/GRAPHQL_FEDERATION_VERIFICATION.md` - Complete guide
 - `docs/GRAPHQL_QUERY_REFERENCE.md` - All query examples
-- `docs/WEEK3_COMPLETION_SUMMARY.md` - Status & next steps
 
 ---
 

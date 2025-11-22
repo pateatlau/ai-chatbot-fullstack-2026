@@ -172,21 +172,24 @@ console.log('Token:', token); // Should see JWT token
 
 ## ⚠️ Common Issues
 
-| Issue               | Solution                                        |
-| ------------------- | ----------------------------------------------- |
-| "Module not found"  | Check tsconfig.base.json path alias             |
-| 401 Unauthorized    | Check localStorage has valid token              |
-| Queries return null | Verify GraphQL services running                 |
-| Slow responses      | Check network tab, verify service response time |
-| Cache not updating  | Verify refetch query logic                      |
+| Issue                      | Solution                                                      |
+| -------------------------- | ------------------------------------------------------------- |
+| "Module not found"         | Check tsconfig.base.json path alias                           |
+| 401 Unauthorized           | Check localStorage has valid token                            |
+| "Invalid signature"        | Clear localStorage and login again (JWT_SECRET changed)       |
+| Logged out on /admin       | See JWT_AUTHENTICATION_FIX_NOV22.md - JWT_SECRET must be same |
+| Queries return null        | Verify GraphQL services running                               |
+| Slow responses             | Check network tab, verify service response time               |
+| Cache not updating         | Verify refetch query logic                                    |
+| Token rejected by services | Ensure all services use same JWT_SECRET from root .env        |
 
 ---
 
 ## 📚 Documentation Files
 
-- **WEEK4_ACTION_PLAN.md** - Detailed implementation guide
-- **WEEK4_APOLLO_CLIENT_COMPLETE.md** - Testing & verification guide
-- **WEEK4_INTEGRATION_CHECKLIST.md** - Phase 2 & 3 tasks
+- **docs/JWT_AUTHENTICATION_FIX_NOV22.md** - Critical JWT authentication fix (Nov 22, 2025)
+- **docs/APOLLO_CLIENT_INTEGRATION_GUIDE.md** - Detailed Apollo Client setup
+- **GRAPHQL_QUICKSTART.md** - GraphQL Federation quick start
 - **libs/frontend/apollo-client/README.md** - Library documentation
 
 ---
@@ -199,8 +202,11 @@ console.log('Token:', token); // Should see JWT token
 ✅ Shell app integrated with ApolloProvider  
 ✅ TypeScript support complete  
 ✅ Error handling in place  
-✅ Authentication forwarding working  
-✅ Caching configured
+✅ Authentication forwarding working (JWT fix applied Nov 22)  
+✅ Caching configured  
+✅ JWT_SECRET centralized in root .env  
+✅ Admin dashboard authentication working  
+✅ All services using consistent JWT configuration
 
 ---
 

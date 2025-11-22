@@ -1,4 +1,5 @@
-import 'dotenv/config';
+import * as dotenv from 'dotenv';
+import * as path from 'path';
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import swaggerUi from 'swagger-ui-express';
@@ -12,6 +13,39 @@ import { buildSubgraphSchema } from '@apollo/subgraph';
 import { typeDefs } from './graphql/schema';
 import { resolvers } from './graphql/resolvers';
 import jwt from 'jsonwebtoken';
+
+// Load environment variables from workspace root
+const possibleEnvPaths = [
+  path.join(__dirname, '../../.env'),
+  path.join(__dirname, '../../../.env'),
+  path.join(process.cwd(), '.env'),
+];
+
+let envLoaded = false;
+for (const envPath of possibleEnvPaths) {
+  const result = dotenv.config({ path: envPath });
+  if (!result.error) {
+    console.log(
+      `[dotenv] Loaded ${Object.keys(result.parsed || {}).length} variables from ${envPath}`
+    );
+    console.log(`[dotenv] JWT_SECRET present: ${!!process.env.JWT_SECRET}`);
+    console.log(
+      `[dotenv] JWT_SECRET length: ${process.env.JWT_SECRET?.length || 0}`
+    );
+    if (process.env.JWT_SECRET) {
+      console.log(
+        `[dotenv] JWT_SECRET value: ${process.env.JWT_SECRET.substring(0, 30)}...`
+      );
+    }
+    envLoaded = true;
+    break;
+  }
+}
+
+if (!envLoaded) {
+  console.warn('[dotenv] Warning: Could not load .env from any path');
+  console.warn('[dotenv] JWT_SECRET fallback: will use default-secret');
+}
 
 const host = process.env.HOST ?? 'localhost';
 const port = process.env.PORT ? Number(process.env.PORT) : 3000;

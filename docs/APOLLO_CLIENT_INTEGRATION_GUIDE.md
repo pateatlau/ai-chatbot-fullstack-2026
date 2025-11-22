@@ -108,8 +108,15 @@ const errorLink = onError(
 
 // Auth Link - Add Authorization header
 const authLink = setContext(async (_, { headers }) => {
-  // Get token from cookies or localStorage
-  const token = localStorage.getItem('accessToken');
+  // Get token from zustand persist store (auth-storage)
+  // IMPORTANT: Do NOT read from plain localStorage.getItem('accessToken')
+  // The auth store uses zustand persist which stores in 'auth-storage' key
+  let token = null;
+  const authStorage = localStorage.getItem('auth-storage');
+  if (authStorage) {
+    const authState = JSON.parse(authStorage);
+    token = authState.state?.accessToken;
+  }
 
   return {
     headers: {
@@ -734,19 +741,40 @@ nx test apollo-client
 
 ---
 
-## 🎯 Step 9: Environment Configuration
+## 🔧 Step 9: Environment Configuration
 
-Create `.env.development`:
+Create `.env` at workspace root:
 
+```env
+# Database
+DATABASE_URL=postgresql://myapp:myapp_dev_password@localhost:5432/myapp_dev
+
+# JWT Configuration - CRITICAL: Must be same across ALL services
+# See docs/JWT_AUTHENTICATION_FIX_NOV22.md for details
+JWT_SECRET="my-super-secret-jwt-key-for-development-only-change-in-production-min-64-chars-long"
+
+# GraphQL Gateway
+VITE_GRAPHQL_GATEWAY_URL=http://localhost:4000/graphql
 ```
+
+Create `.env.development` (optional overrides):
+
+```env
 VITE_GRAPHQL_GATEWAY_URL=http://localhost:4000/graphql
 ```
 
 Create `.env.production`:
 
-```
+```env
 VITE_GRAPHQL_GATEWAY_URL=https://api.yourdomain.com/graphql
 ```
+
+**⚠️ CRITICAL:**
+
+- `JWT_SECRET` MUST be in root `.env` file
+- Do NOT override `JWT_SECRET` in service-level `.env` files
+- All services must use the same `JWT_SECRET` for token verification
+- See `docs/JWT_AUTHENTICATION_FIX_NOV22.md` for complete explanation
 
 ---
 
@@ -880,17 +908,23 @@ describe('UserProfile', () => {
 - [ ] Query and mutation files created
 - [ ] Custom React hooks created
 - [ ] ApolloProvider added to Shell app
+- [ ] Root `.env` file has JWT_SECRET
+- [ ] Service `.env` files do NOT override JWT_SECRET
 - [ ] Environment variables configured
 - [ ] Tests passing
 - [ ] Can query `/graphql` successfully
 - [ ] Authentication headers forwarded correctly
+- [ ] JWT tokens verified successfully (no "invalid signature" errors)
 - [ ] Cache working (verified via Apollo DevTools)
 - [ ] Error handling working
+- [ ] Admin dashboard accessible without logout
 
 ---
 
 ## 📚 Related Documentation
 
+- **JWT_AUTHENTICATION_FIX_NOV22.md** - Critical JWT authentication fix
+- **APOLLO_CLIENT_QUICKREF.md** - Quick reference card
 - **GRAPHQL_FEDERATION_VERIFICATION.md** - GraphQL setup verification
 - **GRAPHQL_QUERY_REFERENCE.md** - GraphQL query examples
 - **CONSOLIDATED_IMPLEMENTATION_ROADMAP-NX.md** - Full roadmap
