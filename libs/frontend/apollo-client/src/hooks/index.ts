@@ -23,6 +23,14 @@ export {
   useDeleteMessage,
 } from './useChat';
 
+// Profile hooks
+export {
+  useProfile,
+  useUpdateProfile,
+  useChangePassword,
+  useProfileOperations,
+} from './useProfile';
+
 // Admin hooks
 export {
   useSystemStats,

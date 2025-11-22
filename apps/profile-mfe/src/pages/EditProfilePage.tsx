@@ -8,7 +8,7 @@ import {
   ErrorBoundary,
   cn,
 } from '@myapp/frontend/ui-components';
-import { profileAPI } from '../api/profile.api';
+import { useProfile, useUpdateProfile } from '@myapp/frontend/apollo-client';
 import {
   useProfileStore,
   useProfileStoreInitialization,
@@ -23,11 +23,18 @@ function EditProfilePageContent() {
   // Use avatar upload helper
   const { uploadAvatar: uploadAvatarToStore } = useProfileAvatarUpload();
 
+  // Fetch user profile via GraphQL
+  const { data: profileData, loading: profileLoading } = useProfile();
+  const profileUser = profileData?.me;
+
+  // Mutation for updating profile
+  const updateProfileMutation = useUpdateProfile();
+
   const { user, setProfile } = useProfileStore();
   const navigate = useNavigate();
   const toast = useToast();
 
-  const [name, setName] = useState(user?.name || '');
+  const [name, setName] = useState(profileUser?.firstName || user?.name || '');
   const [avatar, setAvatar] = useState(user?.avatar || '');
   const [avatarPreview, setAvatarPreview] = useState(user?.avatar || '');
   const [isLoading, setIsLoading] = useState(false);
@@ -89,8 +96,8 @@ function EditProfilePageContent() {
       const updateData: any = {};
 
       // Only include changed fields
-      if (name !== user?.name) {
-        updateData.name = name.trim();
+      if (name !== profileUser?.firstName && name !== user?.name) {
+        updateData.firstName = name.trim();
       }
 
       if (avatar !== user?.avatar) {
@@ -103,23 +110,41 @@ function EditProfilePageContent() {
         return;
       }
 
-      const response = await profileAPI.updateProfile(updateData);
+      // Use GraphQL mutation instead of REST API
+      const result = await updateProfileMutation(updateData);
 
-      // Update profile in store
-      setProfile(response.user);
+      if (result.data?.updateProfile) {
+        const updatedProfile = result.data.updateProfile;
 
-      // Emit event for cross-MFE coordination
-      const eventBus = getEventBus();
-      eventBus.emit(EVENT_NAMES.USER_PROFILE_UPDATED, {
-        userId: user?.id,
-        updates: updateData,
-      });
+        // Update profile in store
+        setProfile({
+          id: updatedProfile.id,
+          email: updatedProfile.email,
+          name: updatedProfile.firstName,
+          role: updatedProfile.role,
+          avatar: avatar || null,
+          isActive: true,
+          createdAt: user?.createdAt || new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        });
 
-      toast.success('Profile updated successfully');
-      navigate('/profile');
+        // Emit event for cross-MFE coordination
+        const eventBus = getEventBus();
+        eventBus.emit(EVENT_NAMES.USER_PROFILE_UPDATED, {
+          userId: updatedProfile.id,
+          updates: updateData,
+        });
+
+        toast.success('Profile updated successfully');
+        navigate('/profile');
+      }
     } catch (error: any) {
       console.error('Profile update error:', error);
-      toast.error(error.response?.data?.error || 'Failed to update profile');
+      const errorMessage =
+        error.graphQLErrors?.[0]?.message ||
+        error.message ||
+        'Failed to update profile';
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }

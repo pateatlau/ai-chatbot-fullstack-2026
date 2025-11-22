@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useToast } from '@ai-chatbot/hooks';
+import { useToast } from '@myapp/frontend/hooks';
 import {
   Card,
   FormField,
@@ -8,7 +8,7 @@ import {
   ErrorBoundary,
   cn,
 } from '@myapp/frontend/ui-components';
-import { profileAPI } from '../api/profile.api';
+import { useChangePassword } from '@myapp/frontend/apollo-client';
 import { useProfileStoreInitialization } from '../store/profile.store';
 
 function SecurityPageContent() {
@@ -17,6 +17,9 @@ function SecurityPageContent() {
 
   const navigate = useNavigate();
   const toast = useToast();
+
+  // GraphQL mutation for changing password
+  const changePasswordMutation = useChangePassword();
 
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -84,30 +87,34 @@ function SecurityPageContent() {
     try {
       setIsLoading(true);
 
-      await profileAPI.changePassword({
-        currentPassword,
-        newPassword,
-        confirmPassword,
-      });
+      // Use GraphQL mutation instead of REST API
+      const result = await changePasswordMutation(currentPassword, newPassword);
 
-      toast.success('Password changed successfully. Please login again.');
+      if (result.data?.changePassword?.success) {
+        toast.success('Password changed successfully. Please login again.');
 
-      // Clear form
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
+        // Clear form
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
 
-      // Redirect to login after 2 seconds
-      setTimeout(() => {
-        navigate('/login');
-      }, 2000);
+        // Redirect to login after 2 seconds
+        setTimeout(() => {
+          navigate('/login');
+        }, 2000);
+      }
     } catch (error: any) {
       console.error('Password change error:', error);
       const errorMessage =
-        error.response?.data?.error || 'Failed to change password';
+        error.graphQLErrors?.[0]?.message ||
+        error.message ||
+        'Failed to change password';
 
       // Check if it's a current password error
-      if (errorMessage.includes('Current password')) {
+      if (
+        errorMessage.includes('Current password') ||
+        errorMessage.includes('current')
+      ) {
         setErrors({ currentPassword: errorMessage });
       } else {
         toast.error(errorMessage);
