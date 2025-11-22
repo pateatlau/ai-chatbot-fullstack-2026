@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Card, Button, ErrorBoundary } from '@myapp/frontend/ui-components';
-import { useToast } from '@myapp/frontend/hooks';
+import { useToast, useRequireRole } from '@myapp/frontend/hooks';
 import { adminAPI, User } from '../api/admin.api';
 import {
   useAdminStore,
@@ -8,6 +8,9 @@ import {
 } from '../store/admin.store';
 
 function UserManagementPageContent() {
+  // Ensure only ADMIN users can access this page
+  useRequireRole('ADMIN');
+
   // Initialize admin store with event bus subscriptions
   useAdminStoreInitialization();
 

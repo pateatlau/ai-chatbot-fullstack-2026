@@ -1,6 +1,6 @@
 import { useLocation } from 'react-router-dom';
 import { ErrorBoundary } from '@myapp/frontend/ui-components';
-import { RecoveryAction } from '@myapp/frontend/hooks';
+import { RecoveryAction, useRequireRole } from '@myapp/frontend/hooks';
 import {
   AdminDashboardPage,
   UserManagementPage,
@@ -9,6 +9,9 @@ import {
 } from '../pages';
 
 function AppContent() {
+  // Ensure admin role at MFE root level for defense-in-depth
+  useRequireRole('ADMIN');
+
   const location = useLocation();
 
   // Router path-based rendering - shell controls routing

@@ -44,8 +44,8 @@ export const useAuthStore = create<AuthState>()(
       setAuth: (user, accessToken, refreshToken) => {
         set({
           user,
-          accessToken: null, // Never store tokens in state that persists
-          refreshToken: null, // Tokens are in HttpOnly cookies
+          accessToken: accessToken || null, // Store token for cross-port API calls (also in HttpOnly cookie)
+          refreshToken: refreshToken || null, // Store token for cross-port API calls (also in HttpOnly cookie)
           isAuthenticated: true,
           isLoading: false,
         });
@@ -118,7 +118,7 @@ export const useAuthStore = create<AuthState>()(
       },
 
       setTokens: (accessToken, refreshToken) =>
-        set({ accessToken: null, refreshToken: null }), // Never store in state
+        set({ accessToken, refreshToken }), // Store for cross-port API calls
 
       setLoading: (isLoading) => set({ isLoading }),
     }),
@@ -128,8 +128,9 @@ export const useAuthStore = create<AuthState>()(
       partialize: (state) => ({
         user: state.user,
         isAuthenticated: state.isAuthenticated,
-        // REMOVED: accessToken and refreshToken are no longer persisted
-        // These are now stored only in HttpOnly cookies
+        accessToken: state.accessToken, // Persisted for dev cross-port API calls
+        refreshToken: state.refreshToken, // Persisted for dev cross-port API calls
+        // NOTE: Also stored in HttpOnly cookies for production use
       }),
     }
   )

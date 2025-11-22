@@ -2,6 +2,7 @@ import * as dotenv from 'dotenv';
 import * as path from 'path';
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import swaggerUi from 'swagger-ui-express';
 import adminRoutes from './routes/admin.routes';
 import { PrismaClient } from '@prisma/client';
@@ -63,6 +64,7 @@ app.use(
     allowedHeaders: ['Content-Type', 'Authorization'],
   })
 );
+app.use(cookieParser()); // Parse cookies for HttpOnly token access
 app.use(express.json());
 
 // JWT context builder for GraphQL

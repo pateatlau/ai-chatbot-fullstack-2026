@@ -99,41 +99,24 @@ class AdminAPI {
       if (isDev) {
         try {
           const authStorage = localStorage.getItem('auth-storage');
-          console.log(
-            '[AdminAPI] DEV MODE - Request interceptor - authStorage:',
-            authStorage ? 'exists' : 'null'
-          );
 
           if (authStorage) {
             const authState = JSON.parse(authStorage);
-            console.log('[AdminAPI] Parsed authState:', {
-              hasState: !!authState.state,
-              hasAccessToken: !!authState.state?.accessToken,
-              tokenPreview: authState.state?.accessToken
-                ? authState.state.accessToken.substring(0, 20) + '...'
-                : 'none',
-            });
-
             const token = authState.state?.accessToken;
-            if (token) {
+
+            // Validate token exists and is a string
+            if (token && typeof token === 'string' && token.length > 10) {
               config.headers.Authorization = `Bearer ${token}`;
-              console.log(
-                '[AdminAPI] Authorization header set with Bearer token (DEV MODE)'
-              );
             } else {
-              console.warn('[AdminAPI] No accessToken found in auth state');
+              console.warn(
+                '[AdminAPI] Invalid or missing token in auth state, continuing without auth header'
+              );
             }
-          } else {
-            console.warn('[AdminAPI] No auth-storage in localStorage');
           }
         } catch (error) {
-          console.error(
-            '[AdminAPI] Failed to get token from localStorage:',
-            error
-          );
+          console.error('[AdminAPI] Failed to process auth state:', error);
+          // Continue without token - let server respond with 401 if needed
         }
-      } else {
-        console.log('[AdminAPI] PROD MODE - Relying on HttpOnly cookies only');
       }
       return config;
     });
@@ -150,16 +133,23 @@ class AdminAPI {
         });
 
         if (error.response?.status === 401) {
-          console.warn(
-            '[AdminAPI] 401 Unauthorized - clearing auth and redirecting to /login'
-          );
-          // Clear auth state before redirecting to avoid PublicRoute redirecting back to dashboard
-          const { clearAuth } = useAuthStore.getState();
-          clearAuth();
-          // Small delay to ensure state is cleared
-          setTimeout(() => {
-            window.location.href = '/login';
-          }, 100);
+          const authState = useAuthStore.getState();
+          const { user, isAuthenticated, clearAuth } = authState;
+
+          // Only logout if user is actually authenticated (avoid race conditions)
+          if (user && isAuthenticated) {
+            console.warn(
+              '[AdminAPI] 401 Unauthorized - Session may have expired. Clearing auth and redirecting to /login'
+            );
+            // Clear auth state before redirecting
+            clearAuth();
+            // Small delay to ensure state is cleared before navigation
+            setTimeout(() => {
+              window.location.href = '/login';
+            }, 100);
+          } else {
+            console.log('[AdminAPI] 401 received but user already logged out');
+          }
         }
         return Promise.reject(error);
       }

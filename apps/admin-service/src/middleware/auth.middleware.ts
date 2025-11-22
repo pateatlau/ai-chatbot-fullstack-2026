@@ -16,6 +16,7 @@ function getJwtSecret(): string {
 
 /**
  * Middleware to verify JWT token
+ * Checks both Authorization header and HttpOnly cookies for token
  */
 export const authMiddleware = (
   req: AuthRequest,
@@ -23,13 +24,22 @@ export const authMiddleware = (
   next: NextFunction
 ) => {
   try {
-    const authHeader = req.headers.authorization;
+    let token: string | null = null;
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    // Try to get token from Authorization header first (for API calls from admin-mfe)
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.substring(7);
+    }
+    // Fall back to HttpOnly cookie (for same-domain requests)
+    else if ((req as any).cookies?.accessToken) {
+      token = (req as any).cookies.accessToken;
+    }
+
+    if (!token) {
       return res.status(401).json({ error: 'No token provided' });
     }
 
-    const token = authHeader.substring(7);
     const JWT_SECRET = getJwtSecret();
 
     try {
