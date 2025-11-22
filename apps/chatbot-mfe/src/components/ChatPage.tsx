@@ -17,12 +17,16 @@ import {
   useDeleteConversation,
   useSendMessage,
 } from '@myapp/frontend/apollo-client';
+import { useAuthStore } from '@myapp/frontend/stores';
 import type { Message } from '../api/chatbot.api';
 import styles from './ChatPage.module.css';
 
 function ChatPageContent() {
   // Initialize chatbot store with event bus subscriptions
   useChatbotStoreInitialization();
+
+  // Get auth token for API calls
+  const accessToken = useAuthStore((state) => state.accessToken);
 
   // Get state and actions from store
   const {
@@ -217,6 +221,7 @@ function ChatPageContent() {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
           },
           credentials: 'include',
           body: JSON.stringify({ content }),
