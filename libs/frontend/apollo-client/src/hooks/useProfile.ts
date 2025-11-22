@@ -1,4 +1,8 @@
 import { useQuery, useMutation, useApolloClient } from '@apollo/client';
+import {
+  useUpdateProfile as useUpdateProfileAuth,
+  useChangePassword as useChangePasswordAuth,
+} from './useAuth';
 import { GET_ME, UPDATE_PROFILE, CHANGE_PASSWORD } from '../queries';
 
 /**
@@ -11,85 +15,16 @@ export function useProfile() {
 }
 
 /**
- * Hook to update user profile
- */
-export function useUpdateProfile() {
-  const client = useApolloClient();
-
-  const [updateProfile] = useMutation(UPDATE_PROFILE, {
-    onCompleted: (data) => {
-      if (data?.updateProfile) {
-        // Refetch GET_ME query to keep profile in sync
-        client
-          .refetchQueries({
-            include: [GET_ME],
-          })
-          .catch((err) => {
-            console.error('Error refetching profile:', err);
-          });
-      }
-    },
-    errorPolicy: 'all',
-  });
-
-  return (variables: any) =>
-    updateProfile({
-      variables: { input: variables },
-    });
-}
-
-/**
- * Hook to change password
- */
-export function useChangePassword() {
-  const [changePassword] = useMutation(CHANGE_PASSWORD, {
-    errorPolicy: 'all',
-  });
-
-  return (oldPassword: string, newPassword: string) =>
-    changePassword({
-      variables: { oldPassword, newPassword },
-    });
-}
-
-/**
  * Combined hook for profile operations (similar to useChat pattern)
+ * Combines profile fetching with update and password change operations
  */
 export function useProfileOperations() {
   const profileQuery = useQuery(GET_ME, {
     errorPolicy: 'all',
   });
 
-  const client = useApolloClient();
-
-  const [updateProfileMutation] = useMutation(UPDATE_PROFILE, {
-    onCompleted: (data) => {
-      if (data?.updateProfile) {
-        client
-          .refetchQueries({
-            include: [GET_ME],
-          })
-          .catch((err) => {
-            console.error('Error refetching profile:', err);
-          });
-      }
-    },
-    errorPolicy: 'all',
-  });
-
-  const [changePasswordMutation] = useMutation(CHANGE_PASSWORD, {
-    errorPolicy: 'all',
-  });
-
-  const updateProfile = (variables: any) =>
-    updateProfileMutation({
-      variables: { input: variables },
-    });
-
-  const changePassword = (oldPassword: string, newPassword: string) =>
-    changePasswordMutation({
-      variables: { oldPassword, newPassword },
-    });
+  const updateProfile = useUpdateProfileAuth();
+  const changePassword = useChangePasswordAuth();
 
   return {
     ...profileQuery,
