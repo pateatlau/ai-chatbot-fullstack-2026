@@ -13,7 +13,7 @@ const authService = new AuthService();
 export class AuthController {
   async register(req: Request, res: Response) {
     try {
-      // Validate input (role is included in schema with default 'USER')
+      // Validate input (role is included in schema with transform to default 'USER' if empty)
       const validatedData = CreateUserSchema.parse(req.body);
 
       // Register user (now returns login response with tokens)

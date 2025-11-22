@@ -23,7 +23,10 @@ export const CreateUserSchema = z.object({
     .regex(/[0-9]/, 'Must contain number')
     .regex(/[^A-Za-z0-9]/, 'Must contain special character'),
   name: z.string().min(2).max(100),
-  role: z.enum(['USER', 'ADMIN']).default('USER'),
+  role: z
+    .string()
+    .transform((val) => (val === '' ? 'USER' : val))
+    .pipe(z.enum(['USER', 'ADMIN'])),
 });
 
 // Extended schema with confirmPassword (for forms)

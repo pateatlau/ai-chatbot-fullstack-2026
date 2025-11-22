@@ -132,6 +132,7 @@ export function RegisterPage() {
             </label>
             <select
               {...register('role')}
+              defaultValue=""
               style={{
                 width: '100%',
                 padding: '8px',

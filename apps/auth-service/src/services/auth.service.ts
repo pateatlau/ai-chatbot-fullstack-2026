@@ -32,9 +32,9 @@ export class AuthService {
     // Hash password
     const hashedPassword = await bcrypt.hash(input.password, 12);
 
-    // Create user with specified role or default to USER
+    // Create user with specified role
     const userId = uuidv4();
-    const userRole = input.role || 'USER';
+    const userRole = input.role;
     await query(
       `INSERT INTO users (id, email, password, name, role, "isActive", "createdAt", "updatedAt") 
        VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())`,
