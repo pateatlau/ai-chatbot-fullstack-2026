@@ -31,7 +31,7 @@ export function useRegister() {
     try {
       const result = await register({
         variables: {
-          input: { email, password, name },
+          input: { email, password, firstName: name },
         },
       });
 
@@ -144,10 +144,10 @@ export function useUpdateProfile() {
     refetchQueries: [{ query: GET_ME }],
   });
 
-  return (name: string, email: string) => {
+  return (name: string) => {
     return updateProfile({
       variables: {
-        input: { name, email },
+        input: { firstName: name },
       },
     });
   };
@@ -162,7 +162,8 @@ export function useChangePassword() {
   return (currentPassword: string, newPassword: string) => {
     return changePassword({
       variables: {
-        input: { currentPassword, newPassword },
+        oldPassword: currentPassword,
+        newPassword: newPassword,
       },
     });
   };

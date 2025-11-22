@@ -9,7 +9,9 @@ export const GET_ME = gql`
     me {
       id
       email
-      name
+      username
+      firstName
+      lastName
       role
       isActive
       createdAt
@@ -26,7 +28,9 @@ export const REGISTER = gql`
       user {
         id
         email
-        name
+        username
+        firstName
+        lastName
         role
       }
       token
@@ -43,7 +47,9 @@ export const LOGIN = gql`
       user {
         id
         email
-        name
+        username
+        firstName
+        lastName
         role
       }
       token
@@ -75,21 +81,19 @@ export const REFRESH_TOKEN = gql`
 export const UPDATE_PROFILE = gql`
   mutation UpdateProfile($input: UpdateProfileInput!) {
     updateProfile(input: $input) {
-      success
-      message
-      user {
-        id
-        email
-        name
-        role
-      }
+      id
+      email
+      username
+      firstName
+      lastName
+      role
     }
   }
 `;
 
 export const CHANGE_PASSWORD = gql`
-  mutation ChangePassword($input: ChangePasswordInput!) {
-    changePassword(input: $input) {
+  mutation ChangePassword($oldPassword: String!, $newPassword: String!) {
+    changePassword(oldPassword: $oldPassword, newPassword: $newPassword) {
       success
       message
     }
@@ -251,12 +255,8 @@ export const GET_AUDIT_LOGS = gql`
 export const UPDATE_USER_ROLE = gql`
   mutation UpdateUserRole($userId: ID!, $role: UserRole!) {
     updateUserRole(userId: $userId, role: $role) {
-      success
-      message
-      user {
-        id
-        role
-      }
+      id
+      role
     }
   }
 `;
@@ -264,12 +264,8 @@ export const UPDATE_USER_ROLE = gql`
 export const DEACTIVATE_USER = gql`
   mutation DeactivateUser($userId: ID!) {
     deactivateUser(userId: $userId) {
-      success
-      message
-      user {
-        id
-        isActive
-      }
+      id
+      isActive
     }
   }
 `;
@@ -277,12 +273,8 @@ export const DEACTIVATE_USER = gql`
 export const ACTIVATE_USER = gql`
   mutation ActivateUser($userId: ID!) {
     activateUser(userId: $userId) {
-      success
-      message
-      user {
-        id
-        isActive
-      }
+      id
+      isActive
     }
   }
 `;
