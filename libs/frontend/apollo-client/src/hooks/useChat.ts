@@ -141,14 +141,14 @@ export function useSendMessage() {
     onCompleted: (data) => {
       if (data?.sendMessage?.conversationId) {
         // Refetch conversation to get updated messages
-        client.refetchQueries({
-          include: [GET_CONVERSATION],
-        });
-
-        // Also refetch stats
-        client.refetchQueries({
-          include: [GET_CHAT_STATS],
-        });
+        // Only refetch queries that are actively being used
+        client
+          .refetchQueries({
+            include: [GET_CONVERSATION],
+          })
+          .catch((err) => {
+            console.error('Error refetching conversation:', err);
+          });
       }
     },
     errorPolicy: 'all',
