@@ -34,11 +34,10 @@ function RegisterContent() {
 
     try {
       const { confirmPassword, ...registerData } = data;
-      const result = await register(
-        registerData.email,
-        registerData.password,
-        registerData.name
-      );
+      console.log('[Register] Form data:', registerData);
+      console.log('[Register] Role:', registerData.role);
+
+      const result = await register(registerData);
 
       if (result.data?.register) {
         const userData = result.data.register.user;
