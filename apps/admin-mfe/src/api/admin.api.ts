@@ -102,7 +102,7 @@ class AdminAPI {
 
           if (authStorage) {
             const authState = JSON.parse(authStorage);
-            const token = authState.state?.accessToken;
+            const token = authState.state.accessToken;
 
             // Validate token exists and is a string
             if (token && typeof token === 'string' && token.length > 10) {
