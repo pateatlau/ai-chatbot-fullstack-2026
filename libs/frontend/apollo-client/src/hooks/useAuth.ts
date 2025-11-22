@@ -40,12 +40,29 @@ export function useUsers(page = 1, limit = 10) {
 export function useRegister() {
   const [register] = useMutation(REGISTER);
 
-  return async (email: string, password: string, name: string) => {
+  return async (data: any) => {
     try {
+      // Support both object format {email, password, name, role} and individual parameters
+      const input =
+        typeof data === 'string'
+          ? {
+              email: data,
+              password: arguments[1],
+              firstName: arguments[2],
+              role: arguments[3],
+            }
+          : {
+              email: data.email,
+              password: data.password,
+              firstName: data.name,
+              role: data.role, // Include role from registerData
+            };
+
+      console.log('[useRegister] Called with data:', data);
+      console.log('[useRegister] Sending to GraphQL with input:', input);
+
       const result = await register({
-        variables: {
-          input: { email, password, firstName: name },
-        },
+        variables: { input },
       });
 
       if (result.data?.register?.token) {
@@ -58,6 +75,10 @@ export function useRegister() {
         }
       }
 
+      console.log(
+        '[useRegister] Response received, role:',
+        result.data?.register?.user?.role
+      );
       return result;
     } catch (error) {
       console.error('Registration failed:', error);
