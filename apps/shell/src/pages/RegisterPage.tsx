@@ -50,7 +50,16 @@ export function RegisterPage() {
     setIsLoading(true);
 
     try {
+      console.log('[RegisterPage] Form data:', JSON.stringify(data, null, 2));
+      console.log('[RegisterPage] data.role:', data.role);
+      console.log('[RegisterPage] data.role type:', typeof data.role);
+
       const { confirmPassword, ...registerData } = data;
+      console.log(
+        '[RegisterPage] registerData being sent:',
+        JSON.stringify(registerData, null, 2)
+      );
+
       await registerUser(registerData);
       toast.success('Account created successfully!');
 
@@ -131,7 +140,14 @@ export function RegisterPage() {
               Role <span style={{ color: 'red' }}>*</span>
             </label>
             <select
-              {...register('role')}
+              {...register('role', {
+                onChange: (e) => {
+                  console.log(
+                    '[RegisterPage] Role select changed:',
+                    e.target.value
+                  );
+                },
+              })}
               defaultValue=""
               style={{
                 width: '100%',

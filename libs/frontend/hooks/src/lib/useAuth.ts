@@ -107,11 +107,22 @@ export function useAuth(): UseAuthReturn {
   const register = useCallback(
     async (data: RegisterData): Promise<AuthResponse> => {
       try {
+        console.log(
+          '[useAuth] Register called with data:',
+          JSON.stringify(data, null, 2)
+        );
+        console.log('[useAuth] data.role value:', data.role);
+        console.log('[useAuth] data.role type:', typeof data.role);
+
         const response = await axios.post<AuthResponse>(
           `${API_URL}/auth/register`,
           data
         );
 
+        console.log(
+          '[useAuth] Register response user role:',
+          response.data.user.role
+        );
         const { user, accessToken, refreshToken } = response.data;
         setAuth(user, accessToken, refreshToken);
 
