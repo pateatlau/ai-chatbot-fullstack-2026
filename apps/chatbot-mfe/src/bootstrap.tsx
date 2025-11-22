@@ -2,6 +2,7 @@ import { StrictMode } from 'react';
 import * as ReactDOM from 'react-dom/client';
 import { init } from '@module-federation/runtime';
 import App from './app/app';
+import './styles.css';
 
 // Initialize Module Federation runtime for standalone mode
 init({

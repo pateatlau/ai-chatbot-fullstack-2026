@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { init } from '@module-federation/runtime';
 import App from './app/app';
 import { startMocks } from './mocks/config';
+import './styles.css';
 
 // Initialize Module Federation runtime
 init({

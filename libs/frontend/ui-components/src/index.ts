@@ -17,6 +17,17 @@ export type { ModalProps } from './components/Modal';
 export { Toast } from './components/Toast';
 export type { ToastProps, ToastType } from './components/Toast';
 
+export { ErrorBoundary } from './components/ErrorBoundary/ErrorBoundary';
+export type {
+  ErrorBoundaryProps,
+  ErrorBoundaryVariant,
+} from './components/ErrorBoundary/ErrorBoundary';
+
+export { MfeErrorBoundary } from './components/ErrorBoundary/MfeErrorBoundary';
+export type { MfeErrorBoundaryProps } from './components/ErrorBoundary/MfeErrorBoundary';
+
+export { ErrorLogDashboard } from './components/ErrorLogDashboard/ErrorLogDashboard';
+
 // Design System Exports
 export { designTokens, componentPresets, cn } from './lib/design-tokens';
 

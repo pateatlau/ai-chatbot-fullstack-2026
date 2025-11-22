@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { ErrorBoundary } from '@myapp/frontend/ui-components';
 import { ConversationSidebar } from './ConversationSidebar';
 import { MessageList } from './MessageList';
 import { MessageInput } from './MessageInput';
@@ -11,7 +12,7 @@ import {
 import { chatbotAPI, type Message } from '../api/chatbot.api';
 import styles from './ChatPage.module.css';
 
-export function ChatPage() {
+function ChatPageContent() {
   // Initialize chatbot store with event bus subscriptions
   useChatbotStoreInitialization();
 
@@ -321,5 +322,13 @@ export function ChatPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export function ChatPage() {
+  return (
+    <ErrorBoundary variant="full" context="page-chat">
+      <ChatPageContent />
+    </ErrorBoundary>
   );
 }

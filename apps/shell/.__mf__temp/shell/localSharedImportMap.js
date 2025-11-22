@@ -184,6 +184,38 @@
         
     }
       const usedRemotes = [
+                {
+                  entryGlobalName: "authMfe",
+                  name: "authMfe",
+                  type: "module",
+                  entry: "http://localhost:5174/remoteEntry.js",
+                  shareScope: "default",
+                }
+          ,
+                {
+                  entryGlobalName: "profileMfe",
+                  name: "profileMfe",
+                  type: "module",
+                  entry: "http://localhost:5177/remoteEntry.js",
+                  shareScope: "default",
+                }
+          ,
+                {
+                  entryGlobalName: "adminMfe",
+                  name: "adminMfe",
+                  type: "module",
+                  entry: "http://localhost:5176/remoteEntry.js",
+                  shareScope: "default",
+                }
+          ,
+                {
+                  entryGlobalName: "chatbotMfe",
+                  name: "chatbotMfe",
+                  type: "module",
+                  entry: "http://localhost:5175/remoteEntry.js",
+                  shareScope: "default",
+                }
+          
       ]
       export {
         usedShared,

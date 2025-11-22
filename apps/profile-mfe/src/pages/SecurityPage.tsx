@@ -1,11 +1,16 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@ai-chatbot/hooks';
-import { Card, FormField, Button } from '@myapp/frontend/ui-components';
+import {
+  Card,
+  FormField,
+  Button,
+  ErrorBoundary,
+} from '@myapp/frontend/ui-components';
 import { profileAPI } from '../api/profile.api';
 import { useProfileStoreInitialization } from '../store/profile.store';
 
-export function SecurityPage() {
+function SecurityPageContent() {
   // Initialize profile store with event bus subscriptions
   useProfileStoreInitialization();
 
@@ -201,5 +206,13 @@ export function SecurityPage() {
         </Card>
       </div>
     </div>
+  );
+}
+
+export function SecurityPage() {
+  return (
+    <ErrorBoundary variant="full" context="page-security">
+      <SecurityPageContent />
+    </ErrorBoundary>
   );
 }

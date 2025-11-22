@@ -29,7 +29,8 @@ export class AuthController {
       res.cookie('accessToken', result.accessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
+        sameSite: 'lax', // Changed from 'strict' to allow cross-port requests in dev
+        domain: 'localhost', // Allow cookie to be used across different ports on localhost
         maxAge: 15 * 60 * 1000, // 15 minutes
         path: '/',
       });
@@ -37,14 +38,18 @@ export class AuthController {
       res.cookie('refreshToken', result.refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
+        sameSite: 'lax', // Changed from 'strict' to allow cross-port requests in dev
+        domain: 'localhost', // Allow cookie to be used across different ports on localhost
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         path: '/',
       });
 
-      // Return user data without tokens
+      // Return user data and token
+      // Token is also in HttpOnly cookie for production use
+      // Returning it here allows frontend to send it via Authorization header for dev/cross-service calls
       res.status(201).json({
         user: result.user,
+        accessToken: result.accessToken,
         expiresIn: result.expiresIn,
         message: 'Registration successful',
       });
@@ -72,7 +77,8 @@ export class AuthController {
       res.cookie('accessToken', result.accessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
+        sameSite: 'lax', // Changed from 'strict' to allow cross-port requests in dev
+        domain: 'localhost', // Allow cookie to be used across different ports on localhost
         maxAge: 15 * 60 * 1000, // 15 minutes
         path: '/',
       });
@@ -80,14 +86,18 @@ export class AuthController {
       res.cookie('refreshToken', result.refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
+        sameSite: 'lax', // Changed from 'strict' to allow cross-port requests in dev
+        domain: 'localhost', // Allow cookie to be used across different ports on localhost
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         path: '/',
       });
 
-      // Return user data without tokens
+      // Return user data and token
+      // Token is also in HttpOnly cookie for production use
+      // Returning it here allows frontend to send it via Authorization header for dev/cross-service calls
       res.status(200).json({
         user: result.user,
+        accessToken: result.accessToken,
         expiresIn: result.expiresIn,
         message: 'Login successful',
       });
@@ -125,8 +135,8 @@ export class AuthController {
       const result = await authService.logout(refreshToken);
 
       // Clear cookies
-      res.clearCookie('accessToken', { path: '/' });
-      res.clearCookie('refreshToken', { path: '/' });
+      res.clearCookie('accessToken', { path: '/', domain: 'localhost' });
+      res.clearCookie('refreshToken', { path: '/', domain: 'localhost' });
 
       res.status(200).json(result);
     } catch (error) {
@@ -153,7 +163,8 @@ export class AuthController {
       res.cookie('accessToken', result.accessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
+        sameSite: 'lax', // Changed: 'strict' → 'lax' to allow cross-port requests in dev
+        domain: 'localhost', // Added: enables cookie to be sent to different ports on localhost
         maxAge: 15 * 60 * 1000, // 15 minutes
         path: '/',
       });
@@ -161,7 +172,8 @@ export class AuthController {
       res.cookie('refreshToken', result.refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
+        sameSite: 'lax', // Changed: 'strict' → 'lax' to allow cross-port requests in dev
+        domain: 'localhost', // Added: enables cookie to be sent to different ports on localhost
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         path: '/',
       });

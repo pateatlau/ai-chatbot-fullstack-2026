@@ -1,7 +1,12 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@myapp/frontend/hooks';
-import { Card, FormField, Button } from '@myapp/frontend/ui-components';
+import {
+  Card,
+  FormField,
+  Button,
+  ErrorBoundary,
+} from '@myapp/frontend/ui-components';
 import { profileAPI } from '../api/profile.api';
 import {
   useProfileStore,
@@ -10,7 +15,7 @@ import {
 } from '../store/profile.store';
 import { getEventBus, EVENT_NAMES } from '@myapp/shared/event-bus';
 
-export function EditProfilePage() {
+function EditProfilePageContent() {
   // Initialize profile store with event bus subscriptions
   useProfileStoreInitialization();
 
@@ -203,5 +208,13 @@ export function EditProfilePage() {
         </form>
       </Card>
     </div>
+  );
+}
+
+export function EditProfilePage() {
+  return (
+    <ErrorBoundary variant="full" context="page-profile-edit">
+      <EditProfilePageContent />
+    </ErrorBoundary>
   );
 }

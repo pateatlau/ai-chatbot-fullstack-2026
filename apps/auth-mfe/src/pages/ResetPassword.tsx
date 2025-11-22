@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
-import { FormField, Card } from '@myapp/frontend/ui-components';
+import { FormField, Card, ErrorBoundary } from '@myapp/frontend/ui-components';
 import { useToastStore } from '@myapp/frontend/stores';
 import { authService } from '../services/auth.service';
 
@@ -28,7 +28,7 @@ const resetPasswordSchema = z
 
 type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
 
-export function ResetPassword() {
+function ResetPasswordContent() {
   const [isLoading, setIsLoading] = useState(false);
   const { token } = useParams<{ token: string }>();
   const navigate = useNavigate();
@@ -175,6 +175,14 @@ export function ResetPassword() {
         </Card>
       </div>
     </div>
+  );
+}
+
+export function ResetPassword() {
+  return (
+    <ErrorBoundary variant="full" context="page-reset-password">
+      <ResetPasswordContent />
+    </ErrorBoundary>
   );
 }
 

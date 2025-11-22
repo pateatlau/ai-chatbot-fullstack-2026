@@ -6,9 +6,9 @@ import {
   useNotificationPreferences,
 } from '../store/profile.store';
 import { useToast } from '@myapp/frontend/hooks';
-import { Card, Button } from '@myapp/frontend/ui-components';
+import { Card, Button, ErrorBoundary } from '@myapp/frontend/ui-components';
 
-export function SettingsPage() {
+function SettingsPageContent() {
   // Initialize profile store with event bus subscriptions
   useProfileStoreInitialization();
 
@@ -236,5 +236,13 @@ export function SettingsPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export function SettingsPage() {
+  return (
+    <ErrorBoundary variant="full" context="page-settings">
+      <SettingsPageContent />
+    </ErrorBoundary>
   );
 }

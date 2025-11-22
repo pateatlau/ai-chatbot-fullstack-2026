@@ -2,12 +2,12 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link } from 'react-router-dom';
-import { FormField, Card } from '@myapp/frontend/ui-components';
+import { FormField, Card, ErrorBoundary } from '@myapp/frontend/ui-components';
 import { useAuthStore, useToastStore } from '@myapp/frontend/stores';
 import { loginSchema, LoginFormData } from '../schemas/auth.schema';
 import { authService } from '../services/auth.service';
 
-export function Login() {
+function LoginContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const { setAuth } = useAuthStore();
@@ -144,6 +144,14 @@ export function Login() {
         </Card>
       </div>
     </div>
+  );
+}
+
+export function Login() {
+  return (
+    <ErrorBoundary variant="full" context="page-login">
+      <LoginContent />
+    </ErrorBoundary>
   );
 }
 

@@ -1,10 +1,11 @@
 import { useLocation } from 'react-router-dom';
+import { ErrorBoundary } from '@myapp/frontend/ui-components';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
 import ForgotPassword from '../pages/ForgotPassword';
 import ResetPassword from '../pages/ResetPassword';
 
-export function App() {
+function AppContent() {
   const location = useLocation();
 
   // When embedded in shell, render component based on current path
@@ -23,6 +24,14 @@ export function App() {
 
   // Default to login for /login or any other path
   return <Login />;
+}
+
+export function App() {
+  return (
+    <ErrorBoundary variant="full" context="auth-mfe-root">
+      <AppContent />
+    </ErrorBoundary>
+  );
 }
 
 export default App;

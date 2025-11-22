@@ -1,6 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Card, Button, Input } from '@myapp/frontend/ui-components';
+import {
+  Card,
+  Button,
+  Input,
+  ErrorBoundary,
+} from '@myapp/frontend/ui-components';
 import { useToast } from '@myapp/frontend/hooks';
 import { adminAPI, User } from '../api/admin.api';
 import {
@@ -9,7 +14,7 @@ import {
 } from '../store/admin.store';
 import { getEventBus, EVENT_NAMES } from '@myapp/shared/event-bus';
 
-export function UserDetailPage() {
+function UserDetailPageContent() {
   // Initialize admin store with event bus subscriptions
   useAdminStoreInitialization();
 
@@ -305,5 +310,13 @@ export function UserDetailPage() {
         </div>
       </Card>
     </div>
+  );
+}
+
+export function UserDetailPage() {
+  return (
+    <ErrorBoundary variant="full" context="page-user-detail">
+      <UserDetailPageContent />
+    </ErrorBoundary>
   );
 }

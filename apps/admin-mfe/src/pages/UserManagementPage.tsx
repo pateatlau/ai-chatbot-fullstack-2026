@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Card, Button } from '@myapp/frontend/ui-components';
+import { Card, Button, ErrorBoundary } from '@myapp/frontend/ui-components';
 import { useToast } from '@myapp/frontend/hooks';
 import { adminAPI, User } from '../api/admin.api';
 import {
@@ -7,7 +7,7 @@ import {
   useAdminStoreInitialization,
 } from '../store/admin.store';
 
-export function UserManagementPage() {
+function UserManagementPageContent() {
   // Initialize admin store with event bus subscriptions
   useAdminStoreInitialization();
 
@@ -301,5 +301,13 @@ export function UserManagementPage() {
         )}
       </Card>
     </div>
+  );
+}
+
+export function UserManagementPage() {
+  return (
+    <ErrorBoundary variant="full" context="page-users">
+      <UserManagementPageContent />
+    </ErrorBoundary>
   );
 }

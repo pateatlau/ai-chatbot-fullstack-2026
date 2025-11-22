@@ -19,3 +19,10 @@ export {
   type UseApiOptions,
   type UseApiReturn,
 } from './lib/useApi';
+
+// Error logging hooks
+export {
+  useErrorLogger,
+  type ErrorLogContext,
+  type ErrorLog,
+} from './lib/useErrorLogger';

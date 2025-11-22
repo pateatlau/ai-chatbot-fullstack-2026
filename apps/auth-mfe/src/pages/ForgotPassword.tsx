@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link } from 'react-router-dom';
 import { z } from 'zod';
-import { FormField, Card } from '@myapp/frontend/ui-components';
+import { FormField, Card, ErrorBoundary } from '@myapp/frontend/ui-components';
 import { useToastStore } from '@myapp/frontend/stores';
 import { authService } from '../services/auth.service';
 
@@ -13,7 +13,7 @@ const forgotPasswordSchema = z.object({
 
 type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
 
-export function ForgotPassword() {
+function ForgotPasswordContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const { addToast } = useToastStore();
@@ -144,6 +144,14 @@ export function ForgotPassword() {
         </Card>
       </div>
     </div>
+  );
+}
+
+export function ForgotPassword() {
+  return (
+    <ErrorBoundary variant="full" context="page-forgot-password">
+      <ForgotPasswordContent />
+    </ErrorBoundary>
   );
 }
 

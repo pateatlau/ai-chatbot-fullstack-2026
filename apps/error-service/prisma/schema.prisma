@@ -1,0 +1,59 @@
+// This is your Prisma schema file for error logging service
+// See docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ErrorSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum ErrorStatus {
+  NEW
+  ACKNOWLEDGED
+  INVESTIGATING
+  RESOLVED
+}
+
+model ErrorLog {
+  id             String        @id @default(cuid())
+  errorId        String        @unique
+  message        String
+  stack          String?
+  componentStack String?
+  context        String?
+  severity       ErrorSeverity @default(MEDIUM)
+  status         ErrorStatus   @default(NEW)
+  app            String
+  page           String?
+  userId         String?
+  sessionId      String?
+  userAgent      String?
+  url            String?
+  environment    String
+  metadata       Json?
+  timestamp      DateTime      @default(now())
+  resolvedAt     DateTime?
+  acknowledgedAt DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([app])
+  @@index([page])
+  @@index([severity])
+  @@index([status])
+  @@index([timestamp])
+  @@index([userId])
+  @@index([environment])
+  @@index([app, timestamp])
+  @@index([severity, timestamp])
+}

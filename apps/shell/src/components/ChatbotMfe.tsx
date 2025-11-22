@@ -1,29 +1,8 @@
-import React, { Suspense, lazy } from 'react';
+import { Suspense, lazy } from 'react';
+import { MfeErrorBoundary } from '@myapp/frontend/ui-components';
 
 // Lazy load the chatbot MFE
-const ChatbotMfeModule = lazy(() =>
-  import('chatbotMfe/Module').catch((error) => {
-    console.error('Failed to load Chatbot MFE:', error);
-    return {
-      default: () => (
-        <div className="flex items-center justify-center h-full p-8">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              Chatbot Unavailable
-            </h2>
-            <p className="text-gray-600 mb-4">
-              The chatbot service is currently unavailable. Please try again
-              later.
-            </p>
-            <p className="text-sm text-gray-500">
-              Make sure the chatbot-mfe is running on port 5175
-            </p>
-          </div>
-        </div>
-      ),
-    };
-  })
-);
+const ChatbotMfeModule = lazy(() => import('chatbotMfe/Module'));
 
 function LoadingFallback() {
   return (
@@ -38,8 +17,10 @@ function LoadingFallback() {
 
 export function ChatbotMfe() {
   return (
-    <Suspense fallback={<LoadingFallback />}>
-      <ChatbotMfeModule />
-    </Suspense>
+    <MfeErrorBoundary mfeName="chatbot-mfe">
+      <Suspense fallback={<LoadingFallback />}>
+        <ChatbotMfeModule />
+      </Suspense>
+    </MfeErrorBoundary>
   );
 }

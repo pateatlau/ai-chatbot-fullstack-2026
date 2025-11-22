@@ -27,6 +27,7 @@ export interface AuthResponse {
     name: string;
     role: string;
   };
+  accessToken: string; // Token is returned for use in Authorization headers
   expiresIn: number;
   message?: string;
 }

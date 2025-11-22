@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Card, Button } from '@myapp/frontend/ui-components';
+import { Card, Button, ErrorBoundary } from '@myapp/frontend/ui-components';
 import { useToast } from '@myapp/frontend/hooks';
 import { adminAPI, DashboardStats } from '../api/admin.api';
 import {
@@ -8,7 +8,7 @@ import {
   useAdminDashboardAutoRefresh,
 } from '../store/admin.store';
 
-export function AdminDashboardPage() {
+function AdminDashboardPageContent() {
   // Initialize admin store with event bus subscriptions
   useAdminStoreInitialization();
 
@@ -267,5 +267,13 @@ export function AdminDashboardPage() {
         </div>
       </Card>
     </div>
+  );
+}
+
+export function AdminDashboardPage() {
+  return (
+    <ErrorBoundary variant="full" context="page-admin-dashboard">
+      <AdminDashboardPageContent />
+    </ErrorBoundary>
   );
 }

@@ -2,9 +2,9 @@ import {
   useProfileStore,
   useProfileStoreInitialization,
 } from '../store/profile.store';
-import { Card } from '@myapp/frontend/ui-components';
+import { Card, ErrorBoundary } from '@myapp/frontend/ui-components';
 
-export function ProfilePage() {
+function ProfilePageContent() {
   // Initialize profile store with event bus subscriptions
   useProfileStoreInitialization();
 
@@ -122,5 +122,13 @@ export function ProfilePage() {
         </Card>
       </div>
     </div>
+  );
+}
+
+export function ProfilePage() {
+  return (
+    <ErrorBoundary variant="full" context="page-profile-view">
+      <ProfilePageContent />
+    </ErrorBoundary>
   );
 }

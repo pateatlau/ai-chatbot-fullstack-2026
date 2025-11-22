@@ -1,4 +1,5 @@
 import { useLocation } from 'react-router-dom';
+import { ErrorBoundary } from '@myapp/frontend/ui-components';
 import {
   AdminDashboardPage,
   UserManagementPage,
@@ -6,7 +7,7 @@ import {
   AuditLogsPage,
 } from '../pages';
 
-export function App() {
+function AppContent() {
   const location = useLocation();
 
   // Router path-based rendering - shell controls routing
@@ -29,6 +30,14 @@ export function App() {
 
   // Default to admin dashboard
   return <AdminDashboardPage />;
+}
+
+export function App() {
+  return (
+    <ErrorBoundary variant="full" context="admin-mfe-root">
+      <AppContent />
+    </ErrorBoundary>
+  );
 }
 
 export default App;
