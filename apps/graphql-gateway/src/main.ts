@@ -45,10 +45,15 @@ async function startServer() {
           willSendRequest({ request, context }: any) {
             // Forward the authorization header to subgraphs
             if (context.token) {
+              console.log(
+                `[Gateway] Forwarding token to ${url}, length: ${context.token.length}`
+              );
               request.http.headers.set(
                 'authorization',
                 `Bearer ${context.token}`
               );
+            } else {
+              console.warn(`[Gateway] No token in context for ${url}`);
             }
           },
         });

@@ -78,16 +78,23 @@ const buildContext = (req: express.Request): JWTContext => {
   const token = authHeader?.replace('Bearer ', '');
   let userId: string | undefined;
 
+  console.log(
+    `[Admin Service] Received auth header: ${authHeader ? 'YES' : 'NO'}`
+  );
   if (token) {
+    console.log(`[Admin Service] Token length: ${token.length}`);
     try {
       const decoded: any = jwt.verify(
         token,
         process.env.JWT_SECRET || 'default-secret'
       );
       userId = decoded.userId;
+      console.log(`[Admin Service] Token verified, userId: ${userId}`);
     } catch (err) {
-      // Token invalid or expired
+      console.error(`[Admin Service] Token verification failed:`, err.message);
     }
+  } else {
+    console.warn(`[Admin Service] No token provided`);
   }
 
   return { userId, token };
