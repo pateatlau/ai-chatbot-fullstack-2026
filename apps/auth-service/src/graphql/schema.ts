@@ -3,7 +3,10 @@ import gql from 'graphql-tag';
 export const typeDefs = gql`
   # Federation directive
   extend schema
-    @link(url: "https://specs.apollo.dev/federation/v2.0", import: ["@key"])
+    @link(
+      url: "https://specs.apollo.dev/federation/v2.0"
+      import: ["@key", "@shareable"]
+    )
 
   # User type with federation support
   type User @key(fields: "id") {
