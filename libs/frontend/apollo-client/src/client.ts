@@ -28,8 +28,7 @@ const errorLink = onError(({ graphQLErrors, networkError, operation }) => {
       // Handle 401 Unauthorized - redirect to login
       if (extensions?.code === 'UNAUTHENTICATED') {
         console.warn('Authentication token invalid or expired');
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('auth-storage');
         window.location.href = '/login';
       }
 
@@ -46,8 +45,7 @@ const errorLink = onError(({ graphQLErrors, networkError, operation }) => {
     // Handle connection errors
     if ('statusCode' in networkError) {
       if (networkError.statusCode === 401) {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('auth-storage');
         window.location.href = '/login';
       }
       if (networkError.statusCode === 503) {
@@ -59,7 +57,17 @@ const errorLink = onError(({ graphQLErrors, networkError, operation }) => {
 
 // Auth Link - Add Authorization header with JWT token
 const authLink = setContext((_, { headers }) => {
-  const token = localStorage.getItem('accessToken');
+  // Get token from zustand persist store
+  let token = null;
+  try {
+    const authStorage = localStorage.getItem('auth-storage');
+    if (authStorage) {
+      const authState = JSON.parse(authStorage);
+      token = authState.state?.accessToken;
+    }
+  } catch (error) {
+    console.error('Failed to parse auth storage:', error);
+  }
 
   return {
     headers: {

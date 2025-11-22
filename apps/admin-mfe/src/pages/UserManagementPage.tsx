@@ -54,7 +54,9 @@ function UserManagementPageContent() {
       setUsers(storeUsers);
       setTotal(usersData.users.total);
     }
-  }, [usersData, setUsers]);
+    // setUsers is a stable zustand action, doesn't need to be in deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [usersData]);
 
   // Handle loading and error states
   useEffect(() => {
@@ -63,7 +65,9 @@ function UserManagementPageContent() {
     if (usersError) {
       toast.error('Failed to load user list');
     }
-  }, [usersLoading, usersError, setLoading, toast]);
+    // setLoading and toast are stable functions, don't need to be in deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [usersLoading, usersError]);
 
   const loadUsers = async () => {
     refetch();

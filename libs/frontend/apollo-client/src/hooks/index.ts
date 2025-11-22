@@ -7,6 +7,7 @@ export {
   useRefreshToken,
   useUpdateProfile,
   useChangePassword,
+  useUsers,
 } from './useAuth';
 
 // Chat/Conversation hooks
