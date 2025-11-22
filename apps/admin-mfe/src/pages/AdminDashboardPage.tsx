@@ -41,7 +41,7 @@ function AdminDashboardPageContent() {
   // Load stats from Apollo on mount or when data updates
   useEffect(() => {
     if (statsData?.systemStats) {
-      const { setMetrics } = useAdminStore.getState();
+      const { setMetrics, setError } = useAdminStore.getState();
       const stats = statsData.systemStats;
 
       const metrics = {
@@ -49,49 +49,26 @@ function AdminDashboardPageContent() {
         activeUsers: stats.activeUsers || 0,
         totalConversations: stats.totalConversations || 0,
         totalMessages: stats.totalMessages || 0,
-        avgMessagesPerUser: stats.averageMessagesPerConversation || 0,
+        avgMessagesPerUser: stats.avgResponseTime || 0,
         lastUpdated: new Date().toISOString(),
       };
 
       setMetrics(metrics);
+      setError(null); // Clear any previous errors
     }
   }, [statsData]);
 
-  // Fallback to REST API if GraphQL not available
+  // Handle Apollo loading and error states
   useEffect(() => {
-    if (!statsData && !statsLoading && !isLoading) {
-      loadStats();
-    }
-  }, [statsLoading, isLoading, statsData]);
+    const { setLoading, setError } = useAdminStore.getState();
+    setLoading(statsLoading);
 
-  const loadStats = async () => {
-    try {
-      const { setMetrics, setLoading } = useAdminStore.getState();
-      setLoading(true);
-      const data = await adminAPI.getStats();
-
-      const metrics = {
-        totalUsers: data.totalUsers,
-        activeUsers: data.activeUsers,
-        totalConversations: data.totalConversations,
-        totalMessages:
-          data.totalConversations * (data.averageMessagesPerConversation || 1),
-        avgMessagesPerUser: data.averageMessagesPerConversation,
-        lastUpdated: new Date().toISOString(),
-      };
-
-      setMetrics(metrics);
-    } catch (error: any) {
-      const { setError } = useAdminStore.getState();
-      const errorMsg =
-        error.response?.data?.error || 'Failed to load dashboard data';
+    if (statsError) {
+      const errorMsg = 'Failed to load dashboard data';
       setError(errorMsg);
       toast.error(errorMsg);
-    } finally {
-      const { setLoading } = useAdminStore.getState();
-      setLoading(false);
     }
-  };
+  }, [statsLoading, statsError, toast]);
 
   const formatNumber = (num: number): string => {
     if (num >= 1000000) {
