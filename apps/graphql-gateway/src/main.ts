@@ -69,7 +69,18 @@ async function startServer() {
     // GraphQL endpoint with middleware
     app.use(
       '/graphql',
-      cors<cors.CorsRequest>(),
+      cors<cors.CorsRequest>({
+        origin: [
+          'http://localhost:5173', // Shell
+          'http://localhost:5174', // Auth MFE
+          'http://localhost:5175', // Chatbot MFE
+          'http://localhost:5176', // Admin MFE
+          'http://localhost:5177', // Profile MFE
+        ],
+        credentials: true, // Allow cookies
+        methods: ['GET', 'POST', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
+      }),
       express.json({ limit: '50mb' }),
       expressMiddleware(server, {
         context: async ({ req }: any) => ({
