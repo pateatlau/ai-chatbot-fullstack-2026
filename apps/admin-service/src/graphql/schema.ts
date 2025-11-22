@@ -10,7 +10,6 @@ export const typeDefs = gql`
   # Extend User from Auth Service
   extend type User @key(fields: "id") {
     id: ID! @external
-    role: UserRole! @external
     permissions: [String!]!
   }
 
