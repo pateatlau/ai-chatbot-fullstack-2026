@@ -73,6 +73,10 @@ const authLink = setContext((_, { headers }) => {
         );
       } else {
         console.log('[Apollo Auth] Token found, length:', token.length);
+        console.log(
+          '[Apollo Auth] Will send Authorization header:',
+          `Bearer ${token.substring(0, 20)}...`
+        );
       }
     } else {
       console.warn('[Apollo Auth] No auth-storage in localStorage');
@@ -81,12 +85,16 @@ const authLink = setContext((_, { headers }) => {
     console.error('[Apollo Auth] Failed to parse auth storage:', error);
   }
 
-  return {
+  const result = {
     headers: {
       ...headers,
       ...(token && { authorization: `Bearer ${token}` }),
     },
   };
+
+  console.log('[Apollo Auth] Returning headers:', Object.keys(result.headers));
+
+  return result;
 });
 
 // Cache Configuration with type policies
