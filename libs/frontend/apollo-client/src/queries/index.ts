@@ -41,6 +41,55 @@ export const GET_USERS = gql`
   }
 `;
 
+export const GET_USER = gql`
+  query GetUser($id: ID!) {
+    user(id: $id) {
+      id
+      email
+      username
+      firstName
+      lastName
+      role
+      isActive
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const UPDATE_USER = gql`
+  mutation UpdateUser($id: ID!, $input: UpdateUserInput!) {
+    updateUser(id: $id, input: $input) {
+      id
+      email
+      username
+      firstName
+      lastName
+      role
+      isActive
+      updatedAt
+    }
+  }
+`;
+
+export const DELETE_USER = gql`
+  mutation DeleteUser($id: ID!) {
+    deleteUser(id: $id) {
+      success
+      message
+    }
+  }
+`;
+
+export const RESET_PASSWORD = gql`
+  mutation ResetPassword($userId: ID!, $newPassword: String!) {
+    resetPassword(userId: $userId, newPassword: $newPassword) {
+      success
+      message
+    }
+  }
+`;
+
 export const REGISTER = gql`
   mutation Register($input: RegisterInput!) {
     register(input: $input) {

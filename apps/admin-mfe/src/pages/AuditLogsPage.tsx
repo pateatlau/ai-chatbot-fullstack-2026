@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Card, Button, ErrorBoundary } from '@myapp/frontend/ui-components';
 import { useToast, useRequireRole } from '@myapp/frontend/hooks';
-import { adminAPI, AuditLog } from '../api/admin.api';
+import { useAuditLogs } from '@myapp/frontend/apollo-client';
+import { AuditLog } from '../api/admin.api';
 import {
   useAdminStore,
   useAdminStoreInitialization,
@@ -28,17 +29,32 @@ function AuditLogsPageContent() {
 
   const limit = 20;
 
-  const loadLogs = async () => {
-    try {
-      setLoading(true);
-      const data = await adminAPI.getAuditLogs({ page, limit, ...filters });
-      setLogs(data.logs);
-      setTotal(data.total);
-    } catch (error: any) {
-      toast.error(error.response?.data?.error || 'Failed to load audit logs');
-    } finally {
-      setLoading(false);
+  // Use GraphQL query for audit logs
+  const {
+    data: logsData,
+    loading: logsLoading,
+    error: logsError,
+    refetch,
+  } = useAuditLogs(page, limit);
+
+  // Update local state when GraphQL data changes
+  useEffect(() => {
+    if (logsData?.auditLogs) {
+      setLogs(logsData.auditLogs);
+      setTotal(logsData.auditLogs.length || 0);
     }
+  }, [logsData]);
+
+  // Handle loading and error states
+  useEffect(() => {
+    setLoading(logsLoading);
+    if (logsError) {
+      toast.error('Failed to load audit logs');
+    }
+  }, [logsLoading, logsError]);
+
+  const loadLogs = async () => {
+    refetch();
   };
 
   useEffect(() => {

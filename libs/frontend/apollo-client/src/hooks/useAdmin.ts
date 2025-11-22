@@ -1,11 +1,109 @@
-import { useQuery, useMutation } from '@apollo/client';
+import { useQuery, useMutation, useApolloClient } from '@apollo/client';
 import {
+  GET_USERS,
+  GET_USER,
+  UPDATE_USER,
+  DELETE_USER,
+  RESET_PASSWORD,
   GET_SYSTEM_STATS,
   GET_AUDIT_LOGS,
   UPDATE_USER_ROLE,
   DEACTIVATE_USER,
   ACTIVATE_USER,
 } from '../queries';
+
+/**
+ * Hook to fetch paginated list of users
+ */
+export function useGetUsers(page = 1, limit = 10) {
+  return useQuery(GET_USERS, {
+    variables: {
+      input: { page, limit },
+    },
+    errorPolicy: 'all',
+  });
+}
+
+/**
+ * Hook to fetch a single user by ID
+ */
+export function useGetUser(id: string | null) {
+  return useQuery(GET_USER, {
+    variables: { id },
+    skip: !id,
+    errorPolicy: 'all',
+  });
+}
+
+/**
+ * Hook to update a user
+ */
+export function useUpdateUser() {
+  const client = useApolloClient();
+
+  const [updateUserMutation] = useMutation(UPDATE_USER, {
+    onCompleted: (data) => {
+      if (data?.updateUser) {
+        // Refetch users list to keep in sync
+        client
+          .refetchQueries({
+            include: [GET_USERS, GET_USER],
+          })
+          .catch((err) => {
+            console.error('Error refetching users:', err);
+          });
+      }
+    },
+    errorPolicy: 'all',
+  });
+
+  return (id: string, variables: any) =>
+    updateUserMutation({
+      variables: { id, input: variables },
+    });
+}
+
+/**
+ * Hook to delete a user
+ */
+export function useDeleteUser() {
+  const client = useApolloClient();
+
+  const [deleteUserMutation] = useMutation(DELETE_USER, {
+    onCompleted: (data) => {
+      if (data?.deleteUser?.success) {
+        // Refetch users list after deletion
+        client
+          .refetchQueries({
+            include: [GET_USERS],
+          })
+          .catch((err) => {
+            console.error('Error refetching users:', err);
+          });
+      }
+    },
+    errorPolicy: 'all',
+  });
+
+  return (id: string) =>
+    deleteUserMutation({
+      variables: { id },
+    });
+}
+
+/**
+ * Hook to reset a user's password
+ */
+export function useResetPassword() {
+  const [resetPasswordMutation] = useMutation(RESET_PASSWORD, {
+    errorPolicy: 'all',
+  });
+
+  return (userId: string, newPassword: string) =>
+    resetPasswordMutation({
+      variables: { userId, newPassword },
+    });
+}
 
 /**
  * Hook to fetch system statistics

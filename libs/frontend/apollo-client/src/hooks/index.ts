@@ -29,6 +29,11 @@ export { useProfile, useProfileOperations } from './useProfile';
 // Admin hooks
 export {
   useSystemStats,
+  useGetUsers,
+  useGetUser,
+  useUpdateUser,
+  useDeleteUser,
+  useResetPassword,
   useAuditLogs,
   useUpdateUserRole,
   useDeactivateUser,

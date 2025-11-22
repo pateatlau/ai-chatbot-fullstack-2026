@@ -7,7 +7,12 @@ import {
   ErrorBoundary,
 } from '@myapp/frontend/ui-components';
 import { useToast, useRequireRole } from '@myapp/frontend/hooks';
-import { adminAPI, User } from '../api/admin.api';
+import {
+  useGetUser,
+  useUpdateUser,
+  useResetPassword,
+} from '@myapp/frontend/apollo-client';
+import { User } from '../api/admin.api';
 import {
   useAdminStore,
   useAdminStoreInitialization,
@@ -24,8 +29,6 @@ function UserDetailPageContent() {
   const location = useLocation();
   const userId = location.pathname.split('/').pop() || '';
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -35,36 +38,47 @@ function UserDetailPageContent() {
   const [newPassword, setNewPassword] = useState('');
   const toast = useToast();
 
-  const loadUser = async () => {
-    try {
-      setLoading(true);
-      const data = await adminAPI.getUserById(userId);
-      setUser(data);
-      setFormData({
-        name: data.name,
-        email: data.email,
-        role: data.role,
-        isActive: data.isActive,
-      });
-    } catch (error: any) {
-      toast.error(error.response?.data?.error || 'Failed to load user details');
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Use GraphQL queries and mutations
+  const {
+    data: userData,
+    loading: userLoading,
+    error: userError,
+    refetch: refetchUser,
+  } = useGetUser(userId);
 
+  const updateUserMutation = useUpdateUser();
+  const resetPasswordMutation = useResetPassword();
+
+  // Update local state when GraphQL user data changes
   useEffect(() => {
-    if (userId) {
-      loadUser();
+    if (userData?.user) {
+      const loadedUser = userData.user;
+      setUser(loadedUser);
+      setFormData({
+        name: loadedUser.name,
+        email: loadedUser.email,
+        role: loadedUser.role,
+        isActive: loadedUser.isActive,
+      });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId]);
+  }, [userData]);
+
+  // Handle errors
+  useEffect(() => {
+    if (userError) {
+      toast.error('Failed to load user details');
+    }
+  }, [userError, toast]);
 
   const handleUpdateUser = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      setSaving(true);
-      await adminAPI.updateUser(userId, formData);
+      await updateUserMutation(userId, {
+        name: formData.name,
+        email: formData.email,
+        role: formData.role,
+        isActive: formData.isActive,
+      });
 
       // Emit event for cross-MFE coordination
       const eventBus = getEventBus();
@@ -74,11 +88,9 @@ function UserDetailPageContent() {
       });
 
       toast.success('User information has been updated successfully');
-      loadUser();
+      refetchUser();
     } catch (error: any) {
-      toast.error(error.response?.data?.error || 'Failed to update user');
-    } finally {
-      setSaving(false);
+      toast.error(error.message || 'Failed to update user');
     }
   };
 
@@ -89,11 +101,11 @@ function UserDetailPageContent() {
     }
 
     try {
-      await adminAPI.resetUserPassword(userId, { newPassword });
+      await resetPasswordMutation(userId, newPassword);
       toast.success('User password has been reset successfully');
       setNewPassword('');
     } catch (error: any) {
-      toast.error(error.response?.data?.error || 'Failed to reset password');
+      toast.error(error.message || 'Failed to reset password');
     }
   };
 
@@ -107,7 +119,7 @@ function UserDetailPageContent() {
     });
   };
 
-  if (loading) {
+  if (userLoading) {
     return (
       <div className="space-y-6">
         <div className="animate-pulse">
@@ -239,19 +251,19 @@ function UserDetailPageContent() {
             </div>
 
             <div className="flex gap-3 pt-4">
-              <Button type="submit" disabled={saving}>
-                {saving ? 'Saving...' : 'Save Changes'}
-              </Button>
+              <Button type="submit">Save Changes</Button>
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => {
-                  setFormData({
-                    name: user.name,
-                    email: user.email,
-                    role: user.role,
-                    isActive: user.isActive,
-                  });
+                  if (user) {
+                    setFormData({
+                      name: user.name,
+                      email: user.email,
+                      role: user.role,
+                      isActive: user.isActive,
+                    });
+                  }
                 }}
               >
                 Cancel
