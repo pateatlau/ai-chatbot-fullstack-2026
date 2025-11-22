@@ -13,7 +13,7 @@ import {
 import { useAuthStore, useToastStore } from '@myapp/frontend/stores';
 import { registerSchema, RegisterFormData } from '../schemas/auth.schema';
 import { useRegister } from '@myapp/frontend/apollo-client';
-import { eventBus, Events } from '@myapp/frontend/event-bus';
+import { eventBus, Events } from '@myapp/shared/event-bus';
 
 function RegisterContent() {
   const [isLoading, setIsLoading] = useState(false);

@@ -13,7 +13,7 @@ import {
 import { useAuthStore, useToastStore } from '@myapp/frontend/stores';
 import { loginSchema, LoginFormData } from '../schemas/auth.schema';
 import { useLogin } from '@myapp/frontend/apollo-client';
-import { eventBus, Events } from '@myapp/frontend/event-bus';
+import { eventBus, Events } from '@myapp/shared/event-bus';
 
 function LoginContent() {
   const [isLoading, setIsLoading] = useState(false);
