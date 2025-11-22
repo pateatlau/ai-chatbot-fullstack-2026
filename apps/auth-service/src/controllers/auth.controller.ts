@@ -13,17 +13,11 @@ const authService = new AuthService();
 export class AuthController {
   async register(req: Request, res: Response) {
     try {
-      // Validate input
+      // Validate input (role is included in schema with default 'USER')
       const validatedData = CreateUserSchema.parse(req.body);
 
-      // WORKAROUND: Manually add role from request body since Zod is stripping it
-      const finalData = {
-        ...validatedData,
-        role: req.body.role || 'USER',
-      };
-
       // Register user (now returns login response with tokens)
-      const result = await authService.register(finalData);
+      const result = await authService.register(validatedData);
 
       // Set HttpOnly cookies for tokens (same as login)
       res.cookie('accessToken', result.accessToken, {
