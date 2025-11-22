@@ -111,15 +111,15 @@ function UserDetailPageContent() {
     return (
       <div className="space-y-6">
         <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-64 mb-2"></div>
-          <div className="h-4 bg-gray-200 rounded w-96"></div>
+          <div className="h-8 bg-[var(--bg-tertiary)] rounded w-64 mb-2"></div>
+          <div className="h-4 bg-[var(--bg-tertiary)] rounded w-96"></div>
         </div>
         <Card>
           <div className="animate-pulse space-y-4">
-            <div className="h-4 bg-gray-200 rounded w-32"></div>
-            <div className="h-10 bg-gray-200 rounded"></div>
-            <div className="h-4 bg-gray-200 rounded w-32"></div>
-            <div className="h-10 bg-gray-200 rounded"></div>
+            <div className="h-4 bg-[var(--bg-tertiary)] rounded w-32"></div>
+            <div className="h-10 bg-[var(--bg-tertiary)] rounded"></div>
+            <div className="h-4 bg-[var(--bg-tertiary)] rounded w-32"></div>
+            <div className="h-10 bg-[var(--bg-tertiary)] rounded"></div>
           </div>
         </Card>
       </div>
@@ -131,10 +131,10 @@ function UserDetailPageContent() {
       <div className="space-y-6">
         <Card>
           <div className="text-center py-12">
-            <p className="text-gray-500">User not found</p>
+            <p className="text-[var(--text-secondary)]">User not found</p>
             <a
               href="/admin/users"
-              className="text-primary-600 hover:text-primary-700 mt-4 inline-block"
+              className="text-[var(--interactive-primary)] hover:text-[var(--interactive-primaryHover)] mt-4 inline-block"
             >
               Back to users
             </a>
@@ -151,24 +151,26 @@ function UserDetailPageContent() {
         <div className="flex items-center gap-2 mb-2">
           <a
             href="/admin/users"
-            className="text-primary-600 hover:text-primary-700"
+            className="text-[var(--interactive-primary)] hover:text-[var(--interactive-primaryHover)]"
           >
             ← Back to users
           </a>
         </div>
-        <h1 className="text-3xl font-bold text-gray-900">{user.name}</h1>
-        <p className="text-gray-600 mt-1">{user.email}</p>
+        <h1 className="text-3xl font-bold text-[var(--text-primary)]">
+          {user.name}
+        </h1>
+        <p className="text-[var(--text-secondary)] mt-1">{user.email}</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* User Info Card */}
         <Card className="lg:col-span-2">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+          <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-4">
             User Information
           </h2>
           <form onSubmit={handleUpdateUser} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-[var(--text-primary)] mb-1">
                 Name
               </label>
               <Input
@@ -182,7 +184,7 @@ function UserDetailPageContent() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-[var(--text-primary)] mb-1">
                 Email
               </label>
               <Input
@@ -196,7 +198,7 @@ function UserDetailPageContent() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-[var(--text-primary)] mb-1">
                 Role
               </label>
               <select
@@ -207,7 +209,7 @@ function UserDetailPageContent() {
                     role: e.target.value as 'USER' | 'ADMIN' | 'MODERATOR',
                   }))
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full px-3 py-2 bg-[var(--bg-primary)] text-[var(--text-primary)] border border-[var(--border-default)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)]"
               >
                 <option value="USER">User</option>
                 <option value="MODERATOR">Moderator</option>
@@ -226,11 +228,11 @@ function UserDetailPageContent() {
                     isActive: e.target.checked,
                   }))
                 }
-                className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                className="h-4 w-4 text-[var(--interactive-primary)] focus:ring-[var(--border-focus)] border-[var(--border-default)] rounded"
               />
               <label
                 htmlFor="isActive"
-                className="text-sm font-medium text-gray-700"
+                className="text-sm font-medium text-[var(--text-primary)]"
               >
                 Active Account
               </label>
@@ -260,29 +262,33 @@ function UserDetailPageContent() {
 
         {/* Metadata Card */}
         <Card>
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Metadata</h2>
+          <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-4">
+            Metadata
+          </h2>
           <div className="space-y-3">
             <div>
-              <p className="text-sm text-gray-600">User ID</p>
-              <p className="text-sm font-mono text-gray-900 break-all">
+              <p className="text-sm text-[var(--text-secondary)]">User ID</p>
+              <p className="text-sm font-mono text-[var(--text-primary)] break-all">
                 {user.id}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Created</p>
-              <p className="text-sm text-gray-900">
+              <p className="text-sm text-[var(--text-secondary)]">Created</p>
+              <p className="text-sm text-[var(--text-primary)]">
                 {formatDate(user.createdAt)}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Last Updated</p>
-              <p className="text-sm text-gray-900">
+              <p className="text-sm text-[var(--text-secondary)]">
+                Last Updated
+              </p>
+              <p className="text-sm text-[var(--text-primary)]">
                 {formatDate(user.updatedAt)}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Last Login</p>
-              <p className="text-sm text-gray-900">
+              <p className="text-sm text-[var(--text-secondary)]">Last Login</p>
+              <p className="text-sm text-[var(--text-primary)]">
                 {user.lastLoginAt ? formatDate(user.lastLoginAt) : 'Never'}
               </p>
             </div>
@@ -292,12 +298,12 @@ function UserDetailPageContent() {
 
       {/* Password Reset */}
       <Card>
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">
+        <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-4">
           Reset Password
         </h2>
         <div className="max-w-md space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-[var(--text-primary)] mb-1">
               New Password
             </label>
             <Input

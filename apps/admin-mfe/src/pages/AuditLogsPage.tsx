@@ -59,15 +59,15 @@ function AuditLogsPageContent() {
 
   const getActionBadgeColor = (action: string) => {
     if (action.includes('delete') || action.includes('reset')) {
-      return 'bg-red-100 text-red-800';
+      return 'bg-[var(--status-error)]/10 text-[var(--status-error)]';
     }
     if (action.includes('update') || action.includes('edit')) {
-      return 'bg-yellow-100 text-yellow-800';
+      return 'bg-[var(--status-warning)]/10 text-[var(--status-warning)]';
     }
     if (action.includes('create') || action.includes('add')) {
-      return 'bg-green-100 text-green-800';
+      return 'bg-[var(--status-success)]/10 text-[var(--status-success)]';
     }
-    return 'bg-blue-100 text-blue-800';
+    return 'bg-[var(--status-info)]/10 text-[var(--status-info)]';
   };
 
   const formatAction = (action: string) => {
@@ -84,8 +84,10 @@ function AuditLogsPageContent() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Audit Logs</h1>
-          <p className="text-gray-600 mt-1">
+          <h1 className="text-3xl font-bold text-[var(--text-primary)]">
+            Audit Logs
+          </h1>
+          <p className="text-[var(--text-secondary)] mt-1">
             Track all administrative actions and changes
           </p>
         </div>
@@ -98,7 +100,7 @@ function AuditLogsPageContent() {
       <Card>
         <div className="flex gap-4 items-center">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-[var(--text-primary)] mb-1">
               Action Type
             </label>
             <select
@@ -109,7 +111,7 @@ function AuditLogsPageContent() {
                   action: e.target.value || undefined,
                 }))
               }
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="px-3 py-2 bg-[var(--bg-primary)] text-[var(--text-primary)] border border-[var(--border-default)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)]"
             >
               <option value="">All Actions</option>
               <option value="user_updated">User Updated</option>
@@ -118,7 +120,7 @@ function AuditLogsPageContent() {
               <option value="role_changed">Role Changed</option>
             </select>
           </div>
-          <div className="ml-auto text-sm text-gray-600">
+          <div className="ml-auto text-sm text-[var(--text-secondary)]">
             Showing {logs.length} of {total} logs
           </div>
         </div>
@@ -129,20 +131,20 @@ function AuditLogsPageContent() {
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-gray-200">
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">
+              <tr className="border-b border-[var(--border-default)]">
+                <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--text-primary)]">
                   Timestamp
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">
+                <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--text-primary)]">
                   Admin
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">
+                <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--text-primary)]">
                   Action
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">
+                <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--text-primary)]">
                   Target User
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">
+                <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--text-primary)]">
                   Details
                 </th>
               </tr>
@@ -151,12 +153,15 @@ function AuditLogsPageContent() {
               {loading ? (
                 <>
                   {[1, 2, 3, 4, 5].map((i) => (
-                    <tr key={i} className="border-b border-gray-100">
+                    <tr
+                      key={i}
+                      className="border-b border-[var(--border-subtle)]"
+                    >
                       <td className="px-4 py-4" colSpan={5}>
                         <div className="animate-pulse flex space-x-4">
                           <div className="flex-1 space-y-2">
-                            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                            <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                            <div className="h-4 bg-[var(--bg-tertiary)] rounded w-3/4"></div>
+                            <div className="h-3 bg-[var(--bg-tertiary)] rounded w-1/2"></div>
                           </div>
                         </div>
                       </td>
@@ -167,7 +172,7 @@ function AuditLogsPageContent() {
                 <tr>
                   <td
                     colSpan={5}
-                    className="px-4 py-8 text-center text-gray-500"
+                    className="px-4 py-8 text-center text-[var(--text-secondary)]"
                   >
                     No audit logs found
                   </td>
@@ -176,16 +181,16 @@ function AuditLogsPageContent() {
                 logs.map((log) => (
                   <tr
                     key={log.id}
-                    className="border-b border-gray-100 hover:bg-gray-50"
+                    className="border-b border-[var(--border-subtle)] hover:bg-[var(--bg-secondary)]"
                   >
-                    <td className="px-4 py-4 text-sm text-gray-600">
+                    <td className="px-4 py-4 text-sm text-[var(--text-secondary)]">
                       {formatDate(log.createdAt)}
                     </td>
                     <td className="px-4 py-4">
-                      <div className="text-sm text-gray-900">
+                      <div className="text-sm text-[var(--text-primary)]">
                         {log.adminEmail || 'Unknown Admin'}
                       </div>
-                      <div className="text-xs text-gray-500 font-mono">
+                      <div className="text-xs text-[var(--text-tertiary)] font-mono">
                         {log.adminId.substring(0, 8)}...
                       </div>
                     </td>
@@ -201,31 +206,33 @@ function AuditLogsPageContent() {
                     <td className="px-4 py-4">
                       {log.targetUserEmail ? (
                         <div>
-                          <div className="text-sm text-gray-900">
+                          <div className="text-sm text-[var(--text-primary)]">
                             {log.targetUserEmail}
                           </div>
                           {log.targetUserId && (
-                            <div className="text-xs text-gray-500 font-mono">
+                            <div className="text-xs text-[var(--text-tertiary)] font-mono">
                               {log.targetUserId.substring(0, 8)}...
                             </div>
                           )}
                         </div>
                       ) : (
-                        <span className="text-sm text-gray-400">N/A</span>
+                        <span className="text-sm text-[var(--text-tertiary)]">
+                          N/A
+                        </span>
                       )}
                     </td>
                     <td className="px-4 py-4">
                       {log.metadata && Object.keys(log.metadata).length > 0 ? (
-                        <details className="text-sm text-gray-600">
-                          <summary className="cursor-pointer hover:text-gray-900">
+                        <details className="text-sm text-[var(--text-secondary)]">
+                          <summary className="cursor-pointer hover:text-[var(--text-primary)]">
                             View details
                           </summary>
-                          <pre className="mt-2 text-xs bg-gray-50 p-2 rounded overflow-x-auto">
+                          <pre className="mt-2 text-xs bg-[var(--bg-secondary)] p-2 rounded overflow-x-auto">
                             {JSON.stringify(log.metadata, null, 2)}
                           </pre>
                         </details>
                       ) : (
-                        <span className="text-sm text-gray-400">
+                        <span className="text-sm text-[var(--text-tertiary)]">
                           No details
                         </span>
                       )}
@@ -239,7 +246,7 @@ function AuditLogsPageContent() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200">
+          <div className="flex items-center justify-between px-4 py-3 border-t border-[var(--border-default)]">
             <Button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1 || loading}
@@ -247,7 +254,7 @@ function AuditLogsPageContent() {
             >
               Previous
             </Button>
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-[var(--text-secondary)]">
               Page {page} of {totalPages}
             </div>
             <Button

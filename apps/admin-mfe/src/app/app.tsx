@@ -1,5 +1,5 @@
 import { useLocation } from 'react-router-dom';
-import { ErrorBoundary } from '@myapp/frontend/ui-components';
+import { ErrorBoundary, ThemeProvider } from '@myapp/frontend/ui-components';
 import { RecoveryAction, useRequireRole } from '@myapp/frontend/hooks';
 import {
   AdminDashboardPage,
@@ -37,6 +37,9 @@ function AppContent() {
 }
 
 export function App() {
+  const isInShell =
+    typeof window !== 'undefined' && window.location.port === '5173';
+
   const handleRecovery = (action: RecoveryAction) => {
     console.log('[Admin MFE] Recovery action triggered:', action);
     // Execute recovery action
@@ -48,16 +51,22 @@ export function App() {
   };
 
   return (
-    <ErrorBoundary
-      variant="full"
-      context="admin-mfe-root"
-      enableRecovery={true}
-      onRecovery={handleRecovery}
-      onError={handleError}
-      showDetails={process.env.NODE_ENV === 'development'}
+    <ThemeProvider
+      defaultTheme="light"
+      storageKey="app-theme"
+      passive={isInShell}
     >
-      <AppContent />
-    </ErrorBoundary>
+      <ErrorBoundary
+        variant="full"
+        context="admin-mfe-root"
+        enableRecovery={true}
+        onRecovery={handleRecovery}
+        onError={handleError}
+        showDetails={process.env.NODE_ENV === 'development'}
+      >
+        <AppContent />
+      </ErrorBoundary>
+    </ThemeProvider>
   );
 }
 

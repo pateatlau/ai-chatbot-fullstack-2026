@@ -72,11 +72,11 @@ function UserManagementPageContent() {
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
       case 'ADMIN':
-        return 'bg-red-100 text-red-800';
+        return 'bg-[var(--status-error)]/10 text-[var(--status-error)]';
       case 'MODERATOR':
-        return 'bg-purple-100 text-purple-800';
+        return 'bg-[var(--interactive-primary)]/10 text-[var(--interactive-primary)]';
       default:
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-[var(--status-info)]/10 text-[var(--status-info)]';
     }
   };
 
@@ -95,8 +95,10 @@ function UserManagementPageContent() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
-          <p className="text-gray-600 mt-1">
+          <h1 className="text-3xl font-bold text-[var(--text-primary)]">
+            User Management
+          </h1>
+          <p className="text-[var(--text-secondary)] mt-1">
             Manage users, roles, and permissions
           </p>
         </div>
@@ -109,7 +111,7 @@ function UserManagementPageContent() {
       <Card>
         <div className="flex gap-4 items-center">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-[var(--text-primary)] mb-1">
               Role
             </label>
             <select
@@ -120,7 +122,7 @@ function UserManagementPageContent() {
                   role: e.target.value || undefined,
                 }))
               }
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="px-3 py-2 bg-[var(--bg-primary)] text-[var(--text-primary)] border border-[var(--border-default)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)]"
             >
               <option value="">All Roles</option>
               <option value="USER">User</option>
@@ -129,7 +131,7 @@ function UserManagementPageContent() {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-[var(--text-primary)] mb-1">
               Status
             </label>
             <select
@@ -149,14 +151,14 @@ function UserManagementPageContent() {
                       : e.target.value === 'active',
                 }))
               }
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="px-3 py-2 bg-[var(--bg-primary)] text-[var(--text-primary)] border border-[var(--border-default)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)]"
             >
               <option value="">All Status</option>
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
             </select>
           </div>
-          <div className="ml-auto text-sm text-gray-600">
+          <div className="ml-auto text-sm text-[var(--text-secondary)]">
             Showing {users.length} of {total} users
           </div>
         </div>
@@ -167,23 +169,23 @@ function UserManagementPageContent() {
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-gray-200">
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">
+              <tr className="border-b border-[var(--border-default)]">
+                <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--text-primary)]">
                   User
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">
+                <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--text-primary)]">
                   Role
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">
+                <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--text-primary)]">
                   Status
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">
+                <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--text-primary)]">
                   Last Login
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">
+                <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--text-primary)]">
                   Joined
                 </th>
-                <th className="px-4 py-3 text-right text-sm font-semibold text-gray-900">
+                <th className="px-4 py-3 text-right text-sm font-semibold text-[var(--text-primary)]">
                   Actions
                 </th>
               </tr>
@@ -192,12 +194,15 @@ function UserManagementPageContent() {
               {isLoading ? (
                 <>
                   {[1, 2, 3, 4, 5].map((i) => (
-                    <tr key={i} className="border-b border-gray-100">
+                    <tr
+                      key={i}
+                      className="border-b border-[var(--border-subtle)]"
+                    >
                       <td className="px-4 py-4" colSpan={6}>
                         <div className="animate-pulse flex space-x-4">
                           <div className="flex-1 space-y-2">
-                            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                            <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                            <div className="h-4 bg-[var(--bg-tertiary)] rounded w-3/4"></div>
+                            <div className="h-3 bg-[var(--bg-tertiary)] rounded w-1/2"></div>
                           </div>
                         </div>
                       </td>
@@ -208,7 +213,7 @@ function UserManagementPageContent() {
                 <tr>
                   <td
                     colSpan={6}
-                    className="px-4 py-8 text-center text-gray-500"
+                    className="px-4 py-8 text-center text-[var(--text-secondary)]"
                   >
                     No users found
                   </td>
@@ -217,14 +222,14 @@ function UserManagementPageContent() {
                 users.map((user) => (
                   <tr
                     key={user.id}
-                    className="border-b border-gray-100 hover:bg-gray-50"
+                    className="border-b border-[var(--border-subtle)] hover:bg-[var(--bg-secondary)]"
                   >
                     <td className="px-4 py-4">
                       <div>
-                        <div className="font-medium text-gray-900">
+                        <div className="font-medium text-[var(--text-primary)]">
                           {user.name}
                         </div>
-                        <div className="text-sm text-gray-500">
+                        <div className="text-sm text-[var(--text-secondary)]">
                           {user.email}
                         </div>
                       </div>
@@ -242,32 +247,32 @@ function UserManagementPageContent() {
                       <span
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           user.isActive
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-gray-100 text-gray-800'
+                            ? 'bg-[var(--status-success)]/10 text-[var(--status-success)]'
+                            : 'bg-[var(--bg-tertiary)] text-[var(--text-tertiary)]'
                         }`}
                       >
                         {user.isActive ? 'Active' : 'Inactive'}
                       </span>
                     </td>
-                    <td className="px-4 py-4 text-sm text-gray-600">
+                    <td className="px-4 py-4 text-sm text-[var(--text-secondary)]">
                       {user.lastLoginAt
                         ? formatDate(user.lastLoginAt)
                         : 'Never'}
                     </td>
-                    <td className="px-4 py-4 text-sm text-gray-600">
+                    <td className="px-4 py-4 text-sm text-[var(--text-secondary)]">
                       {formatDate(user.createdAt)}
                     </td>
                     <td className="px-4 py-4 text-right">
                       <div className="flex gap-2 justify-end">
                         <a
                           href={`/admin/users/${user.id}`}
-                          className="text-sm text-primary-600 hover:text-primary-700 font-medium"
+                          className="text-sm text-[var(--interactive-primary)] hover:text-[var(--interactive-primaryHover)] font-medium"
                         >
                           Edit
                         </a>
                         <button
                           onClick={() => handleDeleteUser(user.id, user.name)}
-                          className="text-sm text-red-600 hover:text-red-700 font-medium"
+                          className="text-sm text-[var(--status-error)] hover:opacity-80 font-medium"
                         >
                           Delete
                         </button>
@@ -282,7 +287,7 @@ function UserManagementPageContent() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200">
+          <div className="flex items-center justify-between px-4 py-3 border-t border-[var(--border-default)]">
             <Button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1 || isLoading}
@@ -290,7 +295,7 @@ function UserManagementPageContent() {
             >
               Previous
             </Button>
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-[var(--text-secondary)]">
               Page {page} of {totalPages}
             </div>
             <Button

@@ -141,8 +141,10 @@ function AdminDashboardPageContent() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-        <p className="text-gray-600 mt-1">
+        <h1 className="text-3xl font-bold text-[var(--text-primary)]">
+          Admin Dashboard
+        </h1>
+        <p className="text-[var(--text-secondary)] mt-1">
           Monitor system performance and manage users
         </p>
       </div>
@@ -154,8 +156,8 @@ function AdminDashboardPageContent() {
             {[1, 2, 3, 4].map((i) => (
               <Card key={i}>
                 <div className="animate-pulse">
-                  <div className="h-4 bg-gray-200 rounded w-24 mb-2"></div>
-                  <div className="h-8 bg-gray-200 rounded w-16"></div>
+                  <div className="h-4 bg-[var(--bg-tertiary)] rounded w-24 mb-2"></div>
+                  <div className="h-8 bg-[var(--bg-tertiary)] rounded w-16"></div>
                 </div>
               </Card>
             ))}
@@ -165,20 +167,22 @@ function AdminDashboardPageContent() {
             <Card key={index}>
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">{stat.label}</p>
-                  <p className="text-3xl font-bold text-gray-900">
+                  <p className="text-sm text-[var(--text-secondary)] mb-1">
+                    {stat.label}
+                  </p>
+                  <p className="text-3xl font-bold text-[var(--text-primary)]">
                     {stat.value}
                   </p>
                 </div>
                 <div
                   className={`text-3xl ${
                     stat.color === 'blue'
-                      ? 'text-blue-500'
+                      ? 'text-[var(--status-info)]'
                       : stat.color === 'green'
-                        ? 'text-green-500'
+                        ? 'text-[var(--status-success)]'
                         : stat.color === 'purple'
-                          ? 'text-purple-500'
-                          : 'text-orange-500'
+                          ? 'text-[var(--interactive-primary)]'
+                          : 'text-[var(--status-warning)]'
                   }`}
                 >
                   {stat.icon}
@@ -192,7 +196,7 @@ function AdminDashboardPageContent() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* System Health */}
         <Card>
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+          <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-4">
             System Health
           </h2>
           <div className="space-y-3">
@@ -201,14 +205,16 @@ function AdminDashboardPageContent() {
                 key={index}
                 className="flex items-center justify-between py-2"
               >
-                <span className="text-sm text-gray-600">{item.label}</span>
+                <span className="text-sm text-[var(--text-secondary)]">
+                  {item.label}
+                </span>
                 <span
                   className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                     item.status === 'success'
-                      ? 'bg-green-100 text-green-800'
+                      ? 'bg-[var(--status-success)]/10 text-[var(--status-success)]'
                       : item.status === 'warning'
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : 'bg-red-100 text-red-800'
+                        ? 'bg-[var(--status-warning)]/10 text-[var(--status-warning)]'
+                        : 'bg-[var(--status-error)]/10 text-[var(--status-error)]'
                   }`}
                 >
                   {item.value}
@@ -220,7 +226,7 @@ function AdminDashboardPageContent() {
 
         {/* Recent Activity */}
         <Card>
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+          <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-4">
             Recent Activity
           </h2>
           <div className="space-y-3">
@@ -228,8 +234,12 @@ function AdminDashboardPageContent() {
               <div key={index} className="flex gap-3 py-2">
                 <div className="text-xl">{activity.icon}</div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-gray-900">{activity.message}</p>
-                  <p className="text-xs text-gray-500 mt-1">{activity.time}</p>
+                  <p className="text-sm text-[var(--text-primary)]">
+                    {activity.message}
+                  </p>
+                  <p className="text-xs text-[var(--text-tertiary)] mt-1">
+                    {activity.time}
+                  </p>
                 </div>
               </div>
             ))}
@@ -239,41 +249,57 @@ function AdminDashboardPageContent() {
 
       {/* Quick Actions */}
       <Card>
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">
+        <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-4">
           Quick Admin Actions
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <a
             href="/admin/users"
-            className="block p-4 border border-gray-200 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-colors"
+            className="block p-4 border border-[var(--border-default)] rounded-lg hover:border-[var(--border-hover)] hover:bg-[var(--bg-secondary)] transition-colors"
           >
             <div className="text-2xl mb-2">👥</div>
-            <div className="font-medium text-gray-900">Manage Users</div>
-            <div className="text-sm text-gray-500">View all users</div>
+            <div className="font-medium text-[var(--text-primary)]">
+              Manage Users
+            </div>
+            <div className="text-sm text-[var(--text-secondary)]">
+              View all users
+            </div>
           </a>
           <button
-            className="p-4 border border-gray-200 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-colors text-left"
+            className="p-4 border border-[var(--border-default)] rounded-lg hover:border-[var(--border-hover)] hover:bg-[var(--bg-secondary)] transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed"
             disabled
           >
             <div className="text-2xl mb-2">📊</div>
-            <div className="font-medium text-gray-900">Analytics</div>
-            <div className="text-sm text-gray-500">Coming soon</div>
+            <div className="font-medium text-[var(--text-primary)]">
+              Analytics
+            </div>
+            <div className="text-sm text-[var(--text-secondary)]">
+              Coming soon
+            </div>
           </button>
           <button
-            className="p-4 border border-gray-200 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-colors text-left"
+            className="p-4 border border-[var(--border-default)] rounded-lg hover:border-[var(--border-hover)] hover:bg-[var(--bg-secondary)] transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed"
             disabled
           >
             <div className="text-2xl mb-2">⚙️</div>
-            <div className="font-medium text-gray-900">System Settings</div>
-            <div className="text-sm text-gray-500">Coming soon</div>
+            <div className="font-medium text-[var(--text-primary)]">
+              System Settings
+            </div>
+            <div className="text-sm text-[var(--text-secondary)]">
+              Coming soon
+            </div>
           </button>
           <button
-            className="p-4 border border-gray-200 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-colors text-left"
+            className="p-4 border border-[var(--border-default)] rounded-lg hover:border-[var(--border-hover)] hover:bg-[var(--bg-secondary)] transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed"
             disabled
           >
             <div className="text-2xl mb-2">📧</div>
-            <div className="font-medium text-gray-900">Email Notifications</div>
-            <div className="text-sm text-gray-500">Coming soon</div>
+            <div className="font-medium text-[var(--text-primary)]">
+              Email Notifications
+            </div>
+            <div className="text-sm text-[var(--text-secondary)]">
+              Coming soon
+            </div>
           </button>
         </div>
       </Card>

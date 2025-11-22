@@ -61,7 +61,7 @@ function ForgotPasswordContent() {
         <div className="w-full max-w-md">
           <Card>
             <div className="text-center">
-              <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-feedback-successBg dark:bg-green-900/20 rounded-full">
+              <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-[var(--status-success)]/10 rounded-full">
                 <svg
                   className="w-8 h-8 text-feedback-success"
                   fill="none"

@@ -6,6 +6,26 @@ export default {
     './src/**/*.{js,ts,jsx,tsx}',
     '../../libs/frontend/ui-components/src/**/*.{js,ts,jsx,tsx}',
   ],
+  safelist: [
+    // Layout utilities from ui-components
+    'px-6',
+    'py-4',
+    'px-4',
+    'py-2',
+    'gap-2',
+    'flex-col',
+    'mb-1',
+    'mt-1',
+    'rounded-lg',
+    'overflow-hidden',
+    'flex',
+    'items-center',
+    'justify-between',
+    // Color patterns for arbitrary values
+    { pattern: /bg-\[var\(--.*\)\]/ },
+    { pattern: /text-\[var\(--.*\)\]/ },
+    { pattern: /border-\[var\(--.*\)\]/ },
+  ],
   theme: {
     extend: {
       colors: {
