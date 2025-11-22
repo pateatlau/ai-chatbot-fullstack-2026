@@ -4,6 +4,12 @@
 
 All environment variables are now managed in a single root `.env` file. This document provides a quick reference for all available variables.
 
+**Key Files:**
+
+- `.env` - Your local configuration (git-ignored, create from template)
+- `.env.example` - Template with all variables and documentation
+- `.env.required` - List of required variables (validated automatically)
+
 ## Quick Setup
 
 ```bash
@@ -15,7 +21,26 @@ openssl rand -base64 64
 
 # Edit values
 vim .env  # or your preferred editor
+
+# Validate configuration
+npm run validate:env
 ```
+
+## Automatic Validation
+
+Environment variables are automatically validated when you run:
+
+- `npm run dev` - Validates before starting all services
+- `npm run dev:backend` - Validates before starting backend
+- `npm run validate:env` - Run validation manually
+
+The validation checks:
+
+- ✅ All required variables are present
+- ✅ JWT secrets are 64+ characters
+- ✅ Database/Redis URLs are valid
+- ✅ No placeholder values (like "CHANGE_THIS")
+- ✅ URLs are properly formatted
 
 ## Variable Categories
 

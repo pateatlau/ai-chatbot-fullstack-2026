@@ -125,9 +125,14 @@ ai-chatbot-fullstack-2026/
    # - JWT_REFRESH_SECRET: Generate with `openssl rand -base64 64`
    # - OPENAI_API_KEY: Your OpenAI API key
    # - DATABASE_URL: Update password if needed
+
+   # Validate your configuration
+   npm run validate:env
    ```
 
    **⚠️ Important**: All environment variables are now managed in a single root `.env` file. Do NOT create service-level `.env` files.
+
+   **✅ Automatic Validation**: Environment variables are validated automatically when you run `npm run dev` or `npm run dev:backend`.
 
    See [Environment Variables Quick Reference](./ENV_VARIABLES_QUICKREF.md) for complete documentation.
 
