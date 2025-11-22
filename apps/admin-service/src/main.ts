@@ -90,8 +90,11 @@ const buildContext = (req: express.Request): JWTContext => {
       );
       userId = decoded.userId;
       console.log(`[Admin Service] Token verified, userId: ${userId}`);
-    } catch (err) {
-      console.error(`[Admin Service] Token verification failed:`, err.message);
+    } catch (err: any) {
+      console.error(
+        `[Admin Service] Token verification failed:`,
+        err?.message || err
+      );
     }
   } else {
     console.warn(`[Admin Service] No token provided`);
