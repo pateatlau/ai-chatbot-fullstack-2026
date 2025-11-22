@@ -68,7 +68,7 @@ function AdminDashboardPageContent() {
       setError(errorMsg);
       toast.error(errorMsg);
     }
-  }, [statsLoading, statsError, toast]);
+  }, [statsLoading, statsError]);
 
   const formatNumber = (num: number): string => {
     if (num >= 1000000) {
