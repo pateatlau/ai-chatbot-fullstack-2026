@@ -505,6 +505,47 @@ If issues arise with GraphQL implementation:
 
 ---
 
+## Apollo Cache Management & Fixes
+
+### Issue: Cache Refetch Error #43
+
+**Problem:** When sending a message, Apollo console showed error #43 (Invariant Violation)
+
+- Caused by: `useSendMessage` hook trying to refetch `GET_CHAT_STATS` query
+- Why: ChatPage doesn't use `useChatStats` hook, so refetching unused query failed
+
+**Solution Applied:**
+
+- Removed unnecessary `GET_CHAT_STATS` from refetch list in `useSendMessage`
+- Only refetch `GET_CONVERSATION` which is actively being used
+- Added `.catch()` error handler for robust error handling
+- File: `libs/frontend/apollo-client/src/hooks/useChat.ts`
+
+**Result:**
+
+- ✅ No more error #43 in browser console
+- ✅ Message sending still updates conversation correctly
+- ✅ Cache remains synchronized with server
+- ✅ GET_CHAT_STATS still available for components that need it
+
+### Cache Update Strategy
+
+**Automatic Cache Updates:**
+
+1. After creating conversation → refetch `GET_CONVERSATIONS`
+2. After updating conversation → refetch `GET_CONVERSATIONS` + `GET_CONVERSATION`
+3. After deleting conversation → refetch `GET_CONVERSATIONS`
+4. After sending message → refetch `GET_CONVERSATION`
+5. After deleting message → refetch `GET_CONVERSATION`
+
+**Error Handling:**
+
+- All refetch operations wrapped in error handlers
+- Invalid queries logged to console but don't break functionality
+- `errorPolicy: 'all'` ensures partial cache updates work
+
+---
+
 ## Documentation References
 
 - [Apollo Client Documentation](https://www.apollographql.com/docs/react/)
@@ -540,7 +581,7 @@ If issues arise with GraphQL implementation:
 
 ---
 
-**Last Updated:** November 22, 2025  
-**Committed:** ✅ Yes  
-**Tested:** ✅ Compilation verified  
+**Last Updated:** November 23, 2025  
+**Committed:** ✅ Yes (7382d2d - Apollo cache fix)  
+**Tested:** ✅ Compilation verified, Apollo errors fixed  
 **Ready for Deployment:** ✅ Yes
