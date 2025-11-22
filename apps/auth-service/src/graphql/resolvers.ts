@@ -73,6 +73,52 @@ export const resolvers = {
       return !!user;
     },
 
+    // Get all users with pagination (admin only)
+    users: async (
+      _parent: any,
+      args: { input?: { page?: number; limit?: number } },
+      context: AuthContext
+    ) => {
+      // Check authentication
+      if (!context.userId) {
+        throw new GraphQLError('Not authenticated', {
+          extensions: { code: 'UNAUTHENTICATED' },
+        });
+      }
+
+      // Get current user to check role
+      const currentUser = await prisma.user.findUnique({
+        where: { id: context.userId },
+      });
+
+      // Check if user has admin role
+      if (!currentUser || currentUser.role !== 'ADMIN') {
+        throw new GraphQLError('Forbidden: Admin access required', {
+          extensions: { code: 'FORBIDDEN' },
+        });
+      }
+
+      const page = args.input?.page || 1;
+      const limit = args.input?.limit || 10;
+      const skip = (page - 1) * limit;
+
+      const [users, total] = await Promise.all([
+        prisma.user.findMany({
+          skip,
+          take: limit,
+          orderBy: { createdAt: 'desc' },
+        }),
+        prisma.user.count(),
+      ]);
+
+      return {
+        users,
+        total,
+        page,
+        limit,
+      };
+    },
+
     // Health check for subgraph
     health: () => {
       return 'Auth subgraph is healthy';

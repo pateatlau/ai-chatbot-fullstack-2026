@@ -20,6 +20,27 @@ export const GET_ME = gql`
   }
 `;
 
+export const GET_USERS = gql`
+  query GetUsers($input: PaginationInput) {
+    users(input: $input) {
+      users {
+        id
+        email
+        username
+        firstName
+        lastName
+        role
+        isActive
+        createdAt
+        updatedAt
+      }
+      total
+      page
+      limit
+    }
+  }
+`;
+
 export const REGISTER = gql`
   mutation Register($input: RegisterInput!) {
     register(input: $input) {

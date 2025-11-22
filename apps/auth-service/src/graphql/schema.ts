@@ -39,6 +39,14 @@ export const typeDefs = gql`
     limit: Int
   }
 
+  # User list response
+  type UserListResponse {
+    users: [User!]!
+    total: Int!
+    page: Int!
+    limit: Int!
+  }
+
   # Authentication response
   type AuthResponse {
     success: Boolean!
@@ -80,6 +88,9 @@ export const typeDefs = gql`
 
     # Get user by email
     userByEmail(email: String!): User
+
+    # Get all users with pagination (admin only)
+    users(input: PaginationInput): UserListResponse!
 
     # Check if email exists
     emailExists(email: String!): Boolean!

@@ -1,6 +1,7 @@
 import { useMutation, useApolloClient, useQuery } from '@apollo/client';
 import {
   GET_ME,
+  GET_USERS,
   REGISTER,
   LOGIN,
   LOGOUT,
@@ -17,6 +18,18 @@ export function useMe() {
   return useQuery(GET_ME, {
     errorPolicy: 'all',
     skip: !localStorage.getItem('accessToken'),
+  });
+}
+
+/**
+ * Hook to fetch all users with pagination (admin only)
+ */
+export function useUsers(page = 1, limit = 10) {
+  return useQuery(GET_USERS, {
+    variables: {
+      input: { page, limit },
+    },
+    errorPolicy: 'all',
   });
 }
 

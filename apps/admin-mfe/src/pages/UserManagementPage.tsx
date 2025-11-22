@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Card, Button, ErrorBoundary } from '@myapp/frontend/ui-components';
 import { useToast, useRequireRole } from '@myapp/frontend/hooks';
+import { useUsers } from '@myapp/frontend/apollo-client';
 import { adminAPI, User } from '../api/admin.api';
 import {
   useAdminStore,
@@ -27,30 +28,50 @@ function UserManagementPageContent() {
 
   const limit = 10;
 
-  const loadUsers = async () => {
-    try {
-      setLoading(true);
-      const data = await adminAPI.getUsers({ page, limit, ...filters });
+  // Use GraphQL query for users
+  const {
+    data: usersData,
+    loading: usersLoading,
+    error: usersError,
+    refetch,
+  } = useUsers(page, limit);
 
-      // Convert API users to store format
-      const storeUsers = data.users.map((user) => ({
-        ...user,
-        isBanned: false, // API doesn't provide this, set default
+  // Update store when GraphQL data changes
+  useEffect(() => {
+    if (usersData?.users) {
+      const storeUsers = usersData.users.users.map((user: any) => ({
+        id: user.id,
+        email: user.email,
+        name: user.firstName || user.username || user.email,
+        role: user.role,
+        isActive: user.isActive,
+        isBanned: false,
+        lastLoginAt: null,
         createdAt: user.createdAt,
-        updatedAt: user.updatedAt || user.createdAt,
+        updatedAt: user.updatedAt,
       }));
 
       setUsers(storeUsers);
-      setTotal(data.total);
-    } catch (error: any) {
-      toast.error(error.response?.data?.error || 'Failed to load user list');
-    } finally {
-      setLoading(false);
+      setTotal(usersData.users.total);
     }
+  }, [usersData, setUsers]);
+
+  // Handle loading and error states
+  useEffect(() => {
+    setLoading(usersLoading);
+
+    if (usersError) {
+      toast.error('Failed to load user list');
+    }
+  }, [usersLoading, usersError, setLoading, toast]);
+
+  const loadUsers = async () => {
+    refetch();
   };
 
   useEffect(() => {
-    loadUsers();
+    // Refetch when page or filters change
+    refetch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, filters]);
 
