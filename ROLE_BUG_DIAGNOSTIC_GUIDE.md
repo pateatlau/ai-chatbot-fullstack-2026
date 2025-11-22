@@ -25,7 +25,19 @@ We've added comprehensive logging throughout the entire registration flow to pin
 
 ## How to Test
 
-### Step 1: Start the Auth Service with Logging
+### Initial Check: What Endpoint is Being Called?
+
+Before starting services, open browser DevTools Network tab and:
+
+1. Start the Shell MFE at `http://localhost:5173` (or appropriate port)
+2. Go to Register page
+3. Fill in form with role = "Admin"
+4. Submit form
+5. In Network tab, look for the POST request - it should be to:
+   - **Should Be**: `http://localhost:3000/api/auth/register` (REST endpoint)
+   - **If it's**: `http://localhost:4000/graphql` (GraphQL endpoint)
+
+This is CRITICAL - if it's going to GraphQL, that explains the bug (GraphQL resolver didn't support role until we just fixed it).
 
 ```bash
 cd /Users/patea/2026/projects/ai-chatbot-fullstack-2026
