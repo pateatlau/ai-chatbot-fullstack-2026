@@ -193,10 +193,10 @@
                 }
           ,
                 {
-                  entryGlobalName: "chatbotMfe",
-                  name: "chatbotMfe",
+                  entryGlobalName: "profileMfe",
+                  name: "profileMfe",
                   type: "module",
-                  entry: "http://localhost:5175/remoteEntry.js",
+                  entry: "http://localhost:5177/remoteEntry.js",
                   shareScope: "default",
                 }
           ,
@@ -209,10 +209,10 @@
                 }
           ,
                 {
-                  entryGlobalName: "profileMfe",
-                  name: "profileMfe",
+                  entryGlobalName: "chatbotMfe",
+                  name: "chatbotMfe",
                   type: "module",
-                  entry: "http://localhost:5177/remoteEntry.js",
+                  entry: "http://localhost:5175/remoteEntry.js",
                   shareScope: "default",
                 }
           
