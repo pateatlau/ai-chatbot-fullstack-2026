@@ -13,7 +13,7 @@ import {
 import { useAuthStore, useToastStore } from '@myapp/frontend/stores';
 import { loginSchema, LoginFormData } from '../schemas/auth.schema';
 import { useLogin } from '@myapp/frontend/apollo-client';
-import { eventBus, Events } from '@myapp/shared/event-bus';
+import { getEventBus, EVENT_NAMES } from '@myapp/shared/event-bus';
 
 function LoginContent() {
   const [isLoading, setIsLoading] = useState(false);
@@ -50,12 +50,15 @@ function LoginContent() {
         }
 
         // Emit login event for other MFEs
-        eventBus.publish(Events.USER_LOGIN, {
-          userId: userData.id,
-          email: userData.email,
-          name: userData.name,
-          role: userData.role,
-          accessToken: result.data.login.token,
+        const eventBus = getEventBus();
+        eventBus.emit(EVENT_NAMES.USER_LOGGED_IN, {
+          user: {
+            id: userData.id,
+            email: userData.email,
+            name: userData.name,
+            role: userData.role,
+          },
+          timestamp: Date.now(),
         });
 
         addToast('Login successful!', 'success');
