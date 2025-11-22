@@ -196,12 +196,7 @@ app.get('/health', async (_req, res) => {
 // API routes
 app.use('/api/chat', chatRoutes);
 
-// 404 handler
-app.use((_req, res) => {
-  res.status(404).json({ error: 'Route not found' });
-});
-
-// Error handler
+// Error handler (must be before 404 handler)
 app.use(
   (
     err: any,
@@ -254,13 +249,18 @@ const startServer = async () => {
     // Start Apollo Server
     await startApolloServer();
 
-    // Mount Apollo GraphQL middleware BEFORE REST routes
+    // Mount Apollo GraphQL middleware FIRST (before 404 handler)
     app.use(
       '/graphql',
       expressMiddleware(apolloServer, {
         context: async ({ req }) => buildContext(req),
       })
     );
+
+    // 404 handler (must be last)
+    app.use((_req, res) => {
+      res.status(404).json({ error: 'Route not found' });
+    });
 
     // Then start Express server
     app.listen(port, host, () => {

@@ -7,7 +7,7 @@
     "dev:backend": "bash scripts/start-backend.sh",
     "dev:gateway": "nx serve graphql-gateway",
     "dev:auth": "nx serve auth-service --inspect=false",
-    "dev:chatbot": "cd apps/chatbot-service && npx prisma generate && cd ../.. && nx serve chatbot-service --inspect=false",
+    "dev:chatbot": "nx serve chatbot-service --inspect=false",
     "dev:admin": "nx serve admin-service --inspect=false",
     "dev:frontend": "npm run build:ui-components && nx run-many --target=serve --projects=tag:type:frontend --parallel=5",
     "dev:frontend:manual": "echo 'Start MFEs first in separate terminals:' && echo '1. npm run dev:chatbot-mfe' && echo '2. npm run dev:auth-mfe' && echo '3. npm run dev:admin-mfe (optional)' && echo '4. npm run dev:profile-mfe (optional)' && echo '5. npm run dev:shell' && echo '' && echo 'Wait for each to show READY before starting the next'",
