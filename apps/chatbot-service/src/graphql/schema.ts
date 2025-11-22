@@ -94,11 +94,6 @@ export const typeDefs = gql`
     content: String!
   }
 
-  input PaginationInput {
-    page: Int
-    limit: Int
-  }
-
   # Query type
   type Query {
     # Get user's conversations (paginated)
