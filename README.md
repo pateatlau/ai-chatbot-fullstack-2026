@@ -114,19 +114,36 @@ ai-chatbot-fullstack-2026/
    npm install
    ```
 
-3. **Start local services (PostgreSQL + Redis)**
+3. **Configure environment variables** ⚠️ **REQUIRED**
+
+   ```bash
+   # Copy template to create your .env file
+   cp .env.example .env
+
+   # Edit .env and update the following:
+   # - JWT_SECRET: Generate with `openssl rand -base64 64`
+   # - JWT_REFRESH_SECRET: Generate with `openssl rand -base64 64`
+   # - OPENAI_API_KEY: Your OpenAI API key
+   # - DATABASE_URL: Update password if needed
+   ```
+
+   **⚠️ Important**: All environment variables are now managed in a single root `.env` file. Do NOT create service-level `.env` files.
+
+   See [Environment Variables Quick Reference](./ENV_VARIABLES_QUICKREF.md) for complete documentation.
+
+4. **Start local services (PostgreSQL + Redis)**
 
    ```bash
    npm run docker:up
    ```
 
-4. **Run database migrations**
+5. **Run database migrations**
 
    ```bash
    npm run prisma:migrate
    ```
 
-5. **Start all applications**
+6. **Start all applications**
 
    ```bash
    # Start all (backend + frontend)
