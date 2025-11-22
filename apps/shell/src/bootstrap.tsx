@@ -1,8 +1,6 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { ApolloProvider } from '@apollo/client';
 import { init } from '@module-federation/runtime';
-import { apolloClient } from '@myapp/frontend/apollo-client';
 import App from './app/app';
 import { startMocks } from './mocks/config';
 import './styles.css';
@@ -70,6 +68,10 @@ if (!rootElement) {
 
       // Start MSW mocks if needed
       await startMocks();
+
+      // Import Apollo Client after module federation is ready
+      const { ApolloProvider } = await import('@apollo/client');
+      const { apolloClient } = await import('@myapp/frontend/apollo-client');
 
       const root = createRoot(rootElement);
 
