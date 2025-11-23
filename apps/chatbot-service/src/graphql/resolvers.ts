@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { GraphQLError } from 'graphql';
+import { chatEventEmitter } from '../lib/event-emitter';
 
 const prisma = new PrismaClient();
 
@@ -315,6 +316,12 @@ export const resolvers = {
         },
       });
 
+      // Broadcast to subscribed clients
+      chatEventEmitter.emitMessageReceived({
+        conversationId: args.conversationId,
+        message: userMessage,
+      });
+
       // TODO: Call OpenAI API and create assistant message via SSE streaming
       // For now, return success response
 
@@ -384,6 +391,19 @@ export const resolvers = {
         orderBy: { createdAt: 'asc' },
       });
     },
+    lastMessage: async (parent: any) => {
+      return prisma.message.findFirst({
+        where: { conversationId: parent.id, isDeleted: false },
+        orderBy: { createdAt: 'desc' },
+      });
+    },
+    lastMessageDate: async (parent: any) => {
+      const lastMsg = await prisma.message.findFirst({
+        where: { conversationId: parent.id, isDeleted: false },
+        orderBy: { createdAt: 'desc' },
+      });
+      return lastMsg?.createdAt || parent.updatedAt;
+    },
   },
 
   Message: {
@@ -395,6 +415,108 @@ export const resolvers = {
       return prisma.conversation.findUnique({
         where: { id: parent.conversationId },
       });
+    },
+  },
+
+  // Subscriptions
+  Subscription: {
+    // Real-time message streaming
+    messageReceived: {
+      subscribe: async (
+        _parent: any,
+        args: { conversationId: string },
+        context: AuthContext
+      ) => {
+        if (!context.userId) {
+          throw new GraphQLError('Not authenticated', {
+            extensions: { code: 'UNAUTHENTICATED' },
+          });
+        }
+
+        // Verify user owns the conversation
+        const conversation = await prisma.conversation.findUnique({
+          where: { id: args.conversationId },
+        });
+
+        if (!conversation || conversation.userId !== context.userId) {
+          throw new GraphQLError('Unauthorized', {
+            extensions: { code: 'FORBIDDEN' },
+          });
+        }
+
+        // Create async iterator for this conversation
+        return (async function* () {
+          // Yield existing messages first (last 5)
+          const messages = await prisma.message.findMany({
+            where: {
+              conversationId: args.conversationId,
+              isDeleted: false,
+            },
+            orderBy: { createdAt: 'desc' },
+            take: 5,
+          });
+
+          for (const message of messages.reverse()) {
+            yield { messageReceived: message };
+          }
+
+          // Then listen for new messages
+          yield new Promise((resolve) => {
+            const unsubscribe = chatEventEmitter.onMessageReceived(
+              args.conversationId,
+              (message) => {
+                unsubscribe();
+                resolve({ messageReceived: message });
+              }
+            );
+
+            // Timeout after 30 seconds
+            setTimeout(() => {
+              unsubscribe();
+              resolve({ messageReceived: null });
+            }, 30000);
+          });
+        })();
+      },
+    },
+
+    // Conversation updates
+    conversationUpdated: {
+      subscribe: async (
+        _parent: any,
+        args: { userId: string },
+        context: AuthContext
+      ) => {
+        if (!context.userId) {
+          throw new GraphQLError('Not authenticated', {
+            extensions: { code: 'UNAUTHENTICATED' },
+          });
+        }
+
+        // Only user can subscribe to their own conversations
+        if (args.userId !== context.userId) {
+          throw new GraphQLError('Unauthorized', {
+            extensions: { code: 'FORBIDDEN' },
+          });
+        }
+
+        return (async function* () {
+          yield new Promise((resolve) => {
+            const unsubscribe = chatEventEmitter.onConversationUpdated(
+              args.userId,
+              (conversation) => {
+                unsubscribe();
+                resolve({ conversationUpdated: conversation });
+              }
+            );
+
+            // Timeout
+            setTimeout(() => {
+              unsubscribe();
+            }, 60000);
+          });
+        })();
+      },
     },
   },
 };

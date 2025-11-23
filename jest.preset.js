@@ -7,7 +7,15 @@ module.exports = {
     '^.+\\.(ts|tsx|js|jsx)$': [
       'ts-jest',
       {
-        tsconfig: '<rootDir>/tsconfig.spec.json',
+        tsconfig: {
+          module: 'commonjs',
+          target: 'ES2020',
+          lib: ['ES2020', 'dom'],
+          esModuleInterop: true,
+          allowSyntheticDefaultImports: true,
+          strict: true,
+          skipLibCheck: true,
+        },
       },
     ],
   },
