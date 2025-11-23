@@ -15,6 +15,7 @@ import { expressMiddleware } from '@apollo/server/express4';
 import { buildSubgraphSchema } from '@apollo/subgraph';
 import { typeDefs } from './graphql/schema';
 import { resolvers } from './graphql/resolvers';
+import { connectMongoDB, disconnectMongoDB } from './services/mongodb';
 
 // Load environment variables with smart path resolution
 const envPath =
@@ -246,6 +247,9 @@ const startApolloServer = async () => {
 // Start server with GraphQL support
 const startServer = async () => {
   try {
+    // Connect to MongoDB (new Day 4 feature)
+    await connectMongoDB();
+
     // Start Apollo Server
     await startApolloServer();
 
@@ -263,7 +267,7 @@ const startServer = async () => {
     });
 
     // Then start Express server
-    app.listen(port, host, () => {
+    const server = app.listen(port, host, () => {
       console.log(
         `[ ready ] Chatbot Service running at http://${host}:${port}`
       );
@@ -271,6 +275,25 @@ const startServer = async () => {
         `[ ready ] GraphQL endpoint at http://${host}:${port}/graphql`
       );
       console.log(`[ ready ] REST API at http://${host}:${port}/api/chat`);
+    });
+
+    // Graceful shutdown handler
+    process.on('SIGTERM', async () => {
+      console.log('SIGTERM signal received: closing HTTP server');
+      server.close(async () => {
+        console.log('HTTP server closed');
+        await disconnectMongoDB();
+        process.exit(0);
+      });
+    });
+
+    process.on('SIGINT', async () => {
+      console.log('SIGINT signal received: closing HTTP server');
+      server.close(async () => {
+        console.log('HTTP server closed');
+        await disconnectMongoDB();
+        process.exit(0);
+      });
     });
   } catch (error) {
     console.error('Failed to start server:', error);
