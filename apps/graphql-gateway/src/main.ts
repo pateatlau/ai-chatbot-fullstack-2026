@@ -8,6 +8,9 @@ import {
 } from '@apollo/gateway';
 import cors from 'cors';
 import * as dotenv from 'dotenv';
+import { createRateLimitMiddleware } from './middleware/rate-limit';
+import { createComplexityAnalysisRules } from './middleware/complexity-analysis';
+import { createDataLoaders, DataLoaders } from './dataloaders';
 
 // Load environment variables
 dotenv.config();
@@ -25,6 +28,7 @@ const ADMIN_SUBGRAPH_URL =
 
 interface ContextValue {
   token?: string;
+  dataloaders?: DataLoaders;
 }
 
 async function startServer() {
@@ -60,9 +64,23 @@ async function startServer() {
       },
     });
 
-    // Create Apollo Server
+    // Create Apollo Server with validation rules for complexity analysis
     const server = new ApolloServer<ContextValue>({
       gateway,
+      validationRules: createComplexityAnalysisRules({
+        maximumComplexity: 1000,
+        maximumDepth: 5,
+      }),
+      formatError: (error) => {
+        // Log security-relevant errors
+        if (error.message.includes('exceeds maximum complexity')) {
+          console.warn(`[Security] Query rejected for complexity violation`);
+        }
+        if (error.message.includes('exceeds maximum depth')) {
+          console.warn(`[Security] Query rejected for depth violation`);
+        }
+        return error;
+      },
     });
 
     // Start Apollo Server
@@ -88,6 +106,9 @@ async function startServer() {
         timestamp: new Date().toISOString(),
       });
     });
+
+    // Apply rate limiting middleware (must be before GraphQL)
+    app.use('/graphql', createRateLimitMiddleware());
 
     // GraphQL endpoint with middleware
     app.use(
@@ -122,6 +143,7 @@ async function startServer() {
 
           return {
             token,
+            dataloaders: createDataLoaders(),
           };
         },
       })
@@ -138,6 +160,10 @@ async function startServer() {
       console.log(`  - Auth:    ${AUTH_SUBGRAPH_URL}`);
       console.log(`  - Chatbot: ${CHATBOT_SUBGRAPH_URL}`);
       console.log(`  - Admin:   ${ADMIN_SUBGRAPH_URL}`);
+      console.log(`\n🔒 Security Features:`);
+      console.log(`  - Rate Limiting: 100 req/min per user`);
+      console.log(`  - Complexity Analysis: max 1000, depth 5`);
+      console.log(`  - DataLoader: Batch query optimization enabled`);
     });
   } catch (error) {
     console.error('❌ Failed to start server:', error);

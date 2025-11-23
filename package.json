@@ -179,6 +179,7 @@
     "clsx": "^2.1.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
+    "dataloader": "^2.2.3",
     "dotenv": "^17.2.3",
     "express": "^4.21.2",
     "graphql": "^16.8.0",
