@@ -12,10 +12,9 @@ export const typeDefs = gql`
   type User @key(fields: "id") {
     id: ID!
     email: String!
-    username: String
-    firstName: String
-    lastName: String
+    name: String!
     role: UserRole!
+    avatar: String
     isActive: Boolean!
     createdAt: DateTime!
     updatedAt: DateTime!
@@ -66,17 +65,14 @@ export const typeDefs = gql`
   input RegisterInput {
     email: String!
     password: String!
-    username: String
-    firstName: String
-    lastName: String
+    name: String
     role: String # Optional role during registration (defaults to USER)
   }
 
   # Update profile input
   input UpdateProfileInput {
-    username: String
-    firstName: String
-    lastName: String
+    name: String
+    avatar: String
   }
 
   # Query type

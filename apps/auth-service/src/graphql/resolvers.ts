@@ -25,6 +25,7 @@ interface RegisterInput {
 
 interface UpdateProfileInput {
   name?: string;
+  avatar?: string;
 }
 
 export const resolvers = {
@@ -183,6 +184,7 @@ export const resolvers = {
           email: user.email,
           name: user.name,
           role: user.role,
+          avatar: user.avatar,
           isActive: user.isActive,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,
@@ -339,12 +341,13 @@ export const resolvers = {
         });
       }
 
-      const { name } = args.input;
+      const { name, avatar } = args.input;
 
       const user = await prisma.user.update({
         where: { id: context.userId },
         data: {
           ...(name && { name }),
+          ...(avatar && { avatar }),
         },
       });
 
@@ -353,6 +356,7 @@ export const resolvers = {
         email: user.email,
         name: user.name,
         role: user.role,
+        avatar: user.avatar,
         isActive: user.isActive,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
