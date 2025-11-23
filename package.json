@@ -39,6 +39,7 @@
     "test:e2e:chromium": "playwright test --project=chromium",
     "test:e2e:firefox": "playwright test --project=firefox",
     "test:e2e:webkit": "playwright test --project=webkit",
+    "test:graphql:integration": "bash scripts/test-graphql-integration.sh",
     "test:smoke": "ts-node scripts/smoke-tests.ts --env=local",
     "test:smoke:staging": "ts-node scripts/smoke-tests.ts --env=staging",
     "test:smoke:production": "ts-node scripts/smoke-tests.ts --env=production",

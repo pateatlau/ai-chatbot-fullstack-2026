@@ -310,7 +310,7 @@ export const resolvers = {
       const userMessage = await prisma.message.create({
         data: {
           conversationId: args.conversationId,
-          role: 'USER',
+          role: 'user',
           content: args.input.content,
         },
       });
@@ -387,6 +387,10 @@ export const resolvers = {
   },
 
   Message: {
+    role: (parent: any) => {
+      // Convert database string to GraphQL enum (uppercase)
+      return parent.role?.toUpperCase() || 'USER';
+    },
     conversation: async (parent: any) => {
       return prisma.conversation.findUnique({
         where: { id: parent.conversationId },
