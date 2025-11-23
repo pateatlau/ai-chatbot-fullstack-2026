@@ -86,6 +86,14 @@
           "buildTarget": "admin-service:build:production"
         }
       }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "apps/admin-service/jest.config.ts",
+        "passWithNoTests": true
+      }
     }
   }
 }
