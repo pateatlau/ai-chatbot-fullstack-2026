@@ -164,6 +164,10 @@ export const resolvers = {
       const expiresIn = process.env.JWT_EXPIRES_IN || '15m';
       const refreshExpiresIn = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
 
+      console.log(
+        `[Auth] Generating token with JWT_SECRET length: ${jwtSecret.length}, value: ${jwtSecret.substring(0, 30)}...`
+      );
+
       const token = jwt.sign(
         { userId: user.id, email: user.email },
         jwtSecret,

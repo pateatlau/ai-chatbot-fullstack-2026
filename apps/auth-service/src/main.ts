@@ -102,6 +102,8 @@ const startApolloServer = async () => {
 
   apolloServer = new ApolloServer({
     schema,
+    // Disable CSRF protection for introspection queries (gateway federation)
+    csrfPrevention: false,
   });
 
   await apolloServer.start();

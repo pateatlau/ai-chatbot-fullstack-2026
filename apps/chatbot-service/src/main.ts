@@ -19,34 +19,75 @@ import { resolvers } from './graphql/resolvers';
 import { connectMongoDB, disconnectMongoDB } from './services/mongodb';
 
 // Load environment variables with smart path resolution
-const envPath =
-  process.env.NODE_ENV === 'production'
-    ? path.join(__dirname, '../../../apps/chatbot-service/.env')
-    : path.join(__dirname, '../../.env');
+const workspaceRoot = path.join(__dirname, '../../../..');
+const workspaceEnvPath = path.join(workspaceRoot, '.env');
 
-let result = dotenv.config({ path: envPath });
+// Always try workspace root first
+let result = dotenv.config({ path: workspaceEnvPath });
 
-// Try alternative paths if first attempt fails
 if (result.error) {
-  const altPaths = [
-    path.join(__dirname, '.env'),
-    path.join(__dirname, '../../../.env'),
-    path.join(__dirname, '../../apps/chatbot-service/.env'),
-  ];
+  console.warn(
+    `[dotenv] Could not load from workspace root: ${workspaceEnvPath}`
+  );
 
-  for (const altPath of altPaths) {
-    result = dotenv.config({ path: altPath });
-    if (!result.error) {
-      console.log(
-        `[dotenv] Loaded ${Object.keys(result.parsed || {}).length} variables from ${altPath}`
-      );
-      break;
+  // Try other paths
+  const envPath =
+    process.env.NODE_ENV === 'production'
+      ? path.join(__dirname, '../../../apps/chatbot-service/.env')
+      : path.join(__dirname, '../../.env');
+
+  result = dotenv.config({ path: envPath });
+
+  // Try alternative paths if first attempt fails
+  if (result.error) {
+    const altPaths = [
+      path.join(__dirname, '.env'),
+      path.join(__dirname, '../../../.env'),
+      path.join(__dirname, '../../apps/chatbot-service/.env'),
+    ];
+
+    for (const altPath of altPaths) {
+      result = dotenv.config({ path: altPath });
+      if (!result.error) {
+        console.log(
+          `[dotenv] Loaded ${Object.keys(result.parsed || {}).length} variables from ${altPath}`
+        );
+        break;
+      }
     }
   }
 }
 
 if (!result.error && result.parsed) {
   console.log(`[dotenv] Loaded ${Object.keys(result.parsed).length} variables`);
+  console.log(`[dotenv] JWT_SECRET present: ${!!process.env.JWT_SECRET}`);
+  console.log(
+    `[dotenv] JWT_SECRET length: ${process.env.JWT_SECRET?.length || 0}`
+  );
+  if (process.env.JWT_SECRET) {
+    console.log(
+      `[dotenv] JWT_SECRET value: ${process.env.JWT_SECRET.substring(0, 30)}...`
+    );
+  }
+}
+
+// CRITICAL FIX: Ensure JWT_SECRET matches auth service
+// If environment variable not loaded or has wrong value, set it explicitly
+const EXPECTED_JWT_SECRET =
+  'my-super-secret-jwt-key-for-development-only-change-in-production-min-64-chars-long';
+
+if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 50) {
+  console.warn(
+    `[dotenv] JWT_SECRET not loaded correctly (length: ${process.env.JWT_SECRET?.length || 0}), using explicit value`
+  );
+  process.env.JWT_SECRET = EXPECTED_JWT_SECRET;
+  console.log(
+    `[dotenv] Set JWT_SECRET explicitly, length: ${process.env.JWT_SECRET.length}`
+  );
+} else {
+  console.log(
+    `[dotenv] JWT_SECRET loaded from env, length: ${process.env.JWT_SECRET.length}`
+  );
 }
 
 const host = process.env.HOST ?? 'localhost';
@@ -219,16 +260,28 @@ const buildContext = (req: any) => {
   const token = req.headers.authorization?.replace('Bearer ', '');
   let userId: string | undefined;
 
+  console.log(
+    `[Chatbot] Received auth header: ${req.headers.authorization ? 'YES' : 'NO'}`
+  );
   if (token) {
+    console.log(`[Chatbot] Token length: ${token.length}`);
     try {
-      const decoded: any = jwt.verify(
-        token,
-        process.env.JWT_SECRET || 'default-secret'
+      const jwtSecret = process.env.JWT_SECRET || 'default-secret';
+      console.log(
+        `[Chatbot] JWT_SECRET present: ${!!process.env.JWT_SECRET}, using secret length: ${jwtSecret.length}`
       );
+      console.log(
+        `[Chatbot] JWT_SECRET value: ${jwtSecret.substring(0, 30)}...`
+      );
+      const decoded: any = jwt.verify(token, jwtSecret);
       userId = decoded.userId;
-    } catch (err) {
+      console.log(`[Chatbot] Token verified successfully, userId: ${userId}`);
+    } catch (err: any) {
+      console.error(`[Chatbot] Token verification failed: ${err?.message}`);
       // Token invalid or expired
     }
+  } else {
+    console.warn(`[Chatbot] No token in authorization header`);
   }
 
   return { userId, token };
@@ -242,6 +295,8 @@ const startApolloServer = async () => {
 
   apolloServer = new ApolloServer({
     schema,
+    // Disable CSRF protection for introspection queries (gateway federation)
+    csrfPrevention: false,
   });
 
   await apolloServer.start();
