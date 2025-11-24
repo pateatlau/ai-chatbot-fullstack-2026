@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import swaggerUi from 'swagger-ui-express';
 import chatRoutes from './routes/chat.routes';
+import healthRoutes from './routes/health';
 import { PrismaClient } from '@prisma/client';
 import Redis from 'ioredis';
 import OpenAI from 'openai';
@@ -193,6 +194,9 @@ app.get('/health', async (_req, res) => {
   const statusCode = health.status === 'healthy' ? 200 : 503;
   res.status(statusCode).json(health);
 });
+
+// Health check routes (Kubernetes/Docker probes)
+app.use('/', healthRoutes);
 
 // API routes
 app.use('/api/chat', chatRoutes);

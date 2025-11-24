@@ -107,7 +107,8 @@ describe('MongoDB Connection & Models', () => {
       });
 
       const message = new Message({
-        conversationId: conversation._id,
+        conversationId: conversation._id.toString(), // Now stores as string (UUID or ObjectId string)
+        mongoConversationId: conversation._id, // Optional: direct MongoDB reference
         role: 'user',
         content: 'Hello, how are you?',
         tokens: 5,
@@ -120,7 +121,10 @@ describe('MongoDB Connection & Models', () => {
       const saved = await message.save();
 
       expect(saved._id).toBeDefined();
-      expect(saved.conversationId).toEqual(conversation._id);
+      expect(saved.conversationId).toEqual(conversation._id.toString());
+      expect(saved.mongoConversationId?.toString()).toEqual(
+        conversation._id.toString()
+      );
       expect(saved.role).toBe('user');
       expect(saved.content).toBe('Hello, how are you?');
       expect(saved.tokens).toBe(5);

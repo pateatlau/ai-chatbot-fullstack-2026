@@ -1,13 +1,17 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IMessage extends Document {
-  conversationId: mongoose.Types.ObjectId;
+  conversationId: string; // Can be UUID (from PostgreSQL) or ObjectId (from MongoDB)
+  mongoConversationId?: mongoose.Types.ObjectId; // MongoDB reference for lookups
   role: 'user' | 'assistant' | 'system';
   content: string;
   tokens?: number;
   metadata?: {
     model?: string;
     finishReason?: string;
+    migratedFrom?: string;
+    postgresId?: string;
+    migratedAt?: Date;
   };
   createdAt: Date;
 }
@@ -15,9 +19,14 @@ export interface IMessage extends Document {
 const messageSchema = new Schema<IMessage>(
   {
     conversationId: {
+      type: String,
+      required: true,
+      index: true,
+    },
+    mongoConversationId: {
       type: Schema.Types.ObjectId,
       ref: 'Conversation',
-      required: true,
+      sparse: true,
       index: true,
     },
     role: {

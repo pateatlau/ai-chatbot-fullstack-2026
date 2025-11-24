@@ -76,6 +76,7 @@ model Conversation {
   id        String   @id @default(uuid())
   userId    String
   title     String   @default("New Conversation")
+  mongoId   String?  // Reference to MongoDB _id during dual-write period
   isDeleted Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

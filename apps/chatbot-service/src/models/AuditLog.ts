@@ -14,6 +14,7 @@ export interface IAuditLog extends Document {
   resourceId: string;
   changes?: Record<string, unknown>;
   ipAddress?: string;
+  metadata?: Record<string, unknown>;
   createdAt: Date;
   expiresAt?: Date;
 }
@@ -47,6 +48,7 @@ const auditLogSchema = new Schema<IAuditLog>(
     },
     changes: Schema.Types.Mixed,
     ipAddress: String,
+    metadata: Schema.Types.Mixed,
   },
   {
     timestamps: { createdAt: true, updatedAt: false },

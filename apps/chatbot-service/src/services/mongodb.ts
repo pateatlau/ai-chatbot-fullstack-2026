@@ -8,7 +8,7 @@ const MONGODB_OPTIONS = {
   minPoolSize: 5,
   serverSelectionTimeoutMS: 5000,
   socketTimeoutMS: 45000,
-  retryWrites: true,
+  retryWrites: false,
   w: 'majority' as const,
 };
 

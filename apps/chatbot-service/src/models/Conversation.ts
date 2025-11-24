@@ -8,6 +8,9 @@ export interface IConversation extends Document {
     model?: string;
     temperature?: number;
     maxTokens?: number;
+    migratedFrom?: string;
+    postgresId?: string;
+    migratedAt?: Date;
   };
   createdAt: Date;
   updatedAt: Date;
@@ -35,6 +38,9 @@ const conversationSchema = new Schema<IConversation>(
       model: String,
       temperature: Number,
       maxTokens: Number,
+      migratedFrom: String,
+      postgresId: String,
+      migratedAt: Date,
     },
   },
   {
