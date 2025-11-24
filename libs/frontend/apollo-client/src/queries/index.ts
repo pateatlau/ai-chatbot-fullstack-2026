@@ -9,10 +9,9 @@ export const GET_ME = gql`
     me {
       id
       email
-      username
-      firstName
-      lastName
+      name
       role
+      avatar
       isActive
       createdAt
       updatedAt
@@ -26,10 +25,9 @@ export const GET_USERS = gql`
       users {
         id
         email
-        username
-        firstName
-        lastName
+        name
         role
+        avatar
         isActive
         createdAt
         updatedAt
@@ -46,10 +44,9 @@ export const GET_USER = gql`
     user(id: $id) {
       id
       email
-      username
-      firstName
-      lastName
+      name
       role
+      avatar
       isActive
       createdAt
       updatedAt
@@ -62,10 +59,9 @@ export const UPDATE_USER = gql`
     updateUser(id: $id, input: $input) {
       id
       email
-      username
-      firstName
-      lastName
+      name
       role
+      avatar
       isActive
       updatedAt
     }
@@ -98,10 +94,9 @@ export const REGISTER = gql`
       user {
         id
         email
-        username
-        firstName
-        lastName
+        name
         role
+        avatar
       }
       token
       refreshToken
@@ -117,10 +112,9 @@ export const LOGIN = gql`
       user {
         id
         email
-        username
-        firstName
-        lastName
+        name
         role
+        avatar
       }
       token
       refreshToken
@@ -153,10 +147,9 @@ export const UPDATE_PROFILE = gql`
     updateProfile(input: $input) {
       id
       email
-      username
-      firstName
-      lastName
+      name
       role
+      avatar
     }
   }
 `;

@@ -48,13 +48,13 @@ export function useRegister() {
           ? {
               email: data,
               password: arguments[1],
-              firstName: arguments[2],
+              name: arguments[2],
               role: arguments[3],
             }
           : {
               email: data.email,
               password: data.password,
-              firstName: data.name,
+              name: data.name,
               role: data.role, // Include role from registerData
             };
 
@@ -174,7 +174,7 @@ export function useUpdateProfile() {
   return (name: string) => {
     return updateProfile({
       variables: {
-        input: { firstName: name },
+        input: { name: name },
       },
     });
   };
