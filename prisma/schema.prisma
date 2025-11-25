@@ -24,8 +24,8 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  sessions             Session[]
-  passwordResetTokens  PasswordResetToken[]
+  sessions            Session[]
+  passwordResetTokens PasswordResetToken[]
 
   @@map("users")
 }
@@ -76,7 +76,7 @@ model Conversation {
   id        String   @id @default(uuid())
   userId    String
   title     String   @default("New Conversation")
-  mongoId   String?  // Reference to MongoDB _id during dual-write period
+  mongoId   String? // Reference to MongoDB _id during dual-write period
   isDeleted Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -91,7 +91,7 @@ model Conversation {
 model Message {
   id             String   @id @default(uuid())
   conversationId String
-  role           String   // 'user' or 'assistant'
+  role           String // 'user' or 'assistant'
   content        String   @db.Text
   tokenCount     Int      @default(0)
   isDeleted      Boolean  @default(false)
@@ -122,13 +122,13 @@ model TokenUsage {
 // ============================================
 
 model Admin {
-  id        String   @id @default(uuid())
-  userId    String   @unique
-  role      String   // SUPER_ADMIN, ADMIN, MODERATOR
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  role        String // SUPER_ADMIN, ADMIN, MODERATOR
   permissions String[]
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   @@index([role])
   @@map("admins")
@@ -137,8 +137,8 @@ model Admin {
 model AuditLog {
   id        String   @id @default(uuid())
   userId    String
-  action    String   // ASSIGN_ROLE, UPDATE_PERMISSIONS, etc
-  resource  String   // What was changed (e.g., User:123)
+  action    String // ASSIGN_ROLE, UPDATE_PERMISSIONS, etc
+  resource  String // What was changed (e.g., User:123)
   changes   String   @db.Text // JSON of changes
   timestamp DateTime @default(now())
 
