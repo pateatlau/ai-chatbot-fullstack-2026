@@ -1,4 +1,6 @@
 import { useLocation } from 'react-router-dom';
+import { ErrorBoundary } from '@myapp/frontend/ui-components';
+import { RecoveryAction } from '@myapp/frontend/hooks';
 import {
   ProfilePage,
   EditProfilePage,
@@ -6,7 +8,7 @@ import {
   SecurityPage,
 } from '../pages';
 
-export function App() {
+function AppContent() {
   const location = useLocation();
 
   // Router path-based rendering - shell controls routing
@@ -29,6 +31,31 @@ export function App() {
 
   // Default to profile view
   return <ProfilePage />;
+}
+
+export function App() {
+  const handleRecovery = (action: RecoveryAction) => {
+    console.log('[Profile MFE] Recovery action triggered:', action);
+    // Execute recovery action
+    void action.action();
+  };
+
+  const handleError = (error: Error, errorInfo: React.ErrorInfo) => {
+    console.error('[Profile MFE] Error caught:', { error, errorInfo });
+  };
+
+  return (
+    <ErrorBoundary
+      variant="full"
+      context="profile-mfe-root"
+      enableRecovery={true}
+      onRecovery={handleRecovery}
+      onError={handleError}
+      showDetails={process.env.NODE_ENV === 'development'}
+    >
+      <AppContent />
+    </ErrorBoundary>
+  );
 }
 
 export default App;

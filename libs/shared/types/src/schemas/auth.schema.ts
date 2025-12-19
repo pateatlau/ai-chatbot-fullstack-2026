@@ -15,6 +15,9 @@ export const LoginResponseSchema = z.object({
     email: z.string().email(),
     name: z.string(),
     role: z.enum(['USER', 'ADMIN', 'MODERATOR']),
+    isActive: z.boolean(),
+    createdAt: z.string(),
+    updatedAt: z.string(),
   }),
 });
 

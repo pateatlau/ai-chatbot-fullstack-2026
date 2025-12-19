@@ -1,11 +1,12 @@
 import { FC, ReactNode } from 'react';
-import { clsx } from 'clsx';
+import { designTokens, componentPresets, cn } from '../../lib/design-tokens';
+import { colorMap } from '../../lib/color-system';
 
 export interface CardProps {
   children: ReactNode;
   title?: string;
   footer?: ReactNode;
-  variant?: 'default' | 'bordered' | 'elevated';
+  variant?: 'default' | 'interactive' | 'elevated';
   className?: string;
   headerAction?: ReactNode;
 }
@@ -18,33 +19,44 @@ export const Card: FC<CardProps> = ({
   className,
   headerAction,
 }) => {
-  const variantStyles = {
-    default: 'bg-white',
-    bordered: 'bg-white border border-gray-200',
-    elevated: 'bg-white shadow-md',
-  };
+  const variantClass = {
+    default: componentPresets.card.default,
+    interactive: componentPresets.card.interactive,
+    elevated: componentPresets.card.elevated,
+  }[variant];
 
   return (
-    <div
-      className={clsx(
-        'rounded-lg overflow-hidden',
-        variantStyles[variant],
-        className
-      )}
-    >
+    <div className={cn('rounded-lg overflow-hidden', variantClass, className)}>
       {(title || headerAction) && (
-        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+        <div
+          className={cn(
+            'px-6 py-4 border-b',
+            colorMap.border.default,
+            'flex items-center justify-between'
+          )}
+        >
           {title && (
-            <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+            <h3
+              className={cn(designTokens.typography.h5, colorMap.text.primary)}
+            >
+              {title}
+            </h3>
           )}
           {headerAction && <div>{headerAction}</div>}
         </div>
       )}
 
-      <div className="px-6 py-4">{children}</div>
+      <div className={cn('px-6 py-4', colorMap.text.primary)}>{children}</div>
 
       {footer && (
-        <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
+        <div
+          className={cn(
+            'px-6 py-4',
+            colorMap.bg.secondary,
+            'border-t',
+            colorMap.border.default
+          )}
+        >
           {footer}
         </div>
       )}

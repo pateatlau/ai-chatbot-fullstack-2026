@@ -19,3 +19,31 @@ export {
   type UseApiOptions,
   type UseApiReturn,
 } from './lib/useApi';
+
+// Error logging hooks
+export {
+  useErrorLogger,
+  type ErrorLogContext,
+  type ErrorLog,
+} from './lib/useErrorLogger';
+
+// Error recovery types
+export type {
+  ErrorRecoveryContext,
+  RecoveryAction,
+  StateSnapshot,
+  RecoverySuggestion,
+  RecoveryResult,
+} from './lib/useErrorRecovery.types';
+
+export { ErrorCategory, RecoveryStrategy } from './lib/useErrorRecovery.types';
+
+// Error recovery hook
+export { useErrorRecovery } from './lib/useErrorRecovery';
+
+// Session recovery
+export {
+  sessionRecoveryService,
+  type SessionData,
+  type SessionRecoveryOptions,
+} from './lib/sessionRecovery.service';

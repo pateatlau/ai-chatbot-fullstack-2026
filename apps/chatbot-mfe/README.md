@@ -236,6 +236,27 @@ Future optimization: Code-split language packs
 
 ## Testing
 
+### Integration Test Suite
+
+```bash
+# Run comprehensive integration tests
+bash apps/chatbot-mfe/test-chatbot-mfe.sh
+```
+
+**Test Coverage (50+ tests):**
+
+- ✅ Authentication flow
+- ✅ Component file structure (8 tests)
+- ✅ API integration (5 tests)
+- ✅ Messaging & streaming (3 tests)
+- ✅ Conversation management (2 tests)
+- ✅ Component structure & hooks (6 tests)
+- ✅ Streaming implementation (5 tests)
+- ✅ Rate limiting integration (4 tests)
+- ✅ TypeScript types (4 tests)
+- ✅ Module Federation (2 tests)
+- ✅ CSS styling (4 tests)
+
 ### Manual Testing
 
 1. **Create conversation** - Click + button
@@ -247,12 +268,33 @@ Future optimization: Code-split language packs
 7. **Rate limiting** - Send 10+ messages rapidly
 8. **Error handling** - Stop chatbot service, try sending
 
+### Mock AI Mode
+
+The chatbot service uses **mock AI responses** by default (no OpenAI API key required):
+
+```bash
+# In apps/chatbot-service/.env
+USE_MOCK_AI=true
+
+# Mock responses include:
+# - "I'm a mock AI assistant..."
+# - Echoes your message
+# - Simulated streaming with delays
+# - Full SSE (Server-Sent Events) support
+```
+
+To use real OpenAI:
+
+1. Set `USE_MOCK_AI=false` in `.env`
+2. Add your `OPENAI_API_KEY`
+3. Rebuild and restart chatbot-service
+
 ### Future: Automated Tests
 
 - Unit tests for hooks (useStreamingMessage, useRateLimit)
 - Component tests for message rendering
 - Integration tests for conversation flow
-- E2E tests with Cypress
+- E2E tests with Playwright/Cypress
 
 ## Future Enhancements
 

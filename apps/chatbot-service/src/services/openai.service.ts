@@ -1,9 +1,23 @@
 import OpenAI from 'openai';
 import prisma from '../lib/prisma';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Initialize OpenAI client lazily to allow .env to load first
+let openai: OpenAI | null = null;
+
+function getOpenAIClient(): OpenAI {
+  if (!openai) {
+    // Use a dummy key if mock mode is enabled
+    const apiKey =
+      process.env.USE_MOCK_AI === 'true'
+        ? 'sk-mock-key-for-testing'
+        : process.env.OPENAI_API_KEY;
+
+    openai = new OpenAI({
+      apiKey,
+    });
+  }
+  return openai;
+}
 
 interface ChatMessage {
   role: 'user' | 'assistant' | 'system';
@@ -125,7 +139,8 @@ export class OpenAIService {
     ];
 
     // Create streaming completion
-    const stream = await openai.chat.completions.create({
+    const client = getOpenAIClient();
+    const stream = await client.chat.completions.create({
       model: this.MODEL,
       messages: chatMessages,
       max_tokens: this.MAX_TOKENS,

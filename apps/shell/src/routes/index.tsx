@@ -2,6 +2,7 @@ import { createBrowserRouter } from 'react-router-dom';
 import { ProtectedRoute } from '../components/ProtectedRoute';
 import { PublicRoute } from '../components/PublicRoute';
 import { AdminRoute } from '../components/AdminRoute';
+import { RootRedirect } from '../components/RootRedirect';
 import { DashboardLayout } from '../layouts/DashboardLayout';
 import { ChatbotMfe } from '../components/ChatbotMfe';
 import { AuthMfe } from '../components/AuthMfe';
@@ -9,16 +10,15 @@ import { AdminMfe } from '../components/AdminMfe';
 import { ProfileMfe } from '../components/ProfileMfe';
 
 // Core pages
-import { HomePage } from '../pages/HomePage';
 import { DashboardPage } from '../pages/DashboardPage';
 import { NotFoundPage } from '../pages/NotFoundPage';
 
 export const router = createBrowserRouter([
-  // Public home page
+  // Root route - redirect based on auth status
   {
     path: '/',
     index: true,
-    element: <HomePage />,
+    element: <RootRedirect />,
   },
   // Auth routes - delegated to Auth MFE
   {
@@ -31,6 +31,22 @@ export const router = createBrowserRouter([
   },
   {
     path: '/register',
+    element: (
+      <PublicRoute>
+        <AuthMfe />
+      </PublicRoute>
+    ),
+  },
+  {
+    path: '/forgot-password',
+    element: (
+      <PublicRoute>
+        <AuthMfe />
+      </PublicRoute>
+    ),
+  },
+  {
+    path: '/reset-password/:token',
     element: (
       <PublicRoute>
         <AuthMfe />
@@ -51,9 +67,17 @@ export const router = createBrowserRouter([
         path: 'dashboard',
         element: <DashboardPage />,
       },
-      // Chatbot MFE
+      // Chatbot MFE - all chat routes
       {
-        path: 'chatbot',
+        path: 'chat',
+        element: <ChatbotMfe />,
+      },
+      {
+        path: 'chat/:conversationId',
+        element: <ChatbotMfe />,
+      },
+      {
+        path: 'chatbot', // Legacy route, redirect to /chat
         element: <ChatbotMfe />,
       },
       // Profile routes - delegated to Profile MFE
@@ -92,6 +116,14 @@ export const router = createBrowserRouter([
       },
       {
         path: 'admin/users/:userId',
+        element: (
+          <AdminRoute>
+            <AdminMfe />
+          </AdminRoute>
+        ),
+      },
+      {
+        path: 'admin/audit-logs',
         element: (
           <AdminRoute>
             <AdminMfe />

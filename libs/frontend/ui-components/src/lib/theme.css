@@ -1,0 +1,69 @@
+/**
+ * Global Theme CSS Variables and Dark Mode Utilities
+ */
+
+/* Apply theme colors as CSS custom properties */
+:root {
+  /* These will be set dynamically by ThemeProvider */
+  /* Format: --category-name (e.g., --bg-primary, --text-primary) */
+  color-scheme: light;
+}
+
+/* Dark mode class for Tailwind */
+.dark {
+  color-scheme: dark;
+}
+
+.light {
+  color-scheme: light;
+}
+
+/* Smooth transitions for theme changes */
+* {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* Prevent transition on page load */
+.preload * {
+  transition: none !important;
+}
+
+/* Custom scrollbar styling for dark mode */
+.dark ::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: var(--bg-secondary, #1f2937);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: var(--bg-tertiary, #374151);
+  border-radius: 6px;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: var(--border-hover, #4b5563);
+}
+
+/* Light mode scrollbar */
+.light ::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+.light ::-webkit-scrollbar-track {
+  background: var(--bg-secondary, #f9fafb);
+}
+
+.light ::-webkit-scrollbar-thumb {
+  background: var(--border-default, #e5e7eb);
+  border-radius: 6px;
+}
+
+.light ::-webkit-scrollbar-thumb:hover {
+  background: var(--border-hover, #d1d5db);
+}

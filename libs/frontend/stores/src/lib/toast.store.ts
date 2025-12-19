@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { getEventBus, EVENT_NAMES } from '@myapp/shared/event-bus';
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
 
@@ -27,19 +28,43 @@ export const useToastStore = create<ToastState>((set) => ({
       toasts: [...state.toasts, toast],
     }));
 
+    // Emit toast show event
+    const eventBus = getEventBus();
+    eventBus.emit(EVENT_NAMES.TOAST_SHOW, {
+      id,
+      type,
+      message,
+      duration,
+      timestamp: Date.now(),
+    });
+
     if (duration > 0) {
       setTimeout(() => {
         set((state) => ({
           toasts: state.toasts.filter((t) => t.id !== id),
         }));
+
+        // Emit toast dismiss event
+        eventBus.emit(EVENT_NAMES.TOAST_DISMISS, {
+          id,
+          timestamp: Date.now(),
+        });
       }, duration);
     }
   },
 
-  removeToast: (id) =>
+  removeToast: (id) => {
     set((state) => ({
       toasts: state.toasts.filter((t) => t.id !== id),
-    })),
+    }));
+
+    // Emit toast dismiss event
+    const eventBus = getEventBus();
+    eventBus.emit(EVENT_NAMES.TOAST_DISMISS, {
+      id,
+      timestamp: Date.now(),
+    });
+  },
 
   clearToasts: () => set({ toasts: [] }),
 }));

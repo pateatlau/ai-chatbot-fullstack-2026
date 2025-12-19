@@ -18,9 +18,7 @@ import redis from '../lib/redis';
 import { EmailService } from './email.service';
 
 export class AuthService {
-  async register(
-    input: CreateUserInput
-  ): Promise<{ message: string; userId: string }> {
+  async register(input: CreateUserInput): Promise<LoginResponse> {
     // Check if user already exists
     const existingUserResult = await query(
       'SELECT id FROM users WHERE email = $1',
@@ -34,17 +32,65 @@ export class AuthService {
     // Hash password
     const hashedPassword = await bcrypt.hash(input.password, 12);
 
-    // Create user with specified role or default to USER
+    // Create user with specified role
     const userId = uuidv4();
-    const userRole = input.role || 'USER';
+    const userRole = input.role;
     await query(
       `INSERT INTO users (id, email, password, name, role, "isActive", "createdAt", "updatedAt") 
        VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())`,
       [userId, input.email, hashedPassword, input.name, userRole, true]
     );
+
+    // Auto-login user after registration
+    // Generate tokens
+    // @ts-ignore - TypeScript strict mode JWT secret type issue
+    const accessToken = jwt.sign(
+      {
+        userId: userId,
+        email: input.email,
+        role: userRole,
+        type: 'access',
+      },
+      JWT_SECRET,
+      { expiresIn: JWT_EXPIRES_IN }
+    );
+
+    const sessionId = uuidv4();
+    // @ts-ignore - TypeScript strict mode JWT secret type issue
+    const refreshToken = jwt.sign(
+      {
+        sessionId,
+        userId: userId,
+        type: 'refresh',
+      },
+      JWT_REFRESH_SECRET,
+      { expiresIn: JWT_REFRESH_EXPIRES_IN }
+    );
+
+    // Create session
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 7); // 7 days
+
+    await query(
+      `INSERT INTO sessions (id, "userId", "refreshToken", "expiresAt", "createdAt", "updatedAt") 
+       VALUES ($1, $2, $3, $4, NOW(), NOW())`,
+      [sessionId, userId, refreshToken, expiresAt]
+    );
+
+    // Return login response format
     return {
-      message: 'User registered successfully',
-      userId,
+      user: {
+        id: userId,
+        email: input.email,
+        name: input.name,
+        role: userRole,
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+      accessToken,
+      refreshToken,
+      expiresIn: 900, // 15 minutes in seconds
     };
   }
 
@@ -124,6 +170,9 @@ export class AuthService {
         email: user.email,
         name: user.name,
         role: user.role,
+        isActive: user.isActive,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
       },
     };
   }
@@ -402,5 +451,115 @@ export class AuthService {
       console.error('Redis error checking access token blacklist:', error);
       return false; // Fail open
     }
+  }
+
+  /**
+   * Update user profile
+   */
+  async updateProfile(
+    userId: string,
+    input: { name?: string; avatar?: string | null }
+  ): Promise<{ message: string; user: any }> {
+    // Build dynamic update query
+    const updates: string[] = [];
+    const values: any[] = [];
+    let paramIndex = 1;
+
+    if (input.name !== undefined) {
+      updates.push(`name = $${paramIndex}`);
+      values.push(input.name);
+      paramIndex++;
+    }
+
+    if (input.avatar !== undefined) {
+      updates.push(`avatar = $${paramIndex}`);
+      values.push(input.avatar);
+      paramIndex++;
+    }
+
+    if (updates.length === 0) {
+      throw new Error('No fields to update');
+    }
+
+    updates.push(`"updatedAt" = NOW()`);
+    values.push(userId);
+
+    const updateQuery = `
+      UPDATE users 
+      SET ${updates.join(', ')}
+      WHERE id = $${paramIndex}
+      RETURNING id, email, name, role, avatar, "isActive", "createdAt", "updatedAt"
+    `;
+
+    const result = await query(updateQuery, values);
+
+    if (result.rows.length === 0) {
+      throw new Error('User not found');
+    }
+
+    const user = result.rows[0];
+
+    return {
+      message: 'Profile updated successfully',
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        avatar: user.avatar,
+        isActive: user.isActive,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      },
+    };
+  }
+
+  /**
+   * Change user password
+   */
+  async changePassword(
+    userId: string,
+    currentPassword: string,
+    newPassword: string
+  ): Promise<{ message: string }> {
+    // Get user with password
+    const userResult = await query(
+      'SELECT id, password FROM users WHERE id = $1',
+      [userId]
+    );
+
+    if (userResult.rows.length === 0) {
+      throw new Error('User not found');
+    }
+
+    const user = userResult.rows[0];
+
+    // Verify current password
+    const isPasswordValid = await bcrypt.compare(
+      currentPassword,
+      user.password
+    );
+
+    if (!isPasswordValid) {
+      throw new Error('Current password is incorrect');
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+
+    // Update password
+    await query(
+      `UPDATE users 
+       SET password = $1, "updatedAt" = NOW()
+       WHERE id = $2`,
+      [hashedPassword, userId]
+    );
+
+    // Invalidate all existing sessions for security
+    await query('DELETE FROM sessions WHERE "userId" = $1', [userId]);
+
+    return {
+      message: 'Password changed successfully. Please login again.',
+    };
   }
 }

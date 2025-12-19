@@ -1,0 +1,50 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e6]:
+  - generic [ref=e7]:
+    - heading "Create account" [level=2] [ref=e8]
+    - paragraph [ref=e9]: Sign up to get started with your account.
+  - generic [ref=e10]:
+    - generic [ref=e11]:
+      - generic [ref=e12]: Full name*
+      - textbox "Full name*" [ref=e13]:
+        - /placeholder: John Doe
+        - text: Test User
+    - generic [ref=e14]:
+      - generic [ref=e15]: Email address*
+      - textbox "Email address*" [ref=e16]:
+        - /placeholder: you@example.com
+        - text: testuser1763483087641@example.com
+    - generic [ref=e17]:
+      - generic [ref=e18]: Password*
+      - textbox "Password*" [ref=e19]:
+        - /placeholder: ••••••••
+        - text: Test123!@#
+      - paragraph [ref=e20]: Must be at least 8 characters with uppercase, lowercase, number, and special character
+    - generic [ref=e21]:
+      - generic [ref=e22]: Confirm password*
+      - textbox "Confirm password*" [ref=e23]:
+        - /placeholder: ••••••••
+        - text: Test123!@#
+    - generic [ref=e24]:
+      - generic [ref=e25]: Role
+      - combobox "Role" [ref=e26]:
+        - option "User" [selected]
+        - option "Admin"
+      - paragraph [ref=e27]: Select ADMIN to create an admin account
+    - generic [ref=e28]:
+      - checkbox "I agree to the Terms of Service and Privacy Policy" [active] [ref=e30]
+      - generic [ref=e32]:
+        - text: I agree to the
+        - link "Terms of Service" [ref=e33] [cursor=pointer]:
+          - /url: "#"
+        - text: and
+        - link "Privacy Policy" [ref=e34] [cursor=pointer]:
+          - /url: "#"
+    - button "Create account" [ref=e35] [cursor=pointer]
+    - generic [ref=e36]:
+      - text: Already have an account?
+      - link "Sign in" [ref=e37] [cursor=pointer]:
+        - /url: /login
+```

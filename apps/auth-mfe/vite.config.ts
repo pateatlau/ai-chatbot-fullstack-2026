@@ -4,7 +4,6 @@ import react from '@vitejs/plugin-react';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import { nxCopyAssetsPlugin } from '@nx/vite/plugins/nx-copy-assets.plugin';
 import { federation } from '@module-federation/vite';
-import tailwindcss from '@tailwindcss/postcss';
 
 export default defineConfig(() => ({
   root: __dirname,
@@ -13,17 +12,18 @@ export default defineConfig(() => ({
     port: 5174,
     host: 'localhost',
     hmr: {
+      host: 'localhost',
+      port: 5174,
+      protocol: 'http',
       overlay: true,
+    },
+    headers: {
+      'Access-Control-Allow-Origin': '*',
     },
   },
   preview: {
     port: 5174,
     host: 'localhost',
-  },
-  css: {
-    postcss: {
-      plugins: [tailwindcss()],
-    },
   },
   plugins: [
     react(),

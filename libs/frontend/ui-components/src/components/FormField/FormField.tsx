@@ -1,6 +1,7 @@
 import { forwardRef, InputHTMLAttributes } from 'react';
 import { Input, InputProps } from '../Input';
-import { clsx } from 'clsx';
+import { designTokens, cn } from '../../lib/design-tokens';
+import { colorMap } from '../../lib/color-system';
 
 export interface FormFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -29,14 +30,20 @@ export const FormField = forwardRef<HTMLInputElement, FormFieldProps>(
     const inputId = id || `field-${label?.replace(/\s+/g, '-').toLowerCase()}`;
 
     return (
-      <div className={clsx('flex flex-col gap-1.5', className)}>
+      <div className={cn('flex flex-col gap-2', className)}>
         {label && (
           <label
             htmlFor={inputId}
-            className="text-sm font-medium text-gray-700"
+            className={cn(
+              designTokens.typography.label,
+              colorMap.text.secondary,
+              'mb-1'
+            )}
           >
             {label}
-            {required && <span className="text-error-500 ml-1">*</span>}
+            {required && (
+              <span className={cn(colorMap.text.danger, 'ml-1')}>*</span>
+            )}
           </label>
         )}
 
@@ -44,6 +51,7 @@ export const FormField = forwardRef<HTMLInputElement, FormFieldProps>(
           ref={ref}
           id={inputId}
           error={!!error}
+          success={!error && hint ? false : undefined}
           fullWidth={fullWidth}
           aria-invalid={!!error}
           aria-describedby={
@@ -54,7 +62,14 @@ export const FormField = forwardRef<HTMLInputElement, FormFieldProps>(
         />
 
         {hint && !error && (
-          <p id={`${inputId}-hint`} className="text-sm text-gray-500">
+          <p
+            id={`${inputId}-hint`}
+            className={cn(
+              designTokens.typography.caption,
+              colorMap.text.muted,
+              'mt-1'
+            )}
+          >
             {hint}
           </p>
         )}
@@ -62,7 +77,12 @@ export const FormField = forwardRef<HTMLInputElement, FormFieldProps>(
         {error && (
           <p
             id={`${inputId}-error`}
-            className="text-sm text-error-600 animate-slide-down"
+            className={cn(
+              designTokens.typography.caption,
+              colorMap.text.danger,
+              designTokens.transitions.normal,
+              'mt-1'
+            )}
             role="alert"
           >
             {error}

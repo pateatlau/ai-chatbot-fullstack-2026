@@ -1,0 +1,19 @@
+{
+  "name": "admin-stores",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/admin/stores/src",
+  "projectType": "library",
+  "tags": ["type:store", "scope:admin"],
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/admin/stores/jest.config.ts"
+      }
+    }
+  }
+}

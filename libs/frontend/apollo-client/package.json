@@ -1,0 +1,6 @@
+{
+  "name": "@myapp/frontend/apollo-client",
+  "version": "1.0.0",
+  "description": "Apollo Client library for GraphQL integration",
+  "type": "module"
+}

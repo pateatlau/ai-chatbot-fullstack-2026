@@ -1,0 +1,137 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+jobs:
+  test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: myapp_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium firefox webkit
+
+      - name: Create test environment files
+        run: |
+          # Auth Service
+          cat > apps/auth-service/.env << EOF
+          DATABASE_URL=postgresql://postgres:postgres@localhost:5432/myapp_test
+          JWT_SECRET=test-jwt-secret-key-for-ci-cd-testing
+          JWT_EXPIRES_IN=15m
+          PORT=3000
+          REDIS_URL=redis://localhost:6379
+          EOF
+
+          # Admin Service
+          cat > apps/admin-service/.env << EOF
+          DATABASE_URL=postgresql://postgres:postgres@localhost:5432/myapp_test
+          JWT_SECRET=test-jwt-secret-key-for-ci-cd-testing
+          PORT=3002
+          REDIS_URL=redis://localhost:6379
+          EOF
+
+          # Chatbot Service
+          cat > apps/chatbot-service/.env << EOF
+          DATABASE_URL=postgresql://postgres:postgres@localhost:5432/myapp_test
+          OPENAI_API_KEY=sk-test-key
+          USE_MOCK_AI=true
+          JWT_SECRET=test-jwt-secret-key-for-ci-cd-testing
+          PORT=3001
+          REDIS_URL=redis://localhost:6379
+          EOF
+
+      - name: Run database migrations
+        run: |
+          cd apps/auth-service
+          npx prisma migrate deploy
+          npx prisma db seed
+
+      - name: Build services
+        run: |
+          npx nx build auth-service
+          npx nx build admin-service
+          npx nx build chatbot-service
+
+      - name: Start backend services
+        run: |
+          node dist/apps/auth-service/main.js > /tmp/auth.log 2>&1 &
+          node dist/apps/admin-service/main.js > /tmp/admin.log 2>&1 &
+          node dist/apps/chatbot-service/main.js > /tmp/chatbot.log 2>&1 &
+
+          # Wait for services to be ready
+          sleep 10
+
+          # Verify services are running
+          curl -f http://localhost:3000/health || (cat /tmp/auth.log && exit 1)
+          curl -f http://localhost:3002/health || (cat /tmp/admin.log && exit 1)
+          curl -f http://localhost:3001/health || (cat /tmp/chatbot.log && exit 1)
+
+      - name: Start Shell app
+        run: |
+          npx nx serve shell > /tmp/shell.log 2>&1 &
+
+          # Wait for shell to be ready
+          sleep 20
+          curl -f http://localhost:5173 || (cat /tmp/shell.log && exit 1)
+
+      - name: Run Playwright tests
+        run: npx playwright test
+        env:
+          CI: true
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+
+      - name: Upload service logs
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: service-logs
+          path: /tmp/*.log
+          retention-days: 7

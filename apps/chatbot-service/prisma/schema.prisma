@@ -1,4 +1,4 @@
-// Chatbot Service Prisma Schema
+// Chatbot Service - Prisma Schema
 generator client {
   provider = "prisma-client-js"
   output   = "../../../node_modules/.prisma/client-chatbot"
@@ -6,13 +6,17 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
+
+// ============================================
+// CHATBOT SERVICE MODELS
+// ============================================
 
 model Conversation {
   id        String   @id @default(uuid())
   userId    String
   title     String   @default("New Conversation")
+  mongoId   String? // Reference to MongoDB _id during dual-write period
   isDeleted Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -27,11 +31,12 @@ model Conversation {
 model Message {
   id             String   @id @default(uuid())
   conversationId String
-  role           String   // 'user' or 'assistant'
+  role           String // 'user' or 'assistant'
   content        String   @db.Text
   tokenCount     Int      @default(0)
   isDeleted      Boolean  @default(false)
   createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 

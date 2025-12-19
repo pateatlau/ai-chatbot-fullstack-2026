@@ -1,0 +1,61 @@
+
+ NX   Running target serve for project admin-service and 3 tasks it depends on:
+
+
+
+> nx run types:build  [existing outputs match the cache, left as is]
+
+
+> nx run prisma-client:prisma-generate  [existing outputs match the cache, left as is]
+
+
+> nx run admin-service:build:production  [existing outputs match the cache, left as is]
+
+
+> nx run admin-service:serve:development --inspect=false
+
+[ [32mwatch[39m ] build succeeded, watching for changes...
+[dotenv@17.2.3] injecting env (0) from dist/apps/admin-service/apps/.env -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (0) from dist/apps/admin-service/apps/admin-service/.env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+[dotenv@17.2.3] injecting env (0) from dist/apps/admin-service/.env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+[dotenv@17.2.3] injecting env (0) from apps/admin-service/.env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+[dotenv] Loaded 38 variables from /Users/patea/2026/projects/ai-chatbot-fullstack-2026/.env
+Enabling inline tracing for this subgraph. To disable, use ApolloServerPluginInlineTraceDisabled.
+[1m[31mError: listen EADDRINUSE: address already in use ::1:3002[39m[22m
+[1m[31m    at Server.setupListenHandle [as _listen2] (node:net:1908:16)[39m[22m
+[1m[31m    at listenInCluster (node:net:1965:12)[39m[22m
+[1m[31m    at GetAddrInfoReqWrap.doListen (node:net:2139:7)[39m[22m
+[1m[31m    at GetAddrInfoReqWrap.onlookup [as oncomplete] (node:dns:111:8)[39m[22m
+[1m[31m[39m[22m
+[7m[1m[36m NX [39m[22m[27m [1mProcess exited with code 1, waiting for changes to restart...[22m
+
+ NX   Running target serve for project graphql-gateway and 1 task it depends on:
+
+
+
+> nx run graphql-gateway:build:production  [local cache]
+
+
+> nx run graphql-gateway:serve:development
+
+[ [32mwatch[39m ] build succeeded, watching for changes...
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+[1m[31m[Gateway] No token in context for http://localhost:3000/graphql[39m[22m
+[1m[31m[39m[22m
+[1m[31m[Gateway] No token in context for http://localhost:3001/graphql[39m[22m
+[1m[31m[Gateway] No token in context for http://localhost:3002/graphql[39m[22m
+[1m[31m[39m[22m
+[1m[31m❌ Failed to start server: Error: Couldn't load service definitions for "chatbot" at http://localhost:3001/graphql: request to http://localhost:3001/graphql failed, reason: [39m[22m
+[1m[31m    at [90m/Users/patea/2026/projects/ai-chatbot-fullstack-2026/[39m[31mnode_modules/[4m@apollo[24m/gateway/src/supergraphManagers/IntrospectAndCompose/loadServicesFromRemoteEndpoint.ts:77:15[39m[22m
+[1m[31m[90m    at processTicksAndRejections (node:internal/process/task_queues:95:5)[39m[31m[39m[22m
+[1m[31m    at async Promise.all (index 1)[39m[22m
+[1m[31m    at loadServicesFromRemoteEndpoint [90m(/Users/patea/2026/projects/ai-chatbot-fullstack-2026/[39m[31mnode_modules/[4m@apollo[24m/gateway/src/supergraphManagers/IntrospectAndCompose/loadServicesFromRemoteEndpoint.ts:81:30[90m)[39m[31m[39m[22m
+[1m[31m    at IntrospectAndCompose.updateSupergraphSdl [90m(/Users/patea/2026/projects/ai-chatbot-fullstack-2026/[39m[31mnode_modules/[4m@apollo[24m/gateway/src/supergraphManagers/IntrospectAndCompose/index.ts:92:20[90m)[39m[31m[39m[22m
+[1m[31m    at IntrospectAndCompose.initialize [90m(/Users/patea/2026/projects/ai-chatbot-fullstack-2026/[39m[31mnode_modules/[4m@apollo[24m/gateway/src/supergraphManagers/IntrospectAndCompose/index.ts:62:30[90m)[39m[31m[39m[22m
+[1m[31m    at ApolloGateway.initializeSupergraphManager [90m(/Users/patea/2026/projects/ai-chatbot-fullstack-2026/[39m[31mnode_modules/[4m@apollo[24m/gateway/src/index.ts:430:22[90m)[39m[31m[39m[22m
+[1m[31m    at ApolloGateway.load [90m(/Users/patea/2026/projects/ai-chatbot-fullstack-2026/[39m[31mnode_modules/[4m@apollo[24m/gateway/src/index.ts:340:7[90m)[39m[31m[39m[22m
+[1m[31m    at SchemaManager.start [90m(/Users/patea/2026/projects/ai-chatbot-fullstack-2026/[39m[31mnode_modules/[4m@apollo[24m/server/src/utils/schemaManager.ts:108:22[90m)[39m[31m[39m[22m
+[1m[31m    at ApolloServer._start [90m(/Users/patea/2026/projects/ai-chatbot-fullstack-2026/[39m[31mnode_modules/[4m@apollo[24m/server/src/ApolloServer.ts:410:24[90m)[39m[31m[39m[22m
+[1m[31m[39m[22m
+[7m[1m[36m NX [39m[22m[27m [1mProcess exited with code 1, waiting for changes to restart...[22m

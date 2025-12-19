@@ -1,0 +1,56 @@
+# ============================================================
+# Docker Compose - Development Configuration
+# AI Chatbot Full Stack Application
+# ============================================================
+
+version: '3.8'
+
+services:
+  # ==========================================
+  # Database - PostgreSQL
+  # ==========================================
+  postgres:
+    image: postgres:15-alpine
+    container_name: chatbot-postgres-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: myapp
+      POSTGRES_PASSWORD: myapp_dev_password
+      POSTGRES_DB: myapp_dev
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    networks:
+      - chatbot-dev-network
+
+  # ==========================================
+  # Cache - Redis
+  # ==========================================
+  redis:
+    image: redis:7-alpine
+    container_name: chatbot-redis-dev
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_dev_data:/data
+    ports:
+      - '6379:6379'
+    networks:
+      - chatbot-dev-network
+
+# ==========================================
+# Networks
+# ==========================================
+networks:
+  chatbot-dev-network:
+    driver: bridge
+
+# ==========================================
+# Volumes
+# ==========================================
+volumes:
+  postgres_dev_data:
+    driver: local
+  redis_dev_data:
+    driver: local

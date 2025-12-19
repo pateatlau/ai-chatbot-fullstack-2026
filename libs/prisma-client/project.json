@@ -1,0 +1,18 @@
+{
+  "name": "prisma-client",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "prisma",
+  "projectType": "library",
+  "tags": ["type:library", "scope:shared"],
+  "targets": {
+    "prisma-generate": {
+      "executor": "nx:run-commands",
+      "outputs": ["{workspaceRoot}/node_modules/.prisma/client"],
+      "cache": true,
+      "options": {
+        "command": "npx prisma generate --schema=prisma/schema.prisma",
+        "cwd": "{workspaceRoot}"
+      }
+    }
+  }
+}

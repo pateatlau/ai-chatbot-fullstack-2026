@@ -4,6 +4,8 @@ import {
   LoginSchema,
   CreateUserSchema,
   RefreshTokenSchema,
+  UpdateUserSchema,
+  ChangePasswordSchema,
 } from '@myapp/shared/types';
 
 const authService = new AuthService();
@@ -11,19 +13,40 @@ const authService = new AuthService();
 export class AuthController {
   async register(req: Request, res: Response) {
     try {
-      // Validate input
+      // Validate input (role is included in schema with transform to default 'USER' if empty)
       const validatedData = CreateUserSchema.parse(req.body);
 
-      // WORKAROUND: Manually add role from request body since Zod is stripping it
-      const finalData = {
-        ...validatedData,
-        role: req.body.role || 'USER',
-      };
+      // Register user (now returns login response with tokens)
+      const result = await authService.register(validatedData);
 
-      // Register user
-      const result = await authService.register(finalData);
+      // Set HttpOnly cookies for tokens (same as login)
+      res.cookie('accessToken', result.accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax', // Changed from 'strict' to allow cross-port requests in dev
+        domain: 'localhost', // Allow cookie to be used across different ports on localhost
+        maxAge: 15 * 60 * 1000, // 15 minutes
+        path: '/',
+      });
 
-      res.status(201).json(result);
+      res.cookie('refreshToken', result.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax', // Changed from 'strict' to allow cross-port requests in dev
+        domain: 'localhost', // Allow cookie to be used across different ports on localhost
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        path: '/',
+      });
+
+      // Return user data and token
+      // Token is also in HttpOnly cookie for production use
+      // Returning it here allows frontend to send it via Authorization header for dev/cross-service calls
+      res.status(201).json({
+        user: result.user,
+        accessToken: result.accessToken,
+        expiresIn: result.expiresIn,
+        message: 'Registration successful',
+      });
     } catch (error) {
       if (error instanceof Error) {
         if (error.message === 'User with this email already exists') {
@@ -44,7 +67,34 @@ export class AuthController {
       // Login user
       const result = await authService.login(validatedData);
 
-      res.status(200).json(result);
+      // Set HttpOnly cookies for tokens (secure authentication)
+      res.cookie('accessToken', result.accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax', // Changed from 'strict' to allow cross-port requests in dev
+        domain: 'localhost', // Allow cookie to be used across different ports on localhost
+        maxAge: 15 * 60 * 1000, // 15 minutes
+        path: '/',
+      });
+
+      res.cookie('refreshToken', result.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax', // Changed from 'strict' to allow cross-port requests in dev
+        domain: 'localhost', // Allow cookie to be used across different ports on localhost
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        path: '/',
+      });
+
+      // Return user data and token
+      // Token is also in HttpOnly cookie for production use
+      // Returning it here allows frontend to send it via Authorization header for dev/cross-service calls
+      res.status(200).json({
+        user: result.user,
+        accessToken: result.accessToken,
+        expiresIn: result.expiresIn,
+        message: 'Login successful',
+      });
     } catch (error) {
       if (error instanceof Error) {
         if (
@@ -62,18 +112,25 @@ export class AuthController {
 
   async logout(req: Request, res: Response) {
     try {
-      // Get refresh token from body
-      const validatedData = RefreshTokenSchema.parse(req.body);
+      // Get refresh token from cookie
+      const refreshToken = req.cookies.refreshToken;
 
-      // Get access token from header if available
-      const authHeader = req.headers.authorization;
-      if (authHeader && authHeader.startsWith('Bearer ')) {
-        const accessToken = authHeader.substring(7);
+      if (!refreshToken) {
+        return res.status(400).json({ error: 'Refresh token is required' });
+      }
+
+      // Get access token from cookie if available
+      const accessToken = req.cookies.accessToken;
+      if (accessToken) {
         await authService.blacklistAccessToken(accessToken);
       }
 
       // Logout user
-      const result = await authService.logout(validatedData.refreshToken);
+      const result = await authService.logout(refreshToken);
+
+      // Clear cookies
+      res.clearCookie('accessToken', { path: '/', domain: 'localhost' });
+      res.clearCookie('refreshToken', { path: '/', domain: 'localhost' });
 
       res.status(200).json(result);
     } catch (error) {
@@ -86,13 +143,40 @@ export class AuthController {
 
   async refreshToken(req: Request, res: Response) {
     try {
-      // Validate input
-      const validatedData = RefreshTokenSchema.parse(req.body);
+      // Get refresh token from cookie
+      const refreshToken = req.cookies.refreshToken;
+
+      if (!refreshToken) {
+        return res.status(400).json({ error: 'Refresh token is required' });
+      }
 
       // Refresh token
-      const result = await authService.refreshToken(validatedData.refreshToken);
+      const result = await authService.refreshToken(refreshToken);
 
-      res.status(200).json(result);
+      // Set new HttpOnly cookies
+      res.cookie('accessToken', result.accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax', // Changed: 'strict' → 'lax' to allow cross-port requests in dev
+        domain: 'localhost', // Added: enables cookie to be sent to different ports on localhost
+        maxAge: 15 * 60 * 1000, // 15 minutes
+        path: '/',
+      });
+
+      res.cookie('refreshToken', result.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax', // Changed: 'strict' → 'lax' to allow cross-port requests in dev
+        domain: 'localhost', // Added: enables cookie to be sent to different ports on localhost
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        path: '/',
+      });
+
+      // Return only expiration info
+      res.status(200).json({
+        expiresIn: result.expiresIn,
+        message: 'Token refreshed successfully',
+      });
     } catch (error) {
       if (error instanceof Error) {
         if (
@@ -205,6 +289,72 @@ export class AuthController {
         if (error.message === 'Invalid or expired reset token') {
           return res.status(400).json({ error: error.message });
         }
+        return res.status(400).json({ error: error.message });
+      }
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+
+  async updateProfile(req: Request, res: Response) {
+    try {
+      // Get user ID from auth middleware
+      const userId = (req as any).user?.userId;
+
+      if (!userId) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
+      // Validate input
+      const validatedData = UpdateUserSchema.parse(req.body);
+
+      // Update profile
+      const result = await authService.updateProfile(userId, validatedData);
+
+      res.status(200).json(result);
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.message === 'User not found') {
+          return res.status(404).json({ error: error.message });
+        }
+        if (error.message === 'No fields to update') {
+          return res.status(400).json({ error: error.message });
+        }
+        // Zod validation error
+        return res.status(400).json({ error: error.message });
+      }
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+
+  async changePassword(req: Request, res: Response) {
+    try {
+      // Get user ID from auth middleware
+      const userId = (req as any).user?.userId;
+
+      if (!userId) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
+      // Validate input
+      const validatedData = ChangePasswordSchema.parse(req.body);
+
+      // Change password
+      const result = await authService.changePassword(
+        userId,
+        validatedData.currentPassword,
+        validatedData.newPassword
+      );
+
+      res.status(200).json(result);
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.message === 'Current password is incorrect') {
+          return res.status(400).json({ error: error.message });
+        }
+        if (error.message === 'User not found') {
+          return res.status(404).json({ error: error.message });
+        }
+        // Zod validation error
         return res.status(400).json({ error: error.message });
       }
       res.status(500).json({ error: 'Internal server error' });

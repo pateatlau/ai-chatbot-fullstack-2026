@@ -1,0 +1,184 @@
+# Prometheus Alert Rules for AI Chatbot
+# These alerts monitor database health, service availability, and migration progress
+
+groups:
+  - name: database_alerts
+    interval: 30s
+    rules:
+      # MongoDB Alerts
+      - alert: MongoDBDown
+        expr: chatbot_mongodb_healthy == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: database
+        annotations:
+          summary: 'MongoDB is down'
+          description: 'MongoDB connection is unavailable for more than 1 minute'
+
+      - alert: MongoDBHighLatency
+        expr: mongodb_op_latencies_latency{type="command"} > 500
+        for: 5m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: 'MongoDB high latency detected'
+          description: 'MongoDB command latency is {{ $value }}ms (threshold: 500ms)'
+
+      - alert: MongoDBConnectionPoolExhausted
+        expr: mongodb_connections_current / mongodb_connections_available > 0.9
+        for: 2m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: 'MongoDB connection pool nearly exhausted'
+          description: 'MongoDB connection pool is {{ $value | humanizePercentage }} full'
+
+      # PostgreSQL Alerts
+      - alert: PostgreSQLDown
+        expr: chatbot_postgresql_healthy == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: database
+        annotations:
+          summary: 'PostgreSQL is down'
+          description: 'PostgreSQL connection is unavailable for more than 1 minute'
+
+      - alert: PostgreSQLHighLatency
+        expr: pg_stat_database_blk_read_time / pg_stat_database_blks_read > 100
+        for: 5m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: 'PostgreSQL high I/O latency'
+          description: 'PostgreSQL block read time is {{ $value }}ms per block'
+
+      - alert: PostgreSQLTooManyConnections
+        expr: sum(pg_stat_database_numbackends) / pg_settings_max_connections > 0.8
+        for: 2m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: 'PostgreSQL connection limit approaching'
+          description: 'PostgreSQL is using {{ $value | humanizePercentage }} of max connections'
+
+  - name: service_alerts
+    interval: 30s
+    rules:
+      # Service Health
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: service
+        annotations:
+          summary: 'Service {{ $labels.job }} is down'
+          description: 'Service {{ $labels.job }} has been down for more than 1 minute'
+
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+          component: service
+        annotations:
+          summary: 'High error rate detected'
+          description: 'Error rate is {{ $value | humanizePercentage }} (threshold: 5%)'
+
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+          component: service
+        annotations:
+          summary: 'High latency detected'
+          description: 'P95 latency is {{ $value }}s (threshold: 2s)'
+
+  - name: migration_alerts
+    interval: 30s
+    rules:
+      # Migration Progress
+      - alert: DualReadMismatch
+        expr: rate(dual_read_mismatch_total[5m]) > 0.01
+        for: 2m
+        labels:
+          severity: critical
+          component: migration
+        annotations:
+          summary: 'Data inconsistency detected'
+          description: 'Dual-read mismatch rate is {{ $value | humanizePercentage }} (threshold: 1%)'
+
+      - alert: MongoDBReadPercentageStuck
+        expr: changes(chatbot_mongodb_read_percentage[30m]) == 0 and chatbot_mongodb_read_percentage > 0 and chatbot_mongodb_read_percentage < 100
+        for: 30m
+        labels:
+          severity: warning
+          component: migration
+        annotations:
+          summary: 'MongoDB read percentage unchanged'
+          description: 'MongoDB read percentage has been stuck at {{ $value }}% for 30 minutes'
+
+  - name: system_alerts
+    interval: 30s
+    rules:
+      # System Resources
+      - alert: HighMemoryUsage
+        expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: 'High memory usage'
+          description: 'Memory usage is {{ $value | humanizePercentage }} (threshold: 90%)'
+
+      - alert: HighCPUUsage
+        expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: 'High CPU usage'
+          description: 'CPU usage is {{ $value }}% (threshold: 80%)'
+
+      - alert: DiskSpaceLow
+        expr: (node_filesystem_avail_bytes / node_filesystem_size_bytes) < 0.1
+        for: 5m
+        labels:
+          severity: critical
+          component: system
+        annotations:
+          summary: 'Disk space low'
+          description: 'Available disk space is {{ $value | humanizePercentage }} (threshold: 10%)'
+
+  - name: data_consistency_alerts
+    interval: 30s
+    rules:
+      # Data Consistency
+      - alert: ConversationCountMismatch
+        expr: abs(mongodb_conversations_count - postgresql_conversations_count) > 5
+        for: 5m
+        labels:
+          severity: critical
+          component: data-integrity
+        annotations:
+          summary: 'Conversation count mismatch'
+          description: 'MongoDB has {{ $labels.mongodb }} conversations, PostgreSQL has {{ $labels.postgresql }}'
+
+      - alert: MessageCountMismatch
+        expr: abs(mongodb_messages_count - postgresql_messages_count) > 10
+        for: 5m
+        labels:
+          severity: critical
+          component: data-integrity
+        annotations:
+          summary: 'Message count mismatch'
+          description: 'MongoDB has {{ $labels.mongodb }} messages, PostgreSQL has {{ $labels.postgresql }}'

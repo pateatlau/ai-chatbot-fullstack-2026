@@ -12,6 +12,9 @@ export default defineConfig(() => ({
     port: 5173,
     host: 'localhost',
     hmr: {
+      host: 'localhost',
+      port: 5173,
+      protocol: 'http',
       overlay: true,
     },
   },
@@ -54,6 +57,9 @@ export default defineConfig(() => ({
           entryGlobalName: 'profileMfe',
           shareScope: 'default',
         },
+      },
+      dev: {
+        enableDynamicRemoteImport: true,
       },
       shared: {
         react: { singleton: true, requiredVersion: '^19.0.0' },

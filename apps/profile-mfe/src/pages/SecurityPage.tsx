@@ -1,21 +1,136 @@
 import { useState } from 'react';
-import { Card, FormField } from '@myapp/frontend/ui-components';
+import { useNavigate } from 'react-router-dom';
+import { useToast } from '@myapp/frontend/hooks';
+import {
+  Card,
+  FormField,
+  Button,
+  ErrorBoundary,
+  cn,
+} from '@myapp/frontend/ui-components';
+import { useChangePassword } from '@myapp/frontend/apollo-client';
+import { useProfileStoreInitialization } from '../store/profile.store';
 
-export function SecurityPage() {
+function SecurityPageContent() {
+  // Initialize profile store with event bus subscriptions
+  useProfileStoreInitialization();
+
+  const navigate = useNavigate();
+  const toast = useToast();
+
+  // GraphQL mutation for changing password
+  const changePasswordMutation = useChangePassword();
+
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const handlePasswordChange = (e: React.FormEvent) => {
+  const validatePassword = (password: string): string | null => {
+    if (password.length < 8) {
+      return 'Password must be at least 8 characters';
+    }
+    if (!/[A-Z]/.test(password)) {
+      return 'Must contain uppercase letter';
+    }
+    if (!/[a-z]/.test(password)) {
+      return 'Must contain lowercase letter';
+    }
+    if (!/[0-9]/.test(password)) {
+      return 'Must contain number';
+    }
+    if (!/[^A-Za-z0-9]/.test(password)) {
+      return 'Must contain special character';
+    }
+    return null;
+  };
+
+  const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement password change
+
+    // Reset errors
+    setErrors({});
+
+    // Validate inputs
+    const newErrors: Record<string, string> = {};
+
+    if (!currentPassword) {
+      newErrors.currentPassword = 'Current password is required';
+    }
+
+    if (!newPassword) {
+      newErrors.newPassword = 'New password is required';
+    } else {
+      const passwordError = validatePassword(newPassword);
+      if (passwordError) {
+        newErrors.newPassword = passwordError;
+      }
+    }
+
+    if (!confirmPassword) {
+      newErrors.confirmPassword = 'Please confirm your password';
+    } else if (newPassword !== confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+    }
+
+    if (currentPassword === newPassword) {
+      newErrors.newPassword =
+        'New password must be different from current password';
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+
+      // Use GraphQL mutation instead of REST API
+      const result = await changePasswordMutation(currentPassword, newPassword);
+
+      if (result.data?.changePassword?.success) {
+        toast.success('Password changed successfully. Please login again.');
+
+        // Clear form
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+
+        // Redirect to login after 2 seconds
+        setTimeout(() => {
+          navigate('/login');
+        }, 2000);
+      }
+    } catch (error: any) {
+      console.error('Password change error:', error);
+      const errorMessage =
+        error.graphQLErrors?.[0]?.message ||
+        error.message ||
+        'Failed to change password';
+
+      // Check if it's a current password error
+      if (
+        errorMessage.includes('Current password') ||
+        errorMessage.includes('current')
+      ) {
+        setErrors({ currentPassword: errorMessage });
+      } else {
+        toast.error(errorMessage);
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-6">
+    <div className={cn('max-w-3xl mx-auto', 'px-4 py-6 sm:px-6 lg:px-8')}>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Security</h1>
-        <p className="mt-2 text-gray-600">
+        <h1 className={cn('text-3xl font-bold', 'text-text-primary')}>
+          Security
+        </h1>
+        <p className={cn('mt-2', 'text-text-secondary')}>
           Manage your password and security settings
         </p>
       </div>
@@ -23,7 +138,7 @@ export function SecurityPage() {
       <div className="space-y-6">
         {/* Change Password */}
         <Card>
-          <h3 className="text-lg font-medium text-gray-900 mb-4">
+          <h3 className={cn('text-lg font-medium mb-4', 'text-text-primary')}>
             Change Password
           </h3>
           <form onSubmit={handlePasswordChange} className="space-y-4">
@@ -32,6 +147,7 @@ export function SecurityPage() {
               type="password"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
+              error={errors.currentPassword}
               required
             />
 
@@ -40,6 +156,7 @@ export function SecurityPage() {
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
+              error={errors.newPassword}
               required
               hint="Must be at least 8 characters with uppercase, lowercase, number, and special character"
             />
@@ -49,53 +166,67 @@ export function SecurityPage() {
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
+              error={errors.confirmPassword}
               required
             />
 
             <div className="flex justify-end">
-              <button
-                type="submit"
-                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-              >
+              <Button type="submit" disabled={isLoading} loading={isLoading}>
                 Update Password
-              </button>
+              </Button>
             </div>
           </form>
         </Card>
 
         {/* Two-Factor Authentication */}
         <Card>
-          <h3 className="text-lg font-medium text-gray-900 mb-4">
+          <h3 className={cn('text-lg font-medium mb-4', 'text-text-primary')}>
             Two-Factor Authentication
           </h3>
-          <p className="text-sm text-gray-600 mb-4">
+          <p className={cn('text-sm mb-4', 'text-text-secondary')}>
             Add an extra layer of security to your account by enabling
             two-factor authentication.
           </p>
-          <button
-            type="button"
-            className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-          >
-            Enable Two-Factor Authentication
-          </button>
+          <Button type="button" variant="outline" disabled>
+            Enable Two-Factor Authentication (Coming Soon)
+          </Button>
         </Card>
 
         {/* Active Sessions */}
         <Card>
-          <h3 className="text-lg font-medium text-gray-900 mb-4">
+          <h3
+            className={cn(
+              'text-lg font-medium mb-4',
+              'text-[var(--text-primary)]'
+            )}
+          >
             Active Sessions
           </h3>
+          <p className={cn('text-sm mb-4', 'text-text-secondary')}>
+            View and manage your active sessions across different devices.
+          </p>
           <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+            <div
+              className={cn(
+                'flex items-center justify-between p-3 rounded-lg',
+                'border border-border-default'
+              )}
+            >
               <div>
-                <p className="text-sm font-medium text-gray-900">
+                <p className={cn('text-sm font-medium', 'text-text-primary')}>
                   Current Session
                 </p>
-                <p className="text-xs text-gray-500">
-                  MacOS • Chrome • San Francisco, CA
+                <p className={cn('text-xs', 'text-text-tertiary')}>
+                  Active now
                 </p>
               </div>
-              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+              <span
+                className={cn(
+                  'inline-flex items-center px-2 py-0.5 rounded',
+                  'text-xs font-medium',
+                  'bg-feedback-successBg text-feedback-success'
+                )}
+              >
                 Active
               </span>
             </div>
@@ -103,5 +234,13 @@ export function SecurityPage() {
         </Card>
       </div>
     </div>
+  );
+}
+
+export function SecurityPage() {
+  return (
+    <ErrorBoundary variant="full" context="page-security">
+      <SecurityPageContent />
+    </ErrorBoundary>
   );
 }

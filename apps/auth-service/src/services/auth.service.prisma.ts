@@ -1,4 +1,4 @@
-import { PrismaClient } from '.prisma/client-auth';
+import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import type {
@@ -35,9 +35,7 @@ function getPrismaClient() {
 }
 
 export class AuthService {
-  async register(
-    input: CreateUserInput
-  ): Promise<{ message: string; userId: string }> {
+  async register(input: CreateUserInput): Promise<LoginResponse> {
     const prisma = getPrismaClient();
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
@@ -61,9 +59,39 @@ export class AuthService {
       },
     });
 
+    // Generate tokens for auto-login
+    const accessToken = this.generateAccessToken(
+      user.id,
+      user.email,
+      user.role
+    );
+    const refreshToken = this.generateRefreshToken(user.id);
+
+    // Create session
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 7);
+
+    await prisma.session.create({
+      data: {
+        userId: user.id,
+        refreshToken,
+        expiresAt,
+      },
+    });
+
     return {
-      message: 'User registered successfully',
-      userId: user.id,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role as 'USER' | 'ADMIN' | 'MODERATOR',
+        isActive: user.isActive,
+        createdAt: user.createdAt.toISOString(),
+        updatedAt: user.updatedAt.toISOString(),
+      },
+      accessToken,
+      refreshToken,
+      expiresIn: 900,
     };
   }
 
@@ -124,6 +152,9 @@ export class AuthService {
         email: user.email,
         name: user.name,
         role: user.role as 'USER' | 'ADMIN' | 'MODERATOR',
+        isActive: user.isActive,
+        createdAt: user.createdAt.toISOString(),
+        updatedAt: user.updatedAt.toISOString(),
       },
     };
   }

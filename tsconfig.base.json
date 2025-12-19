@@ -1,6 +1,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "ignoreDeprecations": "5.0",
     "rootDir": ".",
     "sourceMap": true,
     "declaration": false,
@@ -23,6 +24,7 @@
     "paths": {
       "@myapp/shared/types": ["libs/shared/types/src/index.ts"],
       "@myapp/shared/utils": ["libs/shared/utils/src/index.ts"],
+      "@myapp/shared/event-bus": ["libs/shared/event-bus/src/index.ts"],
       "@myapp/backend/logger": ["libs/backend/logger/src/index.ts"],
       "@myapp/backend/metrics": ["libs/backend/metrics/src/index.ts"],
       "@myapp/backend/security": ["libs/backend/security/src/index.ts"],
@@ -34,7 +36,14 @@
       "@myapp/frontend/stores": ["libs/frontend/stores/src/index.ts"],
       "@myapp/frontend/utils": ["libs/frontend/utils/src/index.ts"],
       "@myapp/frontend/mocks": ["libs/frontend/mocks/src/index.ts"],
-      "@ai-chatbot/hooks": ["libs/frontend/hooks/src/index.ts"]
+      "@myapp/frontend/hooks": ["libs/frontend/hooks/src/index.ts"],
+      "@myapp/frontend/apollo-client": [
+        "libs/frontend/apollo-client/src/index.ts"
+      ],
+      "@ai-chatbot/hooks": ["libs/frontend/hooks/src/index.ts"],
+      "@ai-chatbot/chatbot-stores": ["libs/chatbot/stores/src/index.ts"],
+      "@ai-chatbot/admin-stores": ["libs/admin/stores/src/index.ts"],
+      "@ai-chatbot/profile-stores": ["libs/profile/stores/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

@@ -1,34 +1,73 @@
 import { useLocation } from 'react-router-dom';
-import { AdminDashboardPage } from '../pages/AdminDashboardPage';
+import { ErrorBoundary, ThemeProvider } from '@myapp/frontend/ui-components';
+import { RecoveryAction, useRequireRole } from '@myapp/frontend/hooks';
+import {
+  AdminDashboardPage,
+  UserManagementPage,
+  UserDetailPage,
+  AuditLogsPage,
+} from '../pages';
 
-export function App() {
+function AppContent() {
+  // Ensure admin role at MFE root level for defense-in-depth
+  useRequireRole('ADMIN');
+
   const location = useLocation();
 
   // Router path-based rendering - shell controls routing
   // /admin -> Dashboard
-  // /admin/users -> User List (placeholder for now)
-  // /admin/users/:id -> User Detail (placeholder for now)
+  // /admin/users -> User List
+  // /admin/users/:id -> User Detail
+  // /admin/audit-logs -> Audit Logs
 
   if (location.pathname.startsWith('/admin/users/')) {
-    return (
-      <div className="p-6">
-        <h1 className="text-2xl font-bold">User Detail</h1>
-        <p className="text-gray-600 mt-2">User detail page coming soon...</p>
-      </div>
-    );
+    return <UserDetailPage />;
   }
 
   if (location.pathname === '/admin/users') {
-    return (
-      <div className="p-6">
-        <h1 className="text-2xl font-bold">User Management</h1>
-        <p className="text-gray-600 mt-2">User list page coming soon...</p>
-      </div>
-    );
+    return <UserManagementPage />;
+  }
+
+  if (location.pathname === '/admin/audit-logs') {
+    return <AuditLogsPage />;
   }
 
   // Default to admin dashboard
   return <AdminDashboardPage />;
+}
+
+export function App() {
+  const isInShell =
+    typeof window !== 'undefined' && window.location.port === '5173';
+
+  const handleRecovery = (action: RecoveryAction) => {
+    console.log('[Admin MFE] Recovery action triggered:', action);
+    // Execute recovery action
+    void action.action();
+  };
+
+  const handleError = (error: Error, errorInfo: React.ErrorInfo) => {
+    console.error('[Admin MFE] Error caught:', { error, errorInfo });
+  };
+
+  return (
+    <ThemeProvider
+      defaultTheme="light"
+      storageKey="app-theme"
+      passive={isInShell}
+    >
+      <ErrorBoundary
+        variant="full"
+        context="admin-mfe-root"
+        enableRecovery={true}
+        onRecovery={handleRecovery}
+        onError={handleError}
+        showDetails={process.env.NODE_ENV === 'development'}
+      >
+        <AppContent />
+      </ErrorBoundary>
+    </ThemeProvider>
+  );
 }
 
 export default App;

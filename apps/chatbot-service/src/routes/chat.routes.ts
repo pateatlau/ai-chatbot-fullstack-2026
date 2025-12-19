@@ -3,6 +3,18 @@ import prisma from '../lib/prisma';
 import { authenticateToken, AuthenticatedRequest } from '../middleware/auth';
 import { rateLimitMiddleware } from '../middleware/rateLimit';
 import { OpenAIService } from '../services/openai.service';
+import {
+  validateBody,
+  validateQuery,
+  validateParams,
+} from '../middleware/validate';
+import {
+  createConversationSchema,
+  updateConversationSchema,
+  createMessageSchema,
+  paginationSchema,
+  uuidParamSchema,
+} from '../schemas/chat.schemas';
 
 const router = Router();
 
@@ -10,11 +22,43 @@ const router = Router();
 router.use(authenticateToken);
 
 /**
- * POST /api/chat/conversations
- * Create a new conversation
+ * @swagger
+ * /api/chat/conversations:
+ *   post:
+ *     summary: Create a new conversation
+ *     description: Start a new chat conversation
+ *     tags: [Conversations]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/CreateConversationRequest'
+ *     responses:
+ *       201:
+ *         description: Conversation created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Conversation'
+ *       400:
+ *         description: Invalid input
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  */
 router.post(
   '/conversations',
+  validateBody(createConversationSchema),
   async (req: AuthenticatedRequest, res: Response) => {
     try {
       const userId = req.user!.userId;
@@ -36,11 +80,60 @@ router.post(
 );
 
 /**
- * GET /api/chat/conversations
- * List user's conversations (paginated)
+ * @swagger
+ * /api/chat/conversations:
+ *   get:
+ *     summary: List conversations
+ *     description: Get all conversations for the authenticated user with pagination
+ *     tags: [Conversations]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 20
+ *         description: Items per page
+ *     responses:
+ *       200:
+ *         description: List of conversations
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 conversations:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Conversation'
+ *                 pagination:
+ *                   type: object
+ *                   properties:
+ *                     page:
+ *                       type: integer
+ *                     limit:
+ *                       type: integer
+ *                     total:
+ *                       type: integer
+ *                     totalPages:
+ *                       type: integer
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  */
 router.get(
   '/conversations',
+  validateQuery(paginationSchema),
   async (req: AuthenticatedRequest, res: Response) => {
     try {
       const userId = req.user!.userId;
@@ -93,6 +186,7 @@ router.get(
  */
 router.get(
   '/conversations/:id',
+  validateParams(uuidParamSchema),
   async (req: AuthenticatedRequest, res: Response) => {
     try {
       const userId = req.user!.userId;
@@ -130,15 +224,13 @@ router.get(
  */
 router.patch(
   '/conversations/:id',
+  validateParams(uuidParamSchema),
+  validateBody(updateConversationSchema),
   async (req: AuthenticatedRequest, res: Response) => {
     try {
       const userId = req.user!.userId;
       const { id } = req.params;
       const { title } = req.body;
-
-      if (!title || title.trim().length === 0) {
-        return res.status(400).json({ error: 'Title is required' });
-      }
 
       const conversation = await prisma.conversation.findFirst({
         where: { id, userId, isDeleted: false },
@@ -167,6 +259,7 @@ router.patch(
  */
 router.delete(
   '/conversations/:id',
+  validateParams(uuidParamSchema),
   async (req: AuthenticatedRequest, res: Response) => {
     try {
       const userId = req.user!.userId;
@@ -194,27 +287,58 @@ router.delete(
 );
 
 /**
- * POST /api/chat/conversations/:id/messages
- * Send a message (with streaming AI response)
+ * @swagger
+ * /api/chat/conversations/{id}/messages:
+ *   post:
+ *     summary: Send a message
+ *     description: Send a message to a conversation and receive streaming AI response via Server-Sent Events
+ *     tags: [Chat]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: Conversation ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/SendMessageRequest'
+ *     responses:
+ *       200:
+ *         description: Streaming response (Server-Sent Events)
+ *         content:
+ *           text/event-stream:
+ *             schema:
+ *               $ref: '#/components/schemas/StreamResponse'
+ *       404:
+ *         description: Conversation not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       429:
+ *         description: Rate limit exceeded (10 messages per minute)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  */
 router.post(
   '/conversations/:id/messages',
+  validateParams(uuidParamSchema),
+  validateBody(createMessageSchema),
   rateLimitMiddleware(),
   async (req: AuthenticatedRequest, res: Response) => {
     try {
       const userId = req.user!.userId;
       const conversationId = req.params.id as string;
       const { content } = req.body;
-
-      if (!content || content.trim().length === 0) {
-        return res.status(400).json({ error: 'Message content is required' });
-      }
-
-      if (content.length > 10000) {
-        return res
-          .status(400)
-          .json({ error: 'Message too long (max 10,000 characters)' });
-      }
 
       // Verify conversation exists and belongs to user
       const conversation = await prisma.conversation.findFirst({
@@ -320,6 +444,8 @@ router.post(
  */
 router.get(
   '/conversations/:id/messages',
+  validateParams(uuidParamSchema),
+  validateQuery(paginationSchema),
   async (req: AuthenticatedRequest, res: Response) => {
     try {
       const userId = req.user!.userId;
@@ -377,6 +503,7 @@ router.get(
  */
 router.delete(
   '/messages/:id',
+  validateParams(uuidParamSchema),
   async (req: AuthenticatedRequest, res: Response) => {
     try {
       const userId = req.user!.userId;

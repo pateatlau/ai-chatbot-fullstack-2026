@@ -1,0 +1,34 @@
+
+> ai-chatbot-fullstack-2026@1.0.0 test:graphql:integration
+> bash scripts/test-graphql-integration.sh
+
+🧪 GraphQL Integration Test Suite
+==================================
+
+[1;33m1. Gateway Health[0m
+  [0;32m✓[0m Gateway responding on port 4000
+
+[1;33m2. Auth Service Health[0m
+  [0;32m✓[0m Auth service responding on port 3000
+
+[1;33m3. GraphQL Schema Composition[0m
+  [0;32m✓[0m User type in composed schema
+  [0;32m✓[0m Query type in composed schema
+  [0;32m✓[0m Mutation type in composed schema
+
+[1;33m4. GraphQL Auth Queries[0m
+  [0;32m✓[0m me query properly rejects unauthenticated requests
+
+[1;33m5. GraphQL Auth Mutations[0m
+  [0;32m✓[0m register mutation query accepted
+  [1;33m⚠[0m register mutation may have schema issues
+
+[1;33m6. Federation Support[0m
+  [0;32m✓[0m User type available for federation
+
+🎯 Test Results
+===============
+[0;32mPassed: 8[0m
+[0;31mFailed: 0[0m
+
+[0;32m✅ All tests passed! Week 3 integration verified.[0m
